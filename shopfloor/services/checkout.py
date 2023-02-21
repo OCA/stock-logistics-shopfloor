@@ -41,7 +41,7 @@ class Checkout(Component):
     _description = __doc__
 
     def _response_for_select_line(
-        self, picking, message=None, need_confirm_pack_all="", need_confirm_lot=False
+        self, picking, message=None, need_confirm_pack_all="", need_confirm_lot=None
     ):
         if all(line.shopfloor_checkout_done for line in picking.move_line_ids):
             return self._response_for_summary(picking, message=message)
@@ -56,7 +56,7 @@ class Checkout(Component):
         )
 
     def _data_for_select_line(
-        self, picking, need_confirm_pack_all="", need_confirm_lot=False
+        self, picking, need_confirm_pack_all="", need_confirm_lot=None
     ):
         return {
             "picking": self._data_for_stock_picking(picking),
@@ -430,7 +430,7 @@ class Checkout(Component):
             {"qty_done": 0, "shopfloor_user_id": False}
         )
 
-    def scan_line(self, picking_id, barcode, confirm_pack_all=False, confirm_lot=False):
+    def scan_line(self, picking_id, barcode, confirm_pack_all=False, confirm_lot=None):
         """Scan move lines of the stock picking
 
         It allows to select move lines of the stock picking for the next
@@ -1583,7 +1583,7 @@ class ShopfloorCheckoutValidator(Component):
                 "required": False,
             },
             "confirm_lot": {
-                "type": "boolean",
+                "type": "integer",
                 "nullable": True,
                 "required": False,
             },
@@ -1822,7 +1822,7 @@ class ShopfloorCheckoutValidatorResponse(Component):
             group_lines_by_location={"type": "boolean"},
             show_oneline_package_content={"type": "boolean"},
             need_confirm_pack_all={"type": "string"},
-            need_confirm_lot={"type": "boolean"},
+            need_confirm_lot={"type": "integer", "nullable": True},
         )
 
     @property
