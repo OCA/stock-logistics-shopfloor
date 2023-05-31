@@ -290,3 +290,7 @@ class StockAction(Component):
         if lock_lines:
             self._lock_lines(lines)
         self._set_destination_on_lines(lines, location_dest)
+
+    def set_package_on_lines(self, lines, package):
+        self._lock_lines(lines)
+        lines.result_package_id = package
