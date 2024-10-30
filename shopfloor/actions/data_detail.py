@@ -65,8 +65,6 @@ class DataDetailAction(Component):
     def _location_lot_detail_parser(self):
         return self._lot_parser + [
             "removal_date",
-            "expiration_date:expire_date",
-            ("product_id:product_name", lambda rec, fname: rec.product_id.display_name),
         ]
 
     @ensure_model("stock.picking")
@@ -131,7 +129,6 @@ class DataDetailAction(Component):
     def _lot_detail_parser(self):
         return self._lot_parser + [
             "removal_date",
-            "expiration_date:expire_date",
             (
                 "product_id:product",
                 lambda record, fname: self.product_detail(record[fname]),
@@ -194,7 +191,21 @@ class DataDetailAction(Component):
     def _locations_for_product(self, record):
         res = []
         for location in self._get_product_locations(record):
-            loc = self.location_detail(location)
+            quants = location.quant_ids.filtered(lambda q: q.product_id == record)
+            loc = self.location(location)
+            loc["complete_name"] = location.complete_name
+            loc["quantity"] = sum(quants.mapped("quantity"))
+            lots = []
+            quants_lot_qty = defaultdict(lambda: 0)
+            for quant in quants:
+                quants_lot_qty[quant.lot_id] += quant.quantity
+            for lot, qty in quants_lot_qty.items():
+                if not lot:
+                    continue
+                lot_val = self._location_lot(lot)
+                lot_val["quantity"] = qty
+                lots.append(lot_val)
+            loc["lots"] = lots
             res.append(loc)
         return res
 

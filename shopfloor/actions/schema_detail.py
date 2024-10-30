@@ -36,9 +36,7 @@ class ShopfloorSchemaDetailAction(Component):
         schema.update(
             {
                 "removal_date": {"type": "string", "nullable": True, "required": False},
-                "expire_date": {"type": "string", "nullable": True, "required": False},
                 "quantity": {"type": "float", "required": True},
-                "product_name": {"type": "string", "required": True},
             }
         )
         return schema
@@ -99,7 +97,22 @@ class ShopfloorSchemaDetailAction(Component):
                 "image": {"type": "string", "nullable": True, "required": False},
                 "manufacturer": self._schema_dict_of(self._simple_record()),
                 "suppliers": self._schema_list_of(self.product_supplierinfo()),
-                "locations": self._schema_list_of(self.location_detail()),
+                "locations": self._schema_list_of(self.product_location()),
+            }
+        )
+        return schema
+
+    def product_location(self):
+        schema = self.location()
+        schema.update(
+            {
+                "complete_name": {
+                    "type": "string",
+                    "nullable": False,
+                    "required": True,
+                },
+                "quantity": {"type": "float", "required": True},
+                "lots": self._schema_list_of(self.location_lot()),
             }
         )
         return schema
