@@ -20,7 +20,7 @@ Vue.component("detail-product", {
             return [
                 // Image TODO
                 {path: "lot.name", label: "Lot"},
-                {path: "expiry_date", label: "Expiry date"},
+                {path: "expiration_date", label: "Expiry date"},
                 {path: "default_code", label: "Internal ref"},
                 {path: "barcode", label: "Barcode"},
                 {path: "product.supplier_code", label: "Supplier ref"},
@@ -39,14 +39,17 @@ Vue.component("detail-product", {
         render_packaging(record, field) {
             return [record.name, "(" + record.code + ")", "= " + record.qty].join(" ");
         },
-        locations_by_products_options() {
+        locations_options() {
             return {
                 main: false,
                 key_title: "name",
-                klass: "loud-labels",
+                fields: this.locations_fields(),
+                card_klass: "loud-labels",
             };
         },
-
+        locations_fields() {
+            return [{path: "quantity", label: "Reserved"}];
+        },
         available_product_list_options() {
             return {
                 main: true,
@@ -72,10 +75,9 @@ Vue.component("detail-product", {
         lot_detail_fields() {
             const self = this;
             return [
-                {path: "product_name", label: "Product"},
                 {path: "quantity", label: "Qty in stock"},
                 {
-                    path: "expire_date",
+                    path: "expiration_date",
                     label: "Expiry date",
                     renderer: function (rec, field) {
                         return self.utils.display.render_field_date(rec, field);
@@ -116,7 +118,8 @@ Vue.component("detail-product", {
             :options="{key_title: 'display_name', list_item_fields: packaging_detail_fields()}"
             />
     </div>
-    <div class="locations" v-if="record.locations.length">
+
+    <div class="locations mb-4" v-if="record.locations">
         <separator-title>Locations</separator-title>
         <v-expansion-panels v-if="record.locations.length > 0" flat :color="utils.colors.color_for('detail_main_card')">
             <v-expansion-panel v-for="(location, index) in record.locations" :key="make_component_key(['location', index])">
@@ -125,14 +128,17 @@ Vue.component("detail-product", {
                       v-bind="$props"
                       :record="location"
                       :key="make_component_key(['location', location.id])"
-                      :options="locations_by_products_options()"
+                      :options="locations_options()"
                       :card_color="utils.colors.color_for('detail_main_card')"
-                      />
+                      >
+                        <template v-slot:subtitle>
+                        {{ location.complete_name }}
+                        </template>
+                    </item-detail-card>
               </v-expansion-panel-header>
-              <v-expansion-panel-content v-for="(product, i) in location.products">
-                <separator-title>Lots</separator-title>
+              <v-expansion-panel-content v-for="(lot, i) in location.lots">
+                <separator-title v-if="location.lots.length > 0">Lots</separator-title>
                 <item-detail-card
-                v-for="(lot, i) in product.lots"
                 :record="lot"
                 v-bind="$props"
                 :key="make_component_key(['lot', lot.id])"

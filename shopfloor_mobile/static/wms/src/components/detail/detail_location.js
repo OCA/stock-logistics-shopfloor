@@ -42,9 +42,6 @@ Vue.component("detail-location", {
                 main: true,
                 key_title: "display_name",
                 klass: "loud-labels",
-                title_action_field: {
-                    action_val_path: "default_code",
-                },
                 fields: this.available_product_list_fields(),
             };
         },
@@ -67,7 +64,7 @@ Vue.component("detail-location", {
             return [
                 {path: "quantity", label: "Qty in stock"},
                 {
-                    path: "expire_date",
+                    path: "expiration_date",
                     label: "Expiry date",
                     renderer: function (rec, field) {
                         return self.utils.display.render_field_date(rec, field);
