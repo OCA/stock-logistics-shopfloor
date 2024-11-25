@@ -429,7 +429,7 @@ class Reception(Component):
             return self._scan_line__find_or_create_line(picking, return_move)
 
     def _scan_line__by_product(self, picking, product):
-        moves = picking.move_lines.filtered(lambda m: m.product_id == product)
+        moves = picking.move_ids.filtered(lambda m: m.product_id == product)
         # Only create a return if don't already have a maching reception move
         if not moves and self.work.menu.allow_return:
             response = self._scan_line__by_product__return(picking, product)
@@ -471,7 +471,7 @@ class Reception(Component):
             )
 
     def _scan_line__by_packaging(self, picking, packaging):
-        move = picking.move_lines.filtered(
+        move = picking.move_ids.filtered(
             lambda m: packaging in m.product_id.packaging_ids
         )
         # Only create a return if don't already have a maching reception move
@@ -708,7 +708,7 @@ class Reception(Component):
             kw["with_progress"] = True
         data = self.data.picking(picking, **kw)
         if with_lines:
-            data.update({"moves": self._data_for_moves(picking.move_lines)})
+            data.update({"moves": self._data_for_moves(picking.move_ids)})
         return data
 
     def _data_for_stock_pickings(self, pickings, with_lines=False):
@@ -1040,7 +1040,7 @@ class Reception(Component):
             product = selected_line.product_id
             lot = search.lot_from_scan(lot_name, products=product)
             if not lot:
-                lot = self.env["stock.production.lot"].create(
+                lot = self.env["stock.lot"].create(
                     self._create_lot_values(product, lot_name)
                 )
             selected_line.lot_id = lot.id
@@ -1180,7 +1180,7 @@ class Reception(Component):
                 picking, selected_line, message=message
             )
         if selected_line.exists():
-            if selected_line.product_uom_qty:
+            if selected_line.reserved_uom_qty:
                 stock = self._actions_for("stock")
                 stock.unmark_move_line_as_picked(selected_line)
             else:
@@ -1256,7 +1256,7 @@ class Reception(Component):
         return self._response_for_set_destination(picking, selected_line)
 
     def _post_line(self, selected_line):
-        selected_line.product_uom_qty = selected_line.qty_done
+        selected_line.reserved_uom_qty = selected_line.qty_done
         if (
             selected_line.picking_id.is_shopfloor_created
             and self.work.menu.allow_return
@@ -1271,7 +1271,7 @@ class Reception(Component):
             self._auto_post_line(selected_line)
 
     def _post_shopfloor_created_line(self, selected_line):
-        selected_line.product_uom_qty = selected_line.qty_done
+        selected_line.reserved_uom_qty = selected_line.qty_done
         selected_line.picking_id.with_context(cancel_backorder=True)._action_done()
         return self._response_for_select_document(
             message=self.msg_store.transfer_done_success(selected_line.picking_id)
@@ -1287,13 +1287,13 @@ class Reception(Component):
         # in Odoo when move lines are created manually (setting)
         lines_with_qty_todo = selected_line.move_id.move_line_ids.filtered(
             lambda line: line.state not in ("cancel", "done")
-            and line.product_uom_qty > 0
+            and line.reserved_uom_qty > 0
         )
         move = selected_line.move_id
         lock = self._actions_for("lock")
         lock.for_update(move)
         if lines_with_qty_todo:
-            lines_with_qty_todo.product_uom_qty = 0
+            lines_with_qty_todo.reserved_uom_qty = 0
 
         move_quantity = move.product_uom._compute_quantity(
             move.product_uom_qty, selected_line.product_uom_id
@@ -1317,7 +1317,7 @@ class Reception(Component):
             move_quantity = move.product_uom._compute_quantity(
                 move.product_uom_qty, line[0].product_uom_id
             )
-            line.product_uom_qty = move_quantity
+            line.reserved_uom_qty = move_quantity
         move._recompute_state()
         new_move.extract_and_action_done()
 

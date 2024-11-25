@@ -1,6 +1,6 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
-
+# pylint: disable=missing-return
 
 from odoo import fields
 
@@ -23,7 +23,7 @@ class CommonCase(BaseCommonCase):
             "company_id": cls.env.company.id,
         }
         vals.update(kwargs)
-        return cls.env["stock.production.lot"].create(vals)
+        return cls.env["stock.lot"].create(vals)
 
     @classmethod
     def _add_package(cls, picking):
@@ -67,7 +67,7 @@ class CommonCase(BaseCommonCase):
 
     def _data_for_picking_with_moves(self, picking, with_progress=True):
         picking_data = self._data_for_picking(picking, with_progress)
-        moves_data = self._data_for_moves(picking.move_lines)
+        moves_data = self._data_for_moves(picking.move_ids)
         picking_data.update({"moves": moves_data})
         return picking_data
 

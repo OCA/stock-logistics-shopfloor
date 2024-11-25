@@ -1,6 +1,6 @@
 # Copyright 2022 Camptocamp SA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
-
+# pylint: disable=missing-return
 from .common import CommonCase
 
 
@@ -14,12 +14,7 @@ class TestSetQuantityAction(CommonCase):
         )
 
     def test_process_with_existing_package(self):
-        package = self.env["stock.quant.package"].create(
-            {
-                "name": "FOO",
-                "packaging_id": self.product_a_packaging.id,
-            }
-        )
+        package = self.env["stock.quant.package"].create({"name": "FOO"})
         self.selected_move_line.result_package_id = package
         response = self.service.dispatch(
             "process_with_existing_pack",
@@ -87,7 +82,7 @@ class TestSetQuantityAction(CommonCase):
 
     def test_cancel_action(self):
         picking = self._create_picking()
-        move_product_a = picking.move_lines.filtered(
+        move_product_a = picking.move_ids.filtered(
             lambda l: l.product_id == self.product_a
         )
         # User 1 and 2 selects the same picking
@@ -163,7 +158,7 @@ class TestSetQuantityAction(CommonCase):
         self.assertTrue(move_line_user_1.exists())
         self.assertFalse(move_line_user_1.shopfloor_user_id)
         self.assertEqual(move_line_user_1.qty_done, 0)
-        self.assertEqual(move_line_user_1.product_uom_qty, 10)
+        self.assertEqual(move_line_user_1.reserved_uom_qty, 10)
         # make user cancel
         service_user_2.dispatch(
             "set_quantity__cancel_action",

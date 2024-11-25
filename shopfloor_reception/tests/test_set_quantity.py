@@ -1,6 +1,6 @@
 # Copyright 2022 Camptocamp SA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
-
+# pylint: disable=missing-return
 from .common import CommonCase
 
 
@@ -11,23 +11,10 @@ class TestSetQuantity(CommonCase):
         cls.product_a_packaging.qty = 5.0
         cls.packing_location.sudo().active = True
         package_model = cls.env["stock.quant.package"]
-        cls.package_without_location = package_model.create(
-            {
-                "name": "PKG_WO_LOCATION",
-                "packaging_id": cls.product_a_packaging.id,
-            }
-        )
-        cls.package_with_location = package_model.create(
-            {
-                "name": "PKG_W_LOCATION",
-                "packaging_id": cls.product_a_packaging.id,
-            }
-        )
+        cls.package_without_location = package_model.create({"name": "PKG_WO_LOCATION"})
+        cls.package_with_location = package_model.create({"name": "PKG_W_LOCATION"})
         cls.package_with_location_child_of_dest = package_model.create(
-            {
-                "name": "PKG_W_LOCATION_CHILD",
-                "packaging_id": cls.product_a_packaging.id,
-            }
+            {"name": "PKG_W_LOCATION_CHILD"}
         )
         cls._update_qty_in_location(
             cls.packing_location, cls.product_a, 10, package=cls.package_with_location
@@ -455,7 +442,7 @@ class TestSetQuantity(CommonCase):
         self.assertEqual(len(selected_move_line), 1)
         self.assertEqual(selected_move_line.qty_done, 1.0)
         self.assertEqual(
-            selected_move_line.product_uom_qty,
+            selected_move_line.reserved_uom_qty,
             selected_move_line.move_id.product_uom_qty,
         )
 
@@ -471,7 +458,7 @@ class TestSetQuantity(CommonCase):
                 },
             )
         self.assertEqual(selected_move_line.qty_done, 5.0)
-        self.assertEqual(selected_move_line.product_uom_qty, 10.0)
+        self.assertEqual(selected_move_line.reserved_uom_qty, 10.0)
 
         # Now, concurrently pick products with another user for the same move
         manager_user = self.shopfloor_manager
@@ -487,7 +474,7 @@ class TestSetQuantity(CommonCase):
             lambda l: l.product_id == self.product_a
             and l.shopfloor_user_id == manager_user
         )
-        self.assertEqual(new_line.product_uom_qty, 0.0)
+        self.assertEqual(new_line.reserved_uom_qty, 0.0)
 
         move_lines = selected_move_line | new_line
         line_service_mapping = [
@@ -519,15 +506,15 @@ class TestSetQuantity(CommonCase):
         self.assertEqual(lines_qty_done, 10.0)
         self.assertEqual(lines_qty_done, move_lines.move_id.quantity_done)
 
-        # However, product_uom_qty hasn't changed
-        self.assertEqual(selected_move_line.product_uom_qty, 10.0)
-        self.assertEqual(new_line.product_uom_qty, 0.0)
-        # And what's important is that the sum of lines's product_uom_qty is
+        # However, reserved_uom_qty hasn't changed
+        self.assertEqual(selected_move_line.reserved_uom_qty, 10.0)
+        self.assertEqual(new_line.reserved_uom_qty, 0.0)
+        # And what's important is that the sum of lines's reserved_uom_qty is
         # always == move's product_uom_qty
-        self.assertEqual(sum(move_lines.mapped("product_uom_qty")), 10.0)
+        self.assertEqual(sum(move_lines.mapped("reserved_uom_qty")), 10.0)
 
         # However, if we pick more than move's product_uom_qty, then lines
-        # product_uom_qty isn't updated, in order to be able to display an error
+        # reserved_uom_qty isn't updated, in order to be able to display an error
         # in the frontend
 
         for __ in range(2):
@@ -576,8 +563,8 @@ class TestSetQuantity(CommonCase):
                 message=error_msg,
             )
 
-        # But line's product_uom_qty hasn't changed and is still 10.0
-        self.assertEqual(sum(move_lines.mapped("product_uom_qty")), 10.0)
+        # But line's reserved_uom_qty hasn't changed and is still 10.0
+        self.assertEqual(sum(move_lines.mapped("reserved_uom_qty")), 10.0)
 
         # If we lower by 2 the first move qty done, qty_todo will be updated correctly
         self.service.dispatch(
@@ -593,9 +580,9 @@ class TestSetQuantity(CommonCase):
         self.assertEqual(selected_move_line.qty_done, 3.0)
         self.assertEqual(new_line.qty_done, 7.0)
 
-        self.assertEqual(selected_move_line.product_uom_qty, 10.0)
-        self.assertEqual(new_line.product_uom_qty, 0.0)
-        self.assertEqual(sum(move_lines.mapped("product_uom_qty")), 10.0)
+        self.assertEqual(selected_move_line.reserved_uom_qty, 10.0)
+        self.assertEqual(new_line.reserved_uom_qty, 0.0)
+        self.assertEqual(sum(move_lines.mapped("reserved_uom_qty")), 10.0)
 
         # And everything's fine on the move
         move = move_lines.move_id
@@ -661,7 +648,7 @@ class TestSetQuantity(CommonCase):
 
         # Creating the picking, selecting the move line.
         picking = self._create_picking()
-        move = picking.move_lines.filtered(lambda l: l.product_id == self.product_a)
+        move = picking.move_ids.filtered(lambda l: l.product_id == self.product_a)
         service_user_1 = self.service
         service_user_1.dispatch("scan_document", params={"barcode": picking.name})
         service_user_1.dispatch(
@@ -671,7 +658,7 @@ class TestSetQuantity(CommonCase):
         move_line_user_1 = move.move_line_ids
         # The only move line should have qty_done = 1
         self.assertEqual(move_line_user_1.qty_done, 1.0)
-        self.assertEqual(move_line_user_1.product_uom_qty, 10.0)
+        self.assertEqual(move_line_user_1.reserved_uom_qty, 10.0)
 
         # Now, concurrently pick products with another user for the same move
         manager_user = self.shopfloor_manager
@@ -687,7 +674,7 @@ class TestSetQuantity(CommonCase):
             lambda l: l.product_id == self.product_a
             and l.shopfloor_user_id == manager_user
         )
-        self.assertEqual(move_line_user_2.product_uom_qty, 0.0)
+        self.assertEqual(move_line_user_2.reserved_uom_qty, 0.0)
         self.assertEqual(move_line_user_2.qty_done, 1.0)
 
         # At this point, both lines are referencing the same move
@@ -735,15 +722,15 @@ class TestSetQuantity(CommonCase):
         # As well as the new one
         self.assertEqual(len(lines_after), 1)
         # The quantity to do is set on 1 of the lines
-        self.assertEqual(lines_after.product_uom_qty, 0)
-        self.assertEqual(move_line_user_2.product_uom_qty, 9)
+        self.assertEqual(lines_after.reserved_uom_qty, 0)
+        self.assertEqual(move_line_user_2.reserved_uom_qty, 9)
 
     def test_move_states(self):
         # as only assigned moves can be posted, we need to ensure that
         # we got the right states in any case, especially when users are working
         # concurrently
         picking = self._create_picking()
-        move_product_a = picking.move_lines.filtered(
+        move_product_a = picking.move_ids.filtered(
             lambda l: l.product_id == self.product_a
         )
         # user1 processes 10 units
@@ -828,8 +815,8 @@ class TestSetQuantity(CommonCase):
                 "location_name": self.dispatch_location.name,
             },
         )
-        # When posted, the move line product_uom_qty has been set to qty_done
-        self.assertEqual(move_line_user_2.qty_done, move_line_user_2.product_qty)
+        # When posted, the move line reserved_uom_qty has been set to qty_done
+        self.assertEqual(move_line_user_2.qty_done, move_line_user_2.reserved_uom_qty)
         self.assert_response(
             response, next_state="select_move", data=self._data_for_select_move(picking)
         )

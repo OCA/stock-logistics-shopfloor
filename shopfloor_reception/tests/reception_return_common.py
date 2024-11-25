@@ -13,6 +13,7 @@ class CommonCaseReturn(CommonCase):
         super().setUpClass()
         # In order to have the `picking_type_reception_demo` picking_type
         # on returned pickings and moves
+        cls.stock_manager = cls.env.ref("stock.group_stock_manager").users[0]
         cls.reception_type = cls.env.ref(
             "shopfloor_reception.picking_type_reception_demo"
         )
@@ -74,7 +75,7 @@ class CommonCaseReturn(CommonCase):
         for line in order.order_line:
             product = line.product_id
             packaging = packagings.filtered(lambda p: p.product_id == product)
-            line.product_packaging = packaging
+            line.product_packaging_id = packaging
 
     @classmethod
     def deliver(cls, pickings):
@@ -85,7 +86,7 @@ class CommonCaseReturn(CommonCase):
             if not ready_picking:
                 break
             for line in ready_picking.move_line_ids:
-                line.qty_done = line.product_qty
+                line.qty_done = line.reserved_uom_qty
             ready_picking._action_done()
 
     @classmethod
@@ -95,7 +96,9 @@ class CommonCaseReturn(CommonCase):
         if not action_data or action_data is True:
             return picking.browse()
         backorder_wizard = Form(
-            cls.env["stock.backorder.confirmation"].with_context(action_data["context"])
+            cls.env["stock.backorder.confirmation"].with_context(
+                **action_data["context"]
+            )
         ).save()
         backorder_wizard.process()
         return cls.env["stock.picking"].search([("backorder_id", "=", picking.id)])
@@ -141,7 +144,9 @@ class CommonCaseReturn(CommonCase):
             "location_id": location.id,
             "inventory_quantity": qty,
         }
-        cls.env["stock.quant"].sudo().with_context(inventory_mode=True).create(values)
+        cls.env["stock.quant"].with_user(cls.stock_manager).with_context(
+            inventory_mode=True
+        ).create(values)._apply_inventory()
         cls.cache_existing_record_ids()
 
     @classmethod

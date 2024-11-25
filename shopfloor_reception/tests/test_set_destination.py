@@ -1,6 +1,6 @@
 # Copyright 2022 Camptocamp SA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
-
+# pylint: disable=missing-return
 from .common import CommonCase
 
 
@@ -148,7 +148,7 @@ class TestSetDestination(CommonCase):
         line_in_picking = picking.move_line_ids.filtered(
             lambda l: l.product_id == selected_move_line.product_id
         )
-        self.assertEqual(line_in_picking.product_uom_qty, 7)
+        self.assertEqual(line_in_picking.reserved_uom_qty, 7)
         self.assertEqual(line_in_picking.qty_done, 0)
         self.assertEqual(picking.state, "assigned")
 
@@ -160,7 +160,7 @@ class TestSetDestination(CommonCase):
         """
         self.menu.sudo().auto_post_line = True
         picking = self._create_picking(lines=[(self.product_a, 10)])
-        move = picking.move_lines
+        move = picking.move_ids
         # User 1 starts working
         service_u1 = self.service
         res_u1 = service_u1.dispatch(

@@ -1,6 +1,6 @@
 # Copyright 2022 Camptocamp SA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
-
+# pylint: disable=missing-return
 from odoo import fields
 
 from .common import CommonCase
@@ -200,7 +200,7 @@ class TestSelectLine(CommonCase):
         # If there's already a move line for a given incoming move,
         # we assigned the whole move's product_uom_qty to it.
         # The reason for that is that when recomputing states for a given move
-        # if sum(move.move_line_ids.product_uom_qty) != move.product_uom_qty,
+        # if sum(move.move_line_ids.reserved_uom_qty) != move.product_uom_qty,
         # then it's state won't be assigned.
         # For instance:
         #   - user 1 selects line1
@@ -236,7 +236,7 @@ class TestSelectLine(CommonCase):
         self.assertEqual(len(picking.move_line_ids), 3)
         created_line = picking.move_line_ids[2]
         # And its product_uom_qty is 0
-        self.assertEqual(created_line.product_uom_qty, 0.0)
+        self.assertEqual(created_line.reserved_uom_qty, 0.0)
         self.assertEqual(created_line.shopfloor_user_id.id, self.env.uid)
 
     def test_done_action(self):
@@ -252,7 +252,7 @@ class TestSelectLine(CommonCase):
         )
 
         for line in picking.move_line_ids:
-            line.qty_done = line.product_uom_qty
+            line.qty_done = line.reserved_uom_qty
             lot = (self._create_lot(product_id=line.product_id.id),)
             line.lot_id = lot
         # Ask for confirmation to mark the package as done.
@@ -296,7 +296,7 @@ class TestSelectLine(CommonCase):
 
     def test_manual_select_move(self):
         picking = self._create_picking()
-        selected_move = picking.move_lines.filtered(
+        selected_move = picking.move_ids.filtered(
             lambda m: m.product_id == self.product_a
         )
         response = self.service.dispatch(

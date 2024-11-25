@@ -102,7 +102,7 @@ class TestScanDocumentReturn(CommonCaseReturn):
         self._enable_allow_return()
         delivery = self.create_delivery()
         backorder = self.partial_deliver(delivery, 10)
-        self.assertEqual(backorder.move_lines.product_qty, 10)
+        self.assertEqual(backorder.move_ids.product_qty, 10)
         response = self.service.dispatch(
             "scan_document", params={"barcode": self.order.name}
         )

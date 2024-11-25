@@ -1,6 +1,6 @@
 # Copyright 2022 Camptocamp SA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
-
+# pylint: disable=missing-return
 from .common import CommonCase
 
 
@@ -9,12 +9,7 @@ class TestSelectDestPackage(CommonCase):
     def setUpClassBaseData(cls):
         super().setUpClassBaseData()
         package_model = cls.env["stock.quant.package"]
-        cls.package = package_model.create(
-            {
-                "name": "FOO",
-                "packaging_id": cls.product_a_packaging.id,
-            }
-        )
+        cls.package = package_model.create({"name": "FOO"})
         cls.input_sublocation = (
             cls.env["stock.location"]
             .sudo()
