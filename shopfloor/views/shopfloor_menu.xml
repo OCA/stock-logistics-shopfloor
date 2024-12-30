@@ -171,6 +171,22 @@
                         />
                     </div>
                 </group>
+                <group
+                    name="move_line_processing_sort_order"
+                    invisible="not move_line_processing_sort_order_is_possible"
+                >
+                    <field name="move_line_processing_sort_order" />
+                </group>
+            </group>
+            <group name="options" position="after">
+                <group name="move_line_processing_sort_order_custom_code">
+                    <field
+                        name="move_line_processing_sort_order_custom_code"
+                        invisible="move_line_processing_sort_order != 'custom_code'"
+                        widget="ace"
+                        options="{'mode': 'python'}"
+                    />
+                </group>
             </group>
         </field>
     </record>
