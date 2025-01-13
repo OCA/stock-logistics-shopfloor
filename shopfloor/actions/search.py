@@ -57,6 +57,8 @@ class SearchAction(Component):
             "packaging": self.packaging_from_scan,
             "package_type": self.package_type_from_scan,
             "origin_move": self.origin_move_from_scan,
+            # Extra data can be contained in barcodes
+            "expiration_date": self.dummy_from_scan,
         }
 
     def _make_search_result(self, **kwargs):
@@ -191,3 +193,6 @@ class SearchAction(Component):
         if extra_domain:
             outgoing_move_domain = AND([outgoing_move_domain, extra_domain])
         return model.search(outgoing_move_domain)
+
+    def dummy_from_scan(self, barcode):
+        return None
