@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-11-04 15:06+0000\n"
+"PO-Revision-Date: 2025-01-16 10:06+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -152,6 +152,9 @@ msgid ""
 "same time','Unload package at destination' and 'Multiple moves same "
 "destination package'."
 msgstr ""
+"'Nessun collo di destinazione richiesto' non è compatibile con 'Preleva e "
+"imballa contemporaneamente', 'Scarica il collo a destinazione' e 'Più "
+"movimenti con lo stesso collo di destinazione'."
 
 #. module: shopfloor
 #. odoo-python
@@ -494,7 +497,7 @@ msgstr "Collo destinazione"
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__require_destination_package
 msgid "Destination package required"
-msgstr ""
+msgstr "Richiesto collo destinazione"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__disable_full_bin_action_is_possible
@@ -555,6 +558,9 @@ msgid ""
 "If set, the user will have to scan only the source location and the "
 "destination location to process a line. The unload step will be skipped."
 msgstr ""
+"Se impostato, l'utente dovrà scansionare solo la posizione di origine e la "
+"posizione di destinazione per elaborare una riga. La fase di scarico verrà "
+"saltata."
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__ignore_no_putaway_available
@@ -1389,7 +1395,7 @@ msgstr "Prodotti grezzi esidui non in colli, procedere ugualmente?"
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__require_destination_package_is_possible
 msgid "Require Destination Package Is Possible"
-msgstr ""
+msgstr "È possibile richiedere il collo di destinazione"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_location__reserved_move_line_ids
