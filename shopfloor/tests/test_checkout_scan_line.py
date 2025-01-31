@@ -1,6 +1,5 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
-from odoo import _
 
 from .test_checkout_scan_line_base import CheckoutScanLineCaseBase
 
@@ -258,11 +257,12 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         self._fill_stock_for_moves(picking.move_ids, in_lot=True)
         picking.action_assign()
         previous_lot = picking.move_line_ids.lot_id
-        # Create a lot that is not registered in the location we are working on
-        # so a draft inventory for control is generated automatically when the
-        # lot is changed.
+        # Create a lot that is registered in the location we are working on
         lot = self.env["stock.lot"].create(
             {"product_id": self.product_a.id, "company_id": self.env.company.id}
+        )
+        self._update_qty_in_location(
+            picking.move_line_ids.location_id, self.product_a, 10, lot=lot
         )
         self._test_scan_line_error(
             picking,
@@ -280,8 +280,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
             },
         )
         message = self.msg_store.lot_replaced_by_lot(previous_lot, lot)
-        inventory_message = _("A draft inventory has been created for control.")
-        message["body"] = f"{message['body']} {inventory_message}"
+        message["body"] = f"{message['body']}"
         self.assert_response(
             response,
             next_state="select_package",
