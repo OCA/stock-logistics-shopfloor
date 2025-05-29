@@ -219,19 +219,19 @@
                         <p>Three variables are available:</p>
                         <ul>
                             <li><code
-                                >line</code>: The move line for with the key must be computed.
+                            >line</code>: The move line for with the key must be computed.
                         </li>
                             <li><code
-                                >get_sort_key_priority</code>: Return sort key to sort by priority. (return a tuple)
+                            >get_sort_key_priority</code>: Return sort key to sort by priority. (return a tuple)
                         </li>
                             <li><code
-                                >get_sort_key_location</code>: Return sort key to sort by location. (return a tuple)
+                            >get_sort_key_location</code>: Return sort key to sort by location. (return a tuple)
                         </li>
                             <li><code
-                                >get_sort_key_assigned_to_current_user</code>: Return sort key to get line assigned to current user first. (return a tuple)
+                            >get_sort_key_assigned_to_current_user</code>: Return sort key to get line assigned to current user first. (return a tuple)
                         </li>
                             <li>To assign the key value: <code
-                                >key = get_sort_key_assigned_to_current_user(line) + (line.x, )</code></li>
+                            >key = get_sort_key_assigned_to_current_user(line) + (line.x, )</code></li>
                         </ul>
                         <field
                             name="move_line_search_sort_order_custom_code"

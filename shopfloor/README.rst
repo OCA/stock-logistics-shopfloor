@@ -16,35 +16,40 @@ Shopfloor
 .. |badge2| image:: https://img.shields.io/badge/licence-AGPL--3-blue.png
     :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
     :alt: License: AGPL-3
-.. |badge3| image:: https://img.shields.io/badge/github-OCA%2Fwms-lightgray.png?logo=github
-    :target: https://github.com/OCA/wms/tree/16.0/shopfloor
-    :alt: OCA/wms
+.. |badge3| image:: https://img.shields.io/badge/github-OCA%2Fstock--logistics--shopfloor-lightgray.png?logo=github
+    :target: https://github.com/OCA/stock-logistics-shopfloor/tree/18.0/shopfloor
+    :alt: OCA/stock-logistics-shopfloor
 .. |badge4| image:: https://img.shields.io/badge/weblate-Translate%20me-F47D42.png
-    :target: https://translation.odoo-community.org/projects/wms-16-0/wms-16-0-shopfloor
+    :target: https://translation.odoo-community.org/projects/stock-logistics-shopfloor-18-0/stock-logistics-shopfloor-18-0-shopfloor
     :alt: Translate me on Weblate
 .. |badge5| image:: https://img.shields.io/badge/runboat-Try%20me-875A7B.png
-    :target: https://runboat.odoo-community.org/builds?repo=OCA/wms&target_branch=16.0
+    :target: https://runboat.odoo-community.org/builds?repo=OCA/stock-logistics-shopfloor&target_branch=18.0
     :alt: Try me on Runboat
 
 |badge1| |badge2| |badge3| |badge4| |badge5|
 
-Shopfloor is a barcode scanner application for internal warehouse operations.
+Shopfloor is a barcode scanner application for internal warehouse
+operations.
 
 The application supports scenarios, to relate to Operation Types:
 
-* Cluster Picking
-* Zone Picking
-* Checkout/Packing
-* Delivery
-* Location Content Transfer
-* Single Pack Transfer
+- Cluster Picking
+- Zone Picking
+- Checkout/Packing
+- Delivery
+- Location Content Transfer
+- Single Pack Transfer
 
-This module provides REST APIs to support the scenarios. It needs a frontend
-to consume the backend APIs and provide screens for users on barcode devices.
-A default front-end application is provided by ``shopfloor_mobile``.
+This module provides REST APIs to support the scenarios. It needs a
+frontend to consume the backend APIs and provide screens for users on
+barcode devices. A default front-end application is provided by
+``shopfloor_mobile``.
 
-| Note: if you want to enable a new scenario on an existing application, you must trigger the registry sync on the shopfloor.app in a post_init_hook or a post-migrate script.
-| See an example `here <https://github.com/OCA/wms/pull/520/commits/bccdfd445a9bc943998c4848f183a076e8459a98>`_.
+| Note: if you want to enable a new scenario on an existing application,
+  you must trigger the registry sync on the shopfloor.app in a
+  post_init_hook or a post-migrate script.
+| See an example
+  `here <https://github.com/OCA/wms/pull/520/commits/bccdfd445a9bc943998c4848f183a076e8459a98>`__.
 
 **Table of contents**
 
@@ -54,36 +59,38 @@ A default front-end application is provided by ``shopfloor_mobile``.
 Usage
 =====
 
-An API key is created in the Demo data (for development), using
-the Demo user. The key to use in the HTTP header ``API-KEY`` is: 72B044F7AC780DAC
+An API key is created in the Demo data (for development), using the Demo
+user. The key to use in the HTTP header ``API-KEY`` is: 72B044F7AC780DAC
 
-Curl example::
+Curl example:
 
-  curl -X POST "http://localhost:8069/shopfloor/user/menu" -H  "accept: */*" -H  "Content-Type: application/json" -H "API-KEY: 72B044F7AC780DAC"
+::
+
+   curl -X POST "http://localhost:8069/shopfloor/user/menu" -H  "accept: */*" -H  "Content-Type: application/json" -H "API-KEY: 72B044F7AC780DAC"
 
 Known issues / Roadmap
 ======================
 
-* improve documentation
-* split out scenario components to their own modules
-* maybe split common stock features to `shopfloor_stock_base`
-  and move scenario to `shopfloor_wms`?
+- improve documentation
+- split out scenario components to their own modules
+- maybe split common stock features to shopfloor_stock_base and move
+  scenario to shopfloor_wms?
 
 Changelog
 =========
 
 13.0.1.0.0
-~~~~~~~~~~
+----------
 
 First official version.
 
 Bug Tracker
 ===========
 
-Bugs are tracked on `GitHub Issues <https://github.com/OCA/wms/issues>`_.
+Bugs are tracked on `GitHub Issues <https://github.com/OCA/stock-logistics-shopfloor/issues>`_.
 In case of trouble, please check there if your issue has already been reported.
 If you spotted it first, help us to smash it by providing a detailed and welcomed
-`feedback <https://github.com/OCA/wms/issues/new?body=module:%20shopfloor%0Aversion:%2016.0%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**>`_.
+`feedback <https://github.com/OCA/stock-logistics-shopfloor/issues/new?body=module:%20shopfloor%0Aversion:%2018.0%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**>`_.
 
 Do not contact contributors directly about support or help with technical issues.
 
@@ -91,45 +98,45 @@ Credits
 =======
 
 Authors
-~~~~~~~
+-------
 
 * Camptocamp
 * BCIM
 * Akretion
 
 Contributors
-~~~~~~~~~~~~
+------------
 
-* Guewen Baconnier <guewen.baconnier@camptocamp.com>
-* Simone Orsi <simahawk@gmail.com>
-* Sébastien Alix <sebastien.alix@camptocamp.com>
-* Alexandre Fayolle <alexandre.fayolle@camptocamp.com>
-* Benoit Guillot <benoit.guillot@akretion.com>
-* Thierry Ducrest <thierry.ducrest@camptocamp.com>
-* Raphaël Reverdy <raphael.reverdy@akretion.com>
-* Jacques-Etienne Baudoux <je@bcim.be>
-* Juan Miguel Sánchez Arce <juan.sanchez@camptocamp.com>
-* Michael Tietz (MT Software) <mtietz@mt-software.de>
-* Souheil Bejaoui <souheil.bejaoui@acsone.eu>
-* Laurent Mignon <laurent.mignon@acsone.eu>
+- Guewen Baconnier <guewen.baconnier@camptocamp.com>
+- Simone Orsi <simahawk@gmail.com>
+- Sébastien Alix <sebastien.alix@camptocamp.com>
+- Alexandre Fayolle <alexandre.fayolle@camptocamp.com>
+- Benoit Guillot <benoit.guillot@akretion.com>
+- Thierry Ducrest <thierry.ducrest@camptocamp.com>
+- Raphaël Reverdy <raphael.reverdy@akretion.com>
+- Jacques-Etienne Baudoux <je@bcim.be>
+- Juan Miguel Sánchez Arce <juan.sanchez@camptocamp.com>
+- Michael Tietz (MT Software) <mtietz@mt-software.de>
+- Souheil Bejaoui <souheil.bejaoui@acsone.eu>
+- Laurent Mignon <laurent.mignon@acsone.eu>
 
 Design
 ~~~~~~
 
-* Joël Grand-Guillaume <joel.grandguillaume@camptocamp.com>
-* Jacques-Etienne Baudoux <je@bcim.be>
+- Joël Grand-Guillaume <joel.grandguillaume@camptocamp.com>
+- Jacques-Etienne Baudoux <je@bcim.be>
 
 Other credits
-~~~~~~~~~~~~~
+-------------
 
 **Financial support**
 
-* Cosanum
-* Camptocamp R&D
-* Akretion R&D
+- Cosanum
+- Camptocamp R&D
+- Akretion R&D
 
 Maintainers
-~~~~~~~~~~~
+-----------
 
 This module is maintained by the OCA.
 
@@ -155,6 +162,6 @@ Current `maintainers <https://odoo-community.org/page/maintainer-role>`__:
 
 |maintainer-guewen| |maintainer-simahawk| |maintainer-sebalix| 
 
-This module is part of the `OCA/wms <https://github.com/OCA/wms/tree/16.0/shopfloor>`_ project on GitHub.
+This module is part of the `OCA/stock-logistics-shopfloor <https://github.com/OCA/stock-logistics-shopfloor/tree/18.0/shopfloor>`_ project on GitHub.
 
 You are welcome to contribute. To learn how please visit https://odoo-community.org/page/Contribute.
