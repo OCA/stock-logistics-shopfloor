@@ -49,7 +49,7 @@ class CheckoutSelectChildLocationCase(CheckoutCommonCase):
 
         self.assertRecordValues(self.picking, [{"state": "done"}])
         self.assertTrue(self.picking.backorder_ids)
-        self.assertEqual(self.picking.backorder_ids.move_line_ids.reserved_uom_qty, 8)
+        self.assertEqual(self.picking.backorder_ids.move_line_ids.quantity, 8)
 
         self.assert_response(
             response,

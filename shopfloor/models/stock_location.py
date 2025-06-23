@@ -56,7 +56,7 @@ class StockLocation(models.Model):
             move_lines = move_lines.filtered(
                 lambda m: m.state not in ("cancel", "done")
             )
-            move_line_qty_field = "reserved_uom_qty"
+            move_line_qty_field = "quantity"
         else:
             move_lines = self.env["stock.move.line"].search(
                 [

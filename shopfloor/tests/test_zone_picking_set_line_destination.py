@@ -23,7 +23,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             params={
                 "move_line_id": 1234567890,
                 "barcode": self.packing_location.barcode,
-                "quantity": move_line.reserved_uom_qty,
+                "quantity": move_line.quantity,
                 "confirmation": None,
             },
         )
@@ -41,7 +41,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         picking_type = self.picking1.picking_type_id
         move_line = self.picking1.move_line_ids
         move_line.location_dest_id = self.shelf1
-        quantity_done = move_line.reserved_uom_qty
+        quantity_done = move_line.quantity
         response = self.service.dispatch(
             "set_destination",
             params={
@@ -69,7 +69,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             params={
                 "move_line_id": move_line.id,
                 "barcode": self.customer_location.barcode,
-                "quantity": move_line.reserved_uom_qty,
+                "quantity": move_line.quantity,
                 "confirmation": self.packing_location.barcode,
             },
         )
@@ -88,7 +88,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             params={
                 "move_line_id": move_line.id,
                 "barcode": self.packing_location.barcode,
-                "quantity": move_line.reserved_uom_qty,
+                "quantity": move_line.quantity,
                 "confirmation": self.packing_location.barcode,
             },
         )
@@ -111,7 +111,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         move_line = self.picking1.move_line_ids
         move_line.move_id.location_dest_id = self.packing_sublocation_a
         move_line.picking_id.location_dest_id = self.packing_sublocation_a
-        quantity_done = move_line.reserved_uom_qty
+        quantity_done = move_line.quantity
         response = self.service.dispatch(
             "set_destination",
             params={
@@ -157,7 +157,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             params={
                 "move_line_id": move_line.id,
                 "barcode": self.packing_location.barcode,
-                "quantity": move_line.reserved_uom_qty,
+                "quantity": move_line.quantity,
                 "confirmation": None,
             },
         )
@@ -259,7 +259,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             params={
                 "move_line_id": move_line.id,
                 "barcode": self.packing_location.barcode,
-                "quantity": move_line.reserved_uom_qty,  # 6 qty
+                "quantity": move_line.quantity,  # 6 qty
                 "confirmation": None,
             },
         )
@@ -273,10 +273,10 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         self.assertEqual(len(move_after), 1)
         self.assertEqual(move_line.move_id.product_uom_qty, 6)
         self.assertEqual(move_line.move_id.state, "done")
-        self.assertEqual(move_line.move_id.move_line_ids.reserved_uom_qty, 0)
+        self.assertEqual(move_line.move_id.move_line_ids.quantity, 0)
         self.assertEqual(move_after.product_uom_qty, 4)
         self.assertEqual(move_after.state, "assigned")
-        self.assertEqual(move_after.move_line_ids.reserved_uom_qty, 4)
+        self.assertEqual(move_after.move_line_ids.quantity, 4)
         self.assertEqual(move_line.qty_done, 6)
         self.assertNotEqual(move_line.move_id, other_move_line.move_id)
         # Check response
@@ -360,7 +360,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             params={
                 "move_line_id": move_line.id,
                 "barcode": self.packing_location.barcode,
-                "quantity": move_line.reserved_uom_qty,
+                "quantity": move_line.quantity,
                 "confirmation": None,
             },
         )
@@ -394,7 +394,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             params={
                 "move_line_id": move_line.id,
                 "barcode": self.free_package.name,
-                "quantity": move_line.reserved_uom_qty,
+                "quantity": move_line.quantity,
                 "confirmation": None,
             },
         )
@@ -406,7 +406,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             [
                 {
                     "result_package_id": self.free_package.id,
-                    "reserved_uom_qty": 10,
+                    "quantity": 10,
                     "qty_done": 10,
                     "shopfloor_user_id": self.env.user.id,
                 },
@@ -464,7 +464,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             [
                 {
                     "result_package_id": self.free_package.id,
-                    "reserved_uom_qty": 6,
+                    "quantity": 6,
                     "qty_done": 6,
                     "shopfloor_user_id": self.env.user.id,
                 },
@@ -475,7 +475,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             [
                 {
                     "result_package_id": new_move_line.package_id.id,  # Unchanged
-                    "reserved_uom_qty": 4,
+                    "quantity": 4,
                     "qty_done": 0,
                     "shopfloor_user_id": False,
                 },
@@ -510,7 +510,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             params={
                 "move_line_id": move_line.id,
                 "barcode": self.free_package.name,
-                "quantity": move_line.reserved_uom_qty,
+                "quantity": move_line.quantity,
                 "confirmation": None,
             },
         )
@@ -537,7 +537,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             params={
                 "move_line_id": move_line.id,
                 "barcode": self.free_package.name,
-                "quantity": move_line.reserved_uom_qty,
+                "quantity": move_line.quantity,
                 "confirmation": None,
             },
         )
@@ -559,7 +559,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             params={
                 "move_line_id": move_line.id,
                 "barcode": self.free_package.name,
-                "quantity": move_line.reserved_uom_qty,
+                "quantity": move_line.quantity,
                 "confirmation": None,
             },
         )
@@ -582,7 +582,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             params={
                 "move_line_id": move_line.id,
                 "barcode": self.free_package.name,
-                "quantity": move_line.reserved_uom_qty,
+                "quantity": move_line.quantity,
                 "confirmation": None,
             },
         )
@@ -619,7 +619,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             params={
                 "move_line_id": move_line.id,
                 "barcode": self.free_package.name,
-                "quantity": move_line.reserved_uom_qty,
+                "quantity": move_line.quantity,
                 "confirmation": None,
             },
         )
@@ -656,7 +656,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             picking_type,
             move_line,
             message=self.service.msg_store.picking_zero_quantity(),
-            qty_done=move_line.reserved_uom_qty,
+            qty_done=move_line.quantity,
         )
 
     def test_set_destination_package_error_concurent_work(self):
@@ -675,7 +675,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             params={
                 "move_line_id": move_line.id,
                 "barcode": self.free_package.name,
-                "quantity": move_line.reserved_uom_qty,
+                "quantity": move_line.quantity,
                 "confirmation": None,
             },
         )
@@ -689,7 +689,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
                 "message_type": "error",
                 "body": "Someone is already working on these transfers",
             },
-            qty_done=move_line.reserved_uom_qty,
+            qty_done=move_line.quantity,
         )
 
     def test_set_destination_location_error_concurent_work(self):
@@ -709,7 +709,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
                 "move_line_id": move_line.id,
                 "package_id": self.free_package.id,
                 "barcode": self.packing_location.barcode,
-                "quantity": move_line.reserved_uom_qty,
+                "quantity": move_line.quantity,
                 "confirmation": None,
             },
         )
@@ -723,5 +723,5 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
                 "message_type": "error",
                 "body": "Someone is already working on these transfers",
             },
-            qty_done=move_line.reserved_uom_qty,
+            qty_done=move_line.quantity,
         )

@@ -146,7 +146,7 @@ class TestStockSplit(TransactionCase):
         # Pick goods from stock and move some of them to a different destination
         self.assertEqual(self.pick_move_a.state, "assigned")
         for i, move_line in enumerate(self.pick_move_a.move_line_ids):
-            move_line.qty_done = move_line.reserved_uom_qty
+            move_line.qty_done = move_line.quantity
             if i % 2:
                 move_line.location_dest_id = dest_location
         self.pick_move_a.extract_and_action_done()
@@ -177,7 +177,7 @@ class TestStockSplit(TransactionCase):
         self.assertFalse(self.picking.backorder_ids)
         self.assertEqual(self.picking.state, "assigned")
         for move_line in self.pick_move_b.move_line_ids:
-            move_line.qty_done = move_line.reserved_uom_qty
+            move_line.qty_done = move_line.quantity
         self.pick_move_b.extract_and_action_done()
         new_picking = self.picking.backorder_ids
         self.assertTrue(new_picking)
@@ -193,7 +193,7 @@ class TestStockSplit(TransactionCase):
         self.assertFalse(self.picking.backorder_ids)
         self.assertEqual(self.picking.state, "assigned")
         for move_line in self.picking.move_line_ids:
-            move_line.qty_done = move_line.reserved_uom_qty
+            move_line.qty_done = move_line.quantity
         self.picking.move_ids.extract_and_action_done()
         # No backorder as all moves of the picking have been validated
         new_picking = self.picking.backorder_ids

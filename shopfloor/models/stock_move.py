@@ -32,11 +32,9 @@ class StockMove(models.Model):
             to_move = other_move_lines
         if other_move_lines or self.state == "partially_available":
             if intersection:
-                qty_to_split = sum(to_move.mapped("reserved_uom_qty"))
+                qty_to_split = sum(to_move.mapped("quantity"))
             else:
-                qty_to_split = self.product_uom_qty - sum(
-                    move_lines.mapped("reserved_uom_qty")
-                )
+                qty_to_split = self.product_uom_qty - sum(move_lines.mapped("quantity"))
             split_move_vals = self._split(qty_to_split)
             split_move = self.create(split_move_vals)
             split_move.move_line_ids = to_move

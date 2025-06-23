@@ -137,8 +137,8 @@ class CheckoutScanSetDestPackageCase(CheckoutCommonCase, SelectDestPackageMixin)
         # them
         cls.move_line1.result_package_id = cls.delivery_package
         # We'll put only product A and B in the destination package
-        cls.move_line1.qty_done = cls.move_line1.reserved_uom_qty
-        cls.move_line2.qty_done = cls.move_line2.reserved_uom_qty
+        cls.move_line1.qty_done = cls.move_line1.quantity
+        cls.move_line2.qty_done = cls.move_line2.quantity
         cls.move_line3.qty_done = 0
 
         cls.picking = picking
@@ -266,7 +266,7 @@ class CheckoutScanSetDestPackageCase(CheckoutCommonCase, SelectDestPackageMixin)
         )
         # Left quantity to do from line 3
         new_move_line = self.picking.move_line_ids.filtered(
-            lambda line: line.qty_done == 0 and line.reserved_uom_qty == 7
+            lambda line: line.qty_done == 0 and line.quantity == 7
         )
         self.assertTrue(new_move_line)
         self.assertFalse(new_move_line.shopfloor_checkout_done)
@@ -318,7 +318,7 @@ class CheckoutScanSetDestPackageCase(CheckoutCommonCase, SelectDestPackageMixin)
         # the maximum allowed, a message should be displayed
         # and the user shouldn't be allowed to select a package.
         line = fields.first(self.picking.move_line_ids)
-        line.qty_done = line.reserved_uom_qty + 1
+        line.qty_done = line.quantity + 1
         response = self.service.dispatch(
             "list_dest_package",
             params={

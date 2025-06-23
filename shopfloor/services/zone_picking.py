@@ -701,7 +701,7 @@ class ZonePicking(Component):
         """
         if self.work.menu.no_prefill_qty:
             return qty
-        return move_line.reserved_uom_qty
+        return move_line.quantity
 
     def _scan_source_product(
         self,
@@ -952,7 +952,7 @@ class ZonePicking(Component):
             for _move_line in package.move_line_ids:
                 if _move_line.state not in ("assigned", "partially_available"):
                     continue
-                _move_line.qty_done = move_line.reserved_uom_qty
+                _move_line.qty_done = move_line.quantity
                 move_lines |= _move_line
         self._write_destination_on_lines(move_lines, location)
 
@@ -991,15 +991,11 @@ class ZonePicking(Component):
 
     def _move_line_compare_qty(self, move_line, qty):
         rounding = move_line.product_uom_id.rounding
-        return float_compare(
-            qty, move_line.reserved_uom_qty, precision_rounding=rounding
-        )
+        return float_compare(qty, move_line.quantity, precision_rounding=rounding)
 
     def _move_line_full_qty(self, move_line, qty):
         rounding = move_line.product_uom_id.rounding
-        return float_is_zero(
-            move_line.reserved_uom_qty - qty, precision_rounding=rounding
-        )
+        return float_is_zero(move_line.quantity - qty, precision_rounding=rounding)
 
     def _is_package_not_valid(self, package):
         message = False
@@ -1038,7 +1034,7 @@ class ZonePicking(Component):
         if qty_greater:
             response = self._response_for_set_line_destination(
                 move_line,
-                message=self.msg_store.unable_to_pick_more(move_line.reserved_uom_qty),
+                message=self.msg_store.unable_to_pick_more(move_line.quantity),
                 qty_done=quantity,
             )
             return (package_changed, response)

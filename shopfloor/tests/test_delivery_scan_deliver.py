@@ -308,7 +308,7 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
         )
         self.assertEqual(line.qty_done, 1)
         self.assertEqual(line.state, "assigned")
-        for _ in range(int(line.reserved_uom_qty) - 1):
+        for _ in range(int(line.quantity) - 1):
             self.service.dispatch(
                 "scan_deliver",
                 params={
@@ -566,7 +566,7 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
         )
         # Re-force qty to 1, as setting the lot resets qty to 0
         cleanup_picking.move_line_ids.lot_id = cleanup_lot
-        cleanup_picking.move_line_ids.reserved_uom_qty = 1.0
+        cleanup_picking.move_line_ids.quantity = 1.0
         params = {"barcode": "CLEANUP_LOT"}
         response = self.service.dispatch("scan_deliver", params=params)
         type_name = cleanup_picking.picking_type_id.name
@@ -688,7 +688,7 @@ class DeliveryScanDeliverSpecialCase(DeliveryCommonCase):
         picking = self._create_picking(lines=[(self.product_a, 10)])
         self._fill_stock_for_moves(picking.move_ids, in_package=True)
         picking.action_assign()
-        picking.move_line_ids.qty_done = picking.move_line_ids.reserved_uom_qty
+        picking.move_line_ids.qty_done = picking.move_line_ids.quantity
         picking._action_done()
         response = self.service.dispatch(
             "scan_deliver", params={"barcode": picking.name}

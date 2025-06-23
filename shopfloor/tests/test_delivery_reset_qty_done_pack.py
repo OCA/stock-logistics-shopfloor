@@ -73,7 +73,7 @@ class DeliveryResetQtyDonePackCase(DeliveryCommonCase):
             "set_qty_done_pack",
             params={"package_id": package.id, "picking_id": self.picking.id},
         )
-        self.assertTrue(all(ml.qty_done == ml.reserved_uom_qty for ml in move_lines))
+        self.assertTrue(all(ml.qty_done == ml.quantity for ml in move_lines))
         # Reset it, no related move lines are "done"
         response = self.service.dispatch(
             "reset_qty_done_pack",

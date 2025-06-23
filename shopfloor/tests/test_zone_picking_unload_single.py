@@ -24,7 +24,7 @@ class ZonePickingUnloadSingleCase(ZonePickingCommonCase):
         # => get back on 'unload_single' screen
         self.service._set_destination_package(
             move_line,
-            move_line.reserved_uom_qty,
+            move_line.quantity,
             self.free_package,
         )
         response = self.service.dispatch(
@@ -77,7 +77,7 @@ class ZonePickingUnloadSingleCase(ZonePickingCommonCase):
         # set the destination package
         self.service._set_destination_package(
             move_line,
-            move_line.reserved_uom_qty,
+            move_line.quantity,
             self.free_package,
         )
         response = self.service.dispatch(
@@ -104,7 +104,7 @@ class ZonePickingUnloadSingleCase(ZonePickingCommonCase):
         # set the destination package
         self.service._set_destination_package(
             move_line,
-            move_line.reserved_uom_qty,
+            move_line.quantity,
             self.free_package,
         )
         response = self.service.dispatch(

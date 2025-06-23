@@ -67,7 +67,7 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
         picking_type = self.picking1.picking_type_id
         move_line = self.picking1.move_line_ids
         move_line.location_dest_id = self.shelf1
-        quantity_done = move_line.reserved_uom_qty
+        quantity_done = move_line.quantity
         previous_qty_done = move_line.qty_done
         # Confirm the destination with the right destination
         response = self.service.dispatch(
@@ -103,7 +103,7 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
             params={
                 "move_line_id": move_line.id,
                 "barcode": self.packing_location.barcode,
-                "quantity": move_line.reserved_uom_qty,
+                "quantity": move_line.quantity,
                 "confirmation": self.packing_location.barcode,
             },
         )
@@ -133,7 +133,7 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
         self.assertEqual(len(moves_before), 1)
         self.assertEqual(len(moves_before.move_line_ids), 1)
         move_line = moves_before.move_line_ids
-        quantity_done = move_line.reserved_uom_qty
+        quantity_done = move_line.quantity
         response = self.service.dispatch(
             "set_destination",
             params={
@@ -162,7 +162,7 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
         self.assertEqual(len(moves_before.move_line_ids), 1)
         move_line = moves_before.move_line_ids
         move_line.picking_id.carrier_id = self.carrier
-        quantity_done = move_line.reserved_uom_qty
+        quantity_done = move_line.quantity
         response = self.service.dispatch(
             "set_destination",
             params={
@@ -208,7 +208,7 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
             params={
                 "move_line_id": move_line.id,
                 "barcode": self.free_package.name,
-                "quantity": move_line.reserved_uom_qty,
+                "quantity": move_line.quantity,
             },
         )
         # Check picking data
@@ -219,7 +219,7 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
             [
                 {
                     "result_package_id": self.free_package.id,
-                    "reserved_uom_qty": 10,
+                    "quantity": 10,
                     "qty_done": 10,
                     "shopfloor_user_id": self.env.user.id,
                 },

@@ -126,7 +126,7 @@ class ClusterPickingStockIssue(ClusterPickingCommonCase):
             + sum(
                 self.batch_other.picking_ids.move_line_ids.filtered(
                     lambda x: x.location_id == self.shelf2
-                ).mapped("reserved_uom_qty")
+                ).mapped("quantity")
             )
         )
         # we should have a quant with 20 quantity and 20 reserved

@@ -754,7 +754,7 @@ class MessageAction(Component):
                 "(%(product_name)s : %(quantity_done)s > %(quantity_reserved)s)",
                 product_name=line.product_id.name,
                 quantity_done=str(line.qty_done),
-                quantity_reserved=str(line.reserved_uom_qty),
+                quantity_reserved=str(line.quantity),
             ),
         }
 

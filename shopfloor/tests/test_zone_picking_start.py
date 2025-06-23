@@ -138,7 +138,7 @@ class ZonePickingStartCase(ZonePickingCommonCase):
         # and set the destination package
         self.service._set_destination_package(
             move_line,
-            move_line.reserved_uom_qty,
+            move_line.quantity,
             self.free_package,
         )
         response = self.service.dispatch("select_zone")

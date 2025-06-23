@@ -221,7 +221,7 @@ class Delivery(Component):
         for line in lines:
             # note: the package level is automatically set to "is_done" when
             # the qty_done is full
-            line.qty_done = line.reserved_uom_qty
+            line.qty_done = line.quantity
         picking = fields.first(lines.mapped("picking_id"))
         return self._action_picking_done(picking, force=allow_prepackaged_product)
 
@@ -420,9 +420,7 @@ class Delivery(Component):
                     message=self.msg_store.product_not_unitary_in_package_scan_package(),
                 )
         # We focus only on lines on which we can increase the 'qty_done'
-        lines = lines.filtered(
-            lambda x: (x.qty_done + product_qty) <= x.reserved_uom_qty
-        )
+        lines = lines.filtered(lambda x: (x.qty_done + product_qty) <= x.quantity)
         # Filter lines to keep only ones from one delivery operation
         # (we do not want to process lines of another delivery operation)
         lines = lines._filter_on_picking(picking)

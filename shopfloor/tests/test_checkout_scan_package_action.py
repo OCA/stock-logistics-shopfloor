@@ -40,18 +40,18 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
 
     def test_scan_package_action_select_product(self):
         self._test_select_product(
-            lambda x: x.product_id.barcode, lambda x: x.reserved_uom_qty, lambda __: 0
+            lambda x: x.product_id.barcode, lambda x: x.quantity, lambda __: 0
         )
 
     def test_scan_package_action_deselect_product(self):
         self._test_select_product(
-            lambda x: x.product_id.barcode, lambda __: 0, lambda x: x.reserved_uom_qty
+            lambda x: x.product_id.barcode, lambda __: 0, lambda x: x.quantity
         )
 
     def test_scan_package_action_select_product_packaging(self):
         self._test_select_product(
             lambda x: x.product_id.packaging_ids.barcode,
-            lambda x: x.reserved_uom_qty,
+            lambda x: x.quantity,
             lambda __: 0,
         )
 
@@ -59,21 +59,21 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
         self._test_select_product(
             lambda x: x.product_id.packaging_ids.barcode,
             lambda __: 0,
-            lambda x: x.reserved_uom_qty,
+            lambda x: x.quantity,
         )
 
     def test_scan_package_action_select_product_lot(self):
         self._test_select_product(
             lambda x: x.lot_id.name,
             lambda __: 0,
-            lambda x: x.reserved_uom_qty,
+            lambda x: x.quantity,
             in_lot=True,
         )
 
     def test_scan_package_action_deselect_product_lot(self):
         self._test_select_product(
             lambda x: x.lot_id.name,
-            lambda x: x.reserved_uom_qty,
+            lambda x: x.quantity,
             lambda __: 0,
             in_lot=True,
         )
@@ -135,8 +135,8 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
 
         move_line1, move_line2, move_line3 = selected_lines
         # We'll put only product A and B in the package
-        move_line1.qty_done = move_line1.reserved_uom_qty
-        move_line2.qty_done = move_line2.reserved_uom_qty
+        move_line1.qty_done = move_line1.quantity
+        move_line2.qty_done = move_line2.quantity
         move_line3.qty_done = 0
 
         response = self.service.dispatch(
@@ -296,8 +296,8 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
 
         move_line1, move_line2, move_line3 = selected_lines
         # we'll put only the first 2 lines (product A and B) in the new package
-        move_line1.qty_done = move_line1.reserved_uom_qty
-        move_line2.qty_done = move_line2.reserved_uom_qty
+        move_line1.qty_done = move_line1.quantity
+        move_line2.qty_done = move_line2.quantity
         move_line3.qty_done = 0
 
         packaging = (
@@ -368,7 +368,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
         self._fill_stock_for_moves(pack1_moves, in_package=True)
         picking.action_assign()
         selected_lines = pack1_moves.move_line_ids
-        selected_lines.qty_done = selected_lines.reserved_uom_qty
+        selected_lines.qty_done = selected_lines.quantity
 
         packaging = (
             self.env["stock.package.type"]
