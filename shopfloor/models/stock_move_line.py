@@ -258,6 +258,10 @@ class StockMoveLine(models.Model):
             "lot_id": quant.lot_id.id,
             "owner_id": quant.owner_id.id,
             "result_package_id": False,
+            # Always set the 'quantity' value in 'values', this ensure quants are
+            # synchronized with the data set on the move line starting from Odoo
+            # 18.0 (see '<stock.move.line.write()' method in 'stock' module).
+            "quantity": self.quantity,
         }
 
         available_quantity = quant.quantity - quant.reserved_quantity
@@ -271,13 +275,12 @@ class StockMoveLine(models.Model):
 
         self.write(values)
 
-        # try reassign the move in case we had a partial qty, also, it will
-        # recreate a package level if it applies
-        if "quantity" in values:
-            # when we change the quantity of the move, the state
-            # will still be "assigned" and be skipped by "_action_assign",
-            # recompute the state to be "partially_available"
-            self.move_id._recompute_state()
+        # Try reassign the move in case we had a partial qty, also, it will
+        # recreate a package level if it applies.
+        # When we change the quantity of the move, the state
+        # will still be "assigned" and be skipped by "_action_assign",
+        # recompute the state to be "partially_available"
+        self.move_id._recompute_state()
 
         # if the new package has less quantities, assign will create new move
         # lines
