@@ -65,7 +65,7 @@ class SearchAction(Component):
             "package_type": self.package_type_from_scan,
             "origin_move": self.origin_move_from_scan,
             # Extra data can be contained in barcodes
-            "expiration_date": self.dummy_from_scan,
+            "expiration_date": self.expiration_date_from_scan,
         }
 
     def _make_search_result(self, **kwargs):
@@ -211,4 +211,8 @@ class SearchAction(Component):
         return model.search(outgoing_move_domain)
 
     def dummy_from_scan(self, barcode):
+        return None
+
+    def expiration_date_from_scan(self, barcode):
+        # TODO
         return None
