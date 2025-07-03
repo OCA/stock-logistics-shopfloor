@@ -20,7 +20,7 @@ class TestSetDestination(CommonCase):
     def test_scan_location_child_of_dest_location(self):
         picking = self._create_picking()
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         self._change_line_dest(selected_move_line)
         response = self.service.dispatch(
@@ -39,7 +39,7 @@ class TestSetDestination(CommonCase):
     def test_scan_location_child_of_pick_type_dest_location(self):
         picking = self._create_picking()
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         self._change_line_dest(selected_move_line)
         response = self.service.dispatch(
@@ -86,7 +86,7 @@ class TestSetDestination(CommonCase):
     def test_scan_location_not_child_of_dest_locations(self):
         picking = self._create_picking()
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         response = self.service.dispatch(
             "set_destination",
@@ -111,7 +111,7 @@ class TestSetDestination(CommonCase):
         self.menu.sudo().auto_post_line = True
         picking = self._create_picking()
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
 
         # User has previously scanned a total of 3 units (with 7 still to do).
@@ -139,17 +139,17 @@ class TestSetDestination(CommonCase):
         )
         # The line has been moved to a different picking.
         self.assertNotEqual(picking, selected_move_line.picking_id)
-        # Its qty_done is 3.
-        self.assertEqual(selected_move_line.qty_done, 3)
+        # Its quantity_picked is 3.
+        self.assertEqual(selected_move_line.qty_picked, 3)
         # The new picking is marked as done.
         self.assertEqual(selected_move_line.picking_id.state, "done")
 
         # The line that remained in the original picking
         line_in_picking = picking.move_line_ids.filtered(
-            lambda l: l.product_id == selected_move_line.product_id
+            lambda li: li.product_id == selected_move_line.product_id
         )
-        self.assertEqual(line_in_picking.reserved_uom_qty, 7)
-        self.assertEqual(line_in_picking.qty_done, 0)
+        self.assertEqual(line_in_picking.quantity, 7)
+        self.assertEqual(line_in_picking.qty_picked, 0)
         self.assertEqual(picking.state, "assigned")
 
     def test_auto_posting_concurent_work(self):

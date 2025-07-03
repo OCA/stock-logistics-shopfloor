@@ -29,7 +29,7 @@ class TestSetQuantity(CommonCase):
     def test_set_quantity_scan_product(self):
         picking = self._create_picking()
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         selected_move_line.shopfloor_user_id = self.env.uid
         response = self.service.dispatch(
@@ -41,7 +41,8 @@ class TestSetQuantity(CommonCase):
                 "barcode": selected_move_line.product_id.barcode,
             },
         )
-        self.assertEqual(selected_move_line.qty_done, 11.0)
+        self.assertEqual(selected_move_line.qty_picked, 11.0)
+        self.assertTrue(selected_move_line.picked)
         data = self.data.picking(picking)
         self.assert_response(
             response,
@@ -56,7 +57,7 @@ class TestSetQuantity(CommonCase):
     def test_set_quantity_scan_packaging(self):
         picking = self._create_picking()
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         selected_move_line.shopfloor_user_id = self.env.uid
         response = self.service.dispatch(
@@ -68,7 +69,8 @@ class TestSetQuantity(CommonCase):
                 "barcode": selected_move_line.product_id.packaging_ids.barcode,
             },
         )
-        self.assertEqual(selected_move_line.qty_done, 15.0)
+        self.assertEqual(selected_move_line.qty_picked, 15.0)
+        self.assertTrue(selected_move_line.picked)
         data = self.data.picking(picking)
         self.assert_response(
             response,
@@ -83,7 +85,7 @@ class TestSetQuantity(CommonCase):
     def test_scan_product(self):
         picking = self._create_picking()
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         selected_move_line.shopfloor_user_id = self.env.uid
         response = self.service.dispatch(
@@ -94,7 +96,8 @@ class TestSetQuantity(CommonCase):
                 "barcode": self.product_a.barcode,
             },
         )
-        self.assertEqual(selected_move_line.qty_done, 1.0)
+        self.assertEqual(selected_move_line.qty_picked, 1.0)
+        self.assertTrue(selected_move_line.picked)
         data = self.data.picking(picking)
         self.assert_response(
             response,
@@ -130,12 +133,13 @@ class TestSetQuantity(CommonCase):
                 "barcode": self.product_a.barcode,
             },
         )
-        self.assertEqual(selected_move_line.qty_done, 4.0)
+        self.assertEqual(selected_move_line.qty_picked, 4.0)
+        self.assertTrue(selected_move_line.picked)
 
     def test_scan_packaging(self):
         picking = self._create_picking()
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         selected_move_line.shopfloor_user_id = self.env.uid
         response = self.service.dispatch(
@@ -146,7 +150,8 @@ class TestSetQuantity(CommonCase):
                 "barcode": self.product_a_packaging.barcode,
             },
         )
-        self.assertEqual(selected_move_line.qty_done, 5.0)
+        self.assertEqual(selected_move_line.qty_picked, 5.0)
+        self.assertTrue(selected_move_line.picked)
         data = self.data.picking(picking)
         self.assert_response(
             response,
@@ -166,13 +171,14 @@ class TestSetQuantity(CommonCase):
                 "barcode": self.product_a_packaging.barcode,
             },
         )
-        self.assertEqual(selected_move_line.qty_done, 10.0)
+        self.assertEqual(selected_move_line.qty_picked, 10.0)
+        self.assertTrue(selected_move_line.picked)
 
     def test_scan_package_with_destination_child_of_dest_location(self):
         # next step is select_move
         picking = self._create_picking()
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         selected_move_line.shopfloor_user_id = self.env.uid
         response = self.service.dispatch(
@@ -196,7 +202,7 @@ class TestSetQuantity(CommonCase):
         # next step is set_quantity with error
         picking = self._create_picking()
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         selected_move_line.shopfloor_user_id = self.env.uid
         response = self.service.dispatch(
@@ -223,7 +229,7 @@ class TestSetQuantity(CommonCase):
         # next_step is set_destination
         picking = self._create_picking()
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         selected_move_line.shopfloor_user_id = self.env.uid
         response = self.service.dispatch(
@@ -250,7 +256,7 @@ class TestSetQuantity(CommonCase):
     def test_scan_location_child_of_dest_location(self):
         picking = self._create_picking()
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         selected_move_line.shopfloor_user_id = self.env.uid
         response = self.service.dispatch(
@@ -269,7 +275,7 @@ class TestSetQuantity(CommonCase):
     def test_scan_location_not_child_of_dest_location(self):
         picking = self._create_picking()
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         selected_move_line.shopfloor_user_id = self.env.uid
         response = self.service.dispatch(
@@ -295,7 +301,7 @@ class TestSetQuantity(CommonCase):
     def test_scan_location_view_usage(self):
         picking = self._create_picking()
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         selected_move_line.shopfloor_user_id = self.env.uid
         self.dispatch_location.sudo().quant_ids.unlink()
@@ -323,7 +329,7 @@ class TestSetQuantity(CommonCase):
     def test_scan_new_package(self):
         picking = self._create_picking()
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         selected_move_line.shopfloor_user_id = self.env.uid
         response = self.service.dispatch(
@@ -372,7 +378,7 @@ class TestSetQuantity(CommonCase):
     def test_reception_set_quantity_confirm_new_package_with_other_new_pack(self):
         picking = self._create_picking()
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         selected_move_line.shopfloor_user_id = self.env.uid
         # Scan new pack 1
@@ -437,15 +443,14 @@ class TestSetQuantity(CommonCase):
             params={"picking_id": picking.id, "barcode": self.product_a.barcode},
         )
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a and li.picked
         )
         self.assertEqual(len(selected_move_line), 1)
-        self.assertEqual(selected_move_line.qty_done, 1.0)
+        self.assertEqual(selected_move_line.qty_picked, 1.0)
         self.assertEqual(
-            selected_move_line.reserved_uom_qty,
+            selected_move_line.quantity,
             selected_move_line.move_id.product_uom_qty,
         )
-
         # Let's make the first user work a little bit, and pick a total of 4 units
         for __ in range(4):
             self.service.dispatch(
@@ -453,13 +458,12 @@ class TestSetQuantity(CommonCase):
                 params={
                     "picking_id": picking.id,
                     "selected_line_id": selected_move_line.id,
-                    "quantity": selected_move_line.qty_done,
+                    "quantity": selected_move_line.qty_picked,
                     "barcode": selected_move_line.product_id.barcode,
                 },
             )
-        self.assertEqual(selected_move_line.qty_done, 5.0)
-        self.assertEqual(selected_move_line.reserved_uom_qty, 10.0)
-
+        self.assertEqual(selected_move_line.qty_picked, 5.0)
+        self.assertEqual(selected_move_line.quantity, 10.0)
         # Now, concurrently pick products with another user for the same move
         manager_user = self.shopfloor_manager
         new_service = self._get_service_for_user(manager_user)
@@ -471,10 +475,10 @@ class TestSetQuantity(CommonCase):
         # The whole move's product_uom_qty has been assigned to the first created line.
         # The new one gets 0.0
         new_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
-            and l.shopfloor_user_id == manager_user
+            lambda li: li.product_id == self.product_a
+            and li.shopfloor_user_id == manager_user
         )
-        self.assertEqual(new_line.reserved_uom_qty, 0.0)
+        self.assertEqual(new_line.quantity, 0.0)
 
         move_lines = selected_move_line | new_line
         line_service_mapping = [
@@ -484,10 +488,10 @@ class TestSetQuantity(CommonCase):
 
         # Now, we picked 5 for the original line, then 1 for the new one.
         # Total qty done should be 6
-        lines_qty_done = sum(move_lines.mapped("qty_done"))
+        lines_qty_done = sum(move_lines.mapped("qty_picked"))
         self.assertEqual(lines_qty_done, 6.0)
-        # should be equal to the moves quantity_done
-        self.assertEqual(lines_qty_done, move_lines.move_id.quantity_done)
+        # should be equal to the moves quantity_picked
+        self.assertEqual(lines_qty_done, move_lines.move_id.quantity_picked)
 
         # Now, let the new user finish its work
         for __ in range(4):
@@ -496,25 +500,25 @@ class TestSetQuantity(CommonCase):
                 params={
                     "picking_id": picking.id,
                     "selected_line_id": new_line.id,
-                    "quantity": new_line.qty_done,
+                    "quantity": new_line.qty_picked,
                     "barcode": new_line.product_id.barcode,
                 },
             )
 
-        # We should have a qty_done == 10.0 on both moves and move lines
-        lines_qty_done = sum(move_lines.mapped("qty_done"))
+        # We should have a quantity_picked == 10.0 on both moves and move lines
+        lines_qty_done = sum(move_lines.mapped("qty_picked"))
         self.assertEqual(lines_qty_done, 10.0)
-        self.assertEqual(lines_qty_done, move_lines.move_id.quantity_done)
+        self.assertEqual(lines_qty_done, move_lines.move_id.quantity_picked)
 
-        # However, reserved_uom_qty hasn't changed
-        self.assertEqual(selected_move_line.reserved_uom_qty, 10.0)
-        self.assertEqual(new_line.reserved_uom_qty, 0.0)
-        # And what's important is that the sum of lines's reserved_uom_qty is
+        # However, quantity hasn't changed
+        self.assertEqual(selected_move_line.quantity, 10.0)
+        self.assertEqual(new_line.quantity, 0.0)
+        # And what's important is that the sum of lines's quantity is
         # always == move's product_uom_qty
-        self.assertEqual(sum(move_lines.mapped("reserved_uom_qty")), 10.0)
+        self.assertEqual(sum(move_lines.mapped("quantity")), 10.0)
 
         # However, if we pick more than move's product_uom_qty, then lines
-        # reserved_uom_qty isn't updated, in order to be able to display an error
+        # quantity isn't updated, in order to be able to display an error
         # in the frontend
 
         for __ in range(2):
@@ -523,15 +527,15 @@ class TestSetQuantity(CommonCase):
                 params={
                     "picking_id": picking.id,
                     "selected_line_id": new_line.id,
-                    "quantity": new_line.qty_done,
+                    "quantity": new_line.qty_picked,
                     "barcode": new_line.product_id.barcode,
                 },
             )
 
         # We're 2 over move's product_uom_qty
-        lines_qty_done = sum(move_lines.mapped("qty_done"))
+        lines_qty_done = sum(move_lines.mapped("qty_picked"))
         self.assertEqual(lines_qty_done, 12.0)
-        self.assertEqual(lines_qty_done, move_lines.move_id.quantity_done)
+        self.assertEqual(lines_qty_done, move_lines.move_id.quantity_picked)
 
         # We shouldn't be able to process any of those move lines
         error_msg = {
@@ -547,7 +551,7 @@ class TestSetQuantity(CommonCase):
                 params={
                     "picking_id": picking.id,
                     "selected_line_id": line.id,
-                    "quantity": line.qty_done,
+                    "quantity": line.qty_picked,
                 },
             )
             line_data = self.data.move_lines(line)
@@ -563,8 +567,8 @@ class TestSetQuantity(CommonCase):
                 message=error_msg,
             )
 
-        # But line's reserved_uom_qty hasn't changed and is still 10.0
-        self.assertEqual(sum(move_lines.mapped("reserved_uom_qty")), 10.0)
+        # But line's quantity hasn't changed and is still 10.0
+        self.assertEqual(sum(move_lines.mapped("quantity")), 10.0)
 
         # If we lower by 2 the first move qty done, qty_todo will be updated correctly
         self.service.dispatch(
@@ -577,16 +581,16 @@ class TestSetQuantity(CommonCase):
             },
         )
 
-        self.assertEqual(selected_move_line.qty_done, 3.0)
-        self.assertEqual(new_line.qty_done, 7.0)
+        self.assertEqual(selected_move_line.qty_picked, 3.0)
+        self.assertEqual(new_line.qty_picked, 7.0)
 
-        self.assertEqual(selected_move_line.reserved_uom_qty, 10.0)
-        self.assertEqual(new_line.reserved_uom_qty, 0.0)
-        self.assertEqual(sum(move_lines.mapped("reserved_uom_qty")), 10.0)
+        self.assertEqual(selected_move_line.quantity, 10.0)
+        self.assertEqual(new_line.quantity, 0.0)
+        self.assertEqual(sum(move_lines.mapped("quantity")), 10.0)
 
         # And everything's fine on the move
         move = move_lines.move_id
-        self.assertEqual(move.product_uom_qty, move.quantity_done)
+        self.assertEqual(move.product_uom_qty, move.quantity_picked)
         self.assertEqual(move.product_uom_qty, 10.0)
 
     def test_split_move_line(self):
@@ -597,10 +601,10 @@ class TestSetQuantity(CommonCase):
             params={"picking_id": picking.id, "barcode": self.product_a.barcode},
         )
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         self.assertEqual(len(selected_move_line), 1)
-        self.assertEqual(selected_move_line.qty_done, 1.0)
+        self.assertEqual(selected_move_line.qty_picked, 1.0)
         # Now, concurrently pick products with another user for the same move
         manager_user = self.shopfloor_manager
         new_service = self._get_service_for_user(manager_user)
@@ -630,7 +634,7 @@ class TestSetQuantity(CommonCase):
         )
         # there should be 3 lines now
         move_lines = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         self.assertEqual(len(move_lines), 3)
 
@@ -648,7 +652,7 @@ class TestSetQuantity(CommonCase):
 
         # Creating the picking, selecting the move line.
         picking = self._create_picking()
-        move = picking.move_ids.filtered(lambda l: l.product_id == self.product_a)
+        move = picking.move_ids.filtered(lambda li: li.product_id == self.product_a)
         service_user_1 = self.service
         service_user_1.dispatch("scan_document", params={"barcode": picking.name})
         service_user_1.dispatch(
@@ -656,9 +660,9 @@ class TestSetQuantity(CommonCase):
             params={"picking_id": picking.id, "barcode": self.product_a.barcode},
         )
         move_line_user_1 = move.move_line_ids
-        # The only move line should have qty_done = 1
-        self.assertEqual(move_line_user_1.qty_done, 1.0)
-        self.assertEqual(move_line_user_1.reserved_uom_qty, 10.0)
+        # The only move line should have qty_picked = 1
+        self.assertEqual(move_line_user_1.qty_picked, 1.0)
+        self.assertEqual(move_line_user_1.quantity, 10.0)
 
         # Now, concurrently pick products with another user for the same move
         manager_user = self.shopfloor_manager
@@ -668,14 +672,14 @@ class TestSetQuantity(CommonCase):
             "scan_line",
             params={"picking_id": picking.id, "barcode": self.product_a.barcode},
         )
-        # The whole move's product_uom_qty has been assigned to the first created line.
+        # The whole move's product_uom_qty has been reserved on the first created line.
         # The new one gets 0.0
         move_line_user_2 = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
-            and l.shopfloor_user_id == manager_user
+            lambda li: li.product_id == self.product_a
+            and li.shopfloor_user_id == manager_user
         )
-        self.assertEqual(move_line_user_2.reserved_uom_qty, 0.0)
-        self.assertEqual(move_line_user_2.qty_done, 1.0)
+        self.assertEqual(move_line_user_2.quantity, 0.0)
+        self.assertEqual(move_line_user_2.qty_picked, 1.0)
 
         # At this point, both lines are referencing the same move
         self.assertEqual(move_line_user_2.move_id, move_line_user_1.move_id)
@@ -691,7 +695,7 @@ class TestSetQuantity(CommonCase):
             params={
                 "picking_id": picking.id,
                 "selected_line_id": move_line_user_1.id,
-                "quantity": move_line_user_1.qty_done,
+                "quantity": move_line_user_1.qty_picked,
             },
         )
         picking_data = self.data.picking(picking)
@@ -715,15 +719,16 @@ class TestSetQuantity(CommonCase):
         lines_after = self.env["stock.move.line"].search(
             [("id", "not in", lines_before.ids)]
         )
-        # After move_line is posted, its state is done, and its qty_done is 1.0
+        # FIXME: Check _auto_post_line with MMQ?
+        # After move_line is posted, its state is done, and its qty_picked is 1.0
         self.assertEqual(move_line_user_1.state, "done")
         # The remaining one is still to be done
-        self.assertEqual(move_line_user_2.state, "assigned")
+        self.assertEqual(move_line_user_2.state, "partially_available")
         # As well as the new one
         self.assertEqual(len(lines_after), 1)
         # The quantity to do is set on 1 of the lines
-        self.assertEqual(lines_after.reserved_uom_qty, 0)
-        self.assertEqual(move_line_user_2.reserved_uom_qty, 9)
+        self.assertEqual(lines_after.quantity, 0)
+        self.assertEqual(move_line_user_2.quantity, 9)
 
     def test_move_states(self):
         # as only assigned moves can be posted, we need to ensure that
@@ -731,7 +736,7 @@ class TestSetQuantity(CommonCase):
         # concurrently
         picking = self._create_picking()
         move_product_a = picking.move_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         # user1 processes 10 units
         move_line_user_1 = move_product_a.move_line_ids
@@ -763,7 +768,7 @@ class TestSetQuantity(CommonCase):
         )
         move_line_user_2 = move_product_a.move_line_ids - move_line_user_1
         # user1 shouldn't be able to process his move, since
-        # move qty_done  > move product_qty
+        # move quantity  > move product_qty
         response = service_user_1.dispatch(
             "process_with_new_pack",
             params={
@@ -772,7 +777,7 @@ class TestSetQuantity(CommonCase):
                 "quantity": 10.0,
             },
         )
-        #
+
         expected_message = {
             "body": "You cannot process that much units.",
             "message_type": "error",
@@ -787,7 +792,8 @@ class TestSetQuantity(CommonCase):
             },
         )
         self.assertFalse(move_line_user_1.shopfloor_user_id)
-        self.assertEqual(move_line_user_1.qty_done, 0)
+        self.assertEqual(move_line_user_1.qty_picked, 0.0)
+        self.assertFalse(move_line_user_1.picked)
         # User2 should be able to process 1 unit
         response = service_user_2.dispatch(
             "process_with_new_pack",
@@ -806,7 +812,7 @@ class TestSetQuantity(CommonCase):
                 "selected_move_line": self.data.move_lines(move_line_user_2),
             },
         )
-        self.assertEqual(move_product_a.quantity_done, 1.0)
+        self.assertEqual(move_product_a.quantity_picked, 1.0)
         response = service_user_2.dispatch(
             "set_destination",
             params={
@@ -815,8 +821,8 @@ class TestSetQuantity(CommonCase):
                 "location_name": self.dispatch_location.name,
             },
         )
-        # When posted, the move line reserved_uom_qty has been set to qty_done
-        self.assertEqual(move_line_user_2.qty_done, move_line_user_2.reserved_uom_qty)
+        # When posted, the move line quantity will be set to qty_picked
+        self.assertEqual(move_line_user_2.qty_picked, 1.0)
         self.assert_response(
             response, next_state="select_move", data=self._data_for_select_move(picking)
         )

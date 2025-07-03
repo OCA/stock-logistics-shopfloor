@@ -14,7 +14,7 @@ class TestSetLot(CommonCase):
         picking = self._create_picking()
         lot = self._create_lot()
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         selected_move_line.shopfloor_user_id = self.env.uid
         response = self.service.dispatch(
@@ -41,7 +41,7 @@ class TestSetLot(CommonCase):
         picking = self._create_picking()
         lot_before = self._create_lot()
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         selected_move_line.shopfloor_user_id = self.env.uid
         selected_move_line.lot_id = lot_before
@@ -72,7 +72,7 @@ class TestSetLot(CommonCase):
         expiration_date = "2022-08-23 12:00:00"
         lot = self._create_lot(expiration_date=expiration_date)
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         selected_move_line.shopfloor_user_id = self.env.uid
         response = self.service.dispatch(
@@ -97,7 +97,7 @@ class TestSetLot(CommonCase):
     def test_set_new_lot(self):
         picking = self._create_picking()
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         selected_move_line.shopfloor_user_id = self.env.uid
         response = self.service.dispatch(
@@ -124,7 +124,7 @@ class TestSetLot(CommonCase):
         picking = self._create_picking()
         lot = self._create_lot()
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         selected_move_line.shopfloor_user_id = self.env.uid
         self.service.dispatch(

@@ -32,7 +32,7 @@ class TestSelectLine(CommonCase):
         )
         data = self.data.picking(picking)
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         self.assert_response(
             response,
@@ -55,7 +55,7 @@ class TestSelectLine(CommonCase):
         )
         data = self.data.picking(picking)
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         self.assert_response(
             response,
@@ -70,7 +70,7 @@ class TestSelectLine(CommonCase):
         picking = self._create_picking()
         lot = self._create_lot()
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         selected_move_line.lot_id = lot
         response = self.service.dispatch(
@@ -104,7 +104,7 @@ class TestSelectLine(CommonCase):
         )
         data = self.data.picking(picking)
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         self.assert_response(
             response,
@@ -129,7 +129,7 @@ class TestSelectLine(CommonCase):
         )
         data = self.data.picking(picking)
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         self.assert_response(
             response,
@@ -188,10 +188,10 @@ class TestSelectLine(CommonCase):
             },
         )
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         other_move_line = fields.first(
-            picking.move_line_ids.filtered(lambda l: l.product_id != self.product_a)
+            picking.move_line_ids.filtered(lambda li: li.product_id != self.product_a)
         )
         self.assertEqual(selected_move_line.shopfloor_user_id.id, self.env.uid)
         self.assertEqual(other_move_line.shopfloor_user_id.id, False)
@@ -200,7 +200,7 @@ class TestSelectLine(CommonCase):
         # If there's already a move line for a given incoming move,
         # we assigned the whole move's product_uom_qty to it.
         # The reason for that is that when recomputing states for a given move
-        # if sum(move.move_line_ids.reserved_uom_qty) != move.product_uom_qty,
+        # if sum(move.move_line_ids.quantity) != move.product_uom_qty,
         # then it's state won't be assigned.
         # For instance:
         #   - user 1 selects line1
@@ -214,15 +214,15 @@ class TestSelectLine(CommonCase):
         picking = self._create_picking()
         self.assertEqual(len(picking.move_line_ids), 2)
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
-        # The picking and the selected line have been previously assigned to a different user
-        # and this user has completed a total of 3 units.
+        # The picking and the selected line have been previously assigned to a
+        #  different user and this user has completed a total of 3 units.
         another_user = fields.first(
             self.env["res.users"].search([("id", "!=", self.env.uid)])
         )
         selected_move_line.shopfloor_user_id = another_user
-        selected_move_line.qty_done = 3
+        selected_move_line.qty_picked = 3
         # When the user scans that product,
         # a new line will be generated with the remaining qty todo.
         self.service.dispatch(
@@ -235,9 +235,11 @@ class TestSelectLine(CommonCase):
         # A new line has been created
         self.assertEqual(len(picking.move_line_ids), 3)
         created_line = picking.move_line_ids[2]
-        # And its product_uom_qty is 0
-        self.assertEqual(created_line.reserved_uom_qty, 0.0)
+        # And its reserved quantity is 0
+        self.assertEqual(created_line.quantity, 0.0)
+        self.assertEqual(created_line.qty_picked, 1)
         self.assertEqual(created_line.shopfloor_user_id.id, self.env.uid)
+        self.assertEqual(sum(created_line.move_id.move_line_ids.mapped("quantity")), 10)
 
     def test_done_action(self):
         picking = self._create_picking()
@@ -252,7 +254,7 @@ class TestSelectLine(CommonCase):
         )
 
         for line in picking.move_line_ids:
-            line.qty_done = line.reserved_uom_qty
+            line.qty_picked = line.quantity
             lot = (self._create_lot(product_id=line.product_id.id),)
             line.lot_id = lot
         # Ask for confirmation to mark the package as done.
@@ -304,7 +306,7 @@ class TestSelectLine(CommonCase):
             params={"move_id": selected_move.id},
         )
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         data = self.data.picking(picking)
         self.assert_response(

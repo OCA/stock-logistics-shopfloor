@@ -11,7 +11,9 @@ from .common import CommonCase
 class TestReceptionDone(CommonCase):
     def test_set_done_no_backorder(self):
         picking = self._create_picking()
-        picking.move_line_ids.write({"qty_done": 10, "shopfloor_checkout_done": True})
+        picking.move_line_ids.write(
+            {"qty_picked": 10, "picked": True, "shopfloor_checkout_done": True}
+        )
         response = self.service.dispatch(
             "done_action", params={"picking_id": picking.id}
         )
@@ -48,7 +50,8 @@ class TestReceptionDone(CommonCase):
             data=self._data_for_select_move(picking),
             message={
                 "message_type": "warning",
-                "body": "No quantity has been processed, unable to complete the transfer.",
+                "body": "No quantity has been processed, unable to complete the "
+                "transfer.",
             },
         )
 
@@ -58,9 +61,9 @@ class TestReceptionDone(CommonCase):
         )
         picking_due_today = self._create_picking(scheduled_date=fields.Datetime.today())
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
-        selected_move_line.qty_done = 10.0
+        selected_move_line.qty_picked = 10
         response = self.service.dispatch(
             "done_action", params={"picking_id": picking.id}
         )

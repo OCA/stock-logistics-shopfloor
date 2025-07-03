@@ -9,12 +9,8 @@
             <group name="options" position="inside">
                 <group
                     name="filter_today_scheduled_pickings"
-                    attrs="{'invisible': [('filter_today_scheduled_pickings_is_possible', '=', False)]}"
+                    invisible="not filter_today_scheduled_pickings_is_possible"
                 >
-                    <field
-                        name="filter_today_scheduled_pickings_is_possible"
-                        invisible="1"
-                    />
                     <field name="filter_today_scheduled_pickings" />
                 </group>
             </group>

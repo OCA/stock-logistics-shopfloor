@@ -36,7 +36,7 @@ class CommonCase(BaseCommonCase):
         packagings = cls.env["product.packaging"].browse(packaging_ids)
         for line in picking.move_line_ids:
             product = line.product_id
-            packaging = packagings.filtered(lambda p: p.product_id == product)
+            packaging = packagings.filtered(lambda p: p.product_id == product)  # noqa: B023
             package = cls.env["stock.quant.package"].create(
                 {"product_packaging_id": packaging.id}
             )

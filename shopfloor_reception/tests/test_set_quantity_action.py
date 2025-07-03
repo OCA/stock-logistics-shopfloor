@@ -10,7 +10,7 @@ class TestSetQuantityAction(CommonCase):
         super().setUpClassBaseData()
         cls.picking = cls._create_picking()
         cls.selected_move_line = cls.picking.move_line_ids.filtered(
-            lambda l: l.product_id == cls.product_a
+            lambda li: li.product_id == cls.product_a
         )
 
     def test_process_with_existing_package(self):
@@ -83,7 +83,7 @@ class TestSetQuantityAction(CommonCase):
     def test_cancel_action(self):
         picking = self._create_picking()
         move_product_a = picking.move_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         # User 1 and 2 selects the same picking
         service_user_1 = self.service
@@ -157,8 +157,8 @@ class TestSetQuantityAction(CommonCase):
         # reset the line
         self.assertTrue(move_line_user_1.exists())
         self.assertFalse(move_line_user_1.shopfloor_user_id)
-        self.assertEqual(move_line_user_1.qty_done, 0)
-        self.assertEqual(move_line_user_1.reserved_uom_qty, 10)
+        self.assertEqual(move_line_user_1.qty_picked, 0)
+        self.assertEqual(move_line_user_1.quantity, 10)
         # make user cancel
         service_user_2.dispatch(
             "set_quantity__cancel_action",

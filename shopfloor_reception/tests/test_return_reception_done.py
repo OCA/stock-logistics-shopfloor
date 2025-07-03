@@ -57,13 +57,13 @@ class TestReturn(CommonCaseReturn):
         )
 
     def test_set_done_partial_qty_done(self):
-        self.assertEqual(self.selected_move_line.reserved_uom_qty, 20.0)
+        self.assertEqual(self.selected_move_line.quantity, 20.0)
         self._set_quantity_done(qty_done=10.0)
         response = self._dispatch()
         # As this is a return created by the app, no backorder is created,
         # even if qty_done doesn't match que product_uom_qty
         self.assertEqual(self.return_picking.state, "done")
-        self.assertEqual(self.selected_move_line.qty_done, 10.0)
+        self.assertEqual(self.selected_move_line.qty_picked, 10.0)
         self.assertFalse(bool(self.return_picking.backorder_ids))
         # Success message
         self.assert_response(
@@ -85,7 +85,7 @@ class TestReturn(CommonCaseReturn):
         )
         selected_line_2 = self.get_new_move_lines()
         # Ensure that the max qty to return is 10.0
-        self.assertEqual(selected_line_2.reserved_uom_qty, 10.0)
+        self.assertEqual(selected_line_2.quantity, 10.0)
         # Set qty done == 10.0
         params = {
             "picking_id": return_picking_2.id,

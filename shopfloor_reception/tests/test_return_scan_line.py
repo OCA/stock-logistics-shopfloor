@@ -48,7 +48,7 @@ class TestScanLineReturn(CommonCaseReturn):
                 "selected_move_line": self.data.move_lines(selected_move_line),
             },
         )
-        self.assertEqual(selected_move_line.qty_done, 1.0)
+        self.assertEqual(selected_move_line.qty_picked, 1.0)
 
     def test_scan_packaging_not_in_delivery(self):
         self._enable_allow_return()
@@ -102,4 +102,4 @@ class TestScanLineReturn(CommonCaseReturn):
                 "selected_move_line": move_line_data,
             },
         )
-        self.assertEqual(selected_move_line.qty_done, self.product_a_packaging.qty)
+        self.assertEqual(selected_move_line.qty_picked, self.product_a_packaging.qty)

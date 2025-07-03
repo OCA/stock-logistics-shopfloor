@@ -74,7 +74,7 @@ class CommonCaseReturn(CommonCase):
         packagings = cls.env["product.packaging"].browse(packaging_ids)
         for line in order.order_line:
             product = line.product_id
-            packaging = packagings.filtered(lambda p: p.product_id == product)
+            packaging = packagings.filtered(lambda p: p.product_id == product)  # noqa: B023
             line.product_packaging_id = packaging
 
     @classmethod
@@ -86,12 +86,13 @@ class CommonCaseReturn(CommonCase):
             if not ready_picking:
                 break
             for line in ready_picking.move_line_ids:
-                line.qty_done = line.reserved_uom_qty
+                line.qty_picked = line.quantity
+                line.picked = True
             ready_picking._action_done()
 
     @classmethod
     def partial_deliver(cls, picking, qty_done):
-        picking.move_line_ids.write({"qty_done": qty_done})
+        picking.move_line_ids.write({"qty_picked": qty_done, "picked": True})
         action_data = picking.button_validate()
         if not action_data or action_data is True:
             return picking.browse()

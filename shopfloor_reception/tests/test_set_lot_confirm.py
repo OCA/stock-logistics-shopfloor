@@ -14,7 +14,7 @@ class TestSetLotConfirm(CommonCase):
         picking = self._create_picking()
         self.product_a.use_expiration_date = True
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         selected_move_line.shopfloor_user_id = self.env.uid
         # product has been set as requiring a expiration date.

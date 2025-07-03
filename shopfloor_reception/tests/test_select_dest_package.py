@@ -19,7 +19,7 @@ class TestSelectDestPackage(CommonCase):
     def test_scan_new_package(self):
         picking = self._create_picking()
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         response = self.service.dispatch(
             "select_dest_package",
@@ -67,12 +67,12 @@ class TestSelectDestPackage(CommonCase):
         )
         picking = self._create_picking()
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         # Assigning a package to a different move line
         # so that the package is available for the picking.
         different_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_b
+            lambda li: li.product_id == self.product_b
         )
         different_move_line.result_package_id = self.package
         response = self.service.dispatch(
@@ -107,24 +107,26 @@ class TestSelectDestPackage(CommonCase):
     def test_scan_existing_package(self):
         picking = self._create_picking()
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         # Assigning a package to a different move line
         # so that the package is available for the picking.
         different_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_b
+            lambda li: li.product_id == self.product_b
         )
-        self.package.location_id = self.input_sublocation
-        different_move_line.result_package_id = self.package
+        package = self.env["stock.quant.package"].create(
+            {"name": "BAR", "location_id": self.input_sublocation.id}
+        )
+        different_move_line.result_package_id = package
         response = self.service.dispatch(
             "select_dest_package",
             params={
                 "picking_id": picking.id,
                 "selected_line_id": selected_move_line.id,
-                "barcode": "FOO",
+                "barcode": "BAR",
             },
         )
-        self.assertEqual(selected_move_line.result_package_id.name, self.package.name)
+        self.assertEqual(selected_move_line.result_package_id.name, package.name)
         self.assertEqual(selected_move_line.location_dest_id, self.input_sublocation)
         self.assert_response(
             response,
