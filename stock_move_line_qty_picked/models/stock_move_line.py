@@ -1,6 +1,7 @@
 # Copyright 2025 Camptocamp SA
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 from odoo import fields, models
+from odoo.tools import float_compare
 
 
 class StockMoveLine(models.Model):
@@ -13,7 +14,14 @@ class StockMoveLine(models.Model):
             "qty_picked": qty,
             "picked": True,
         }
-        if qty > self.quantity:
+        total_demand = self.move_id.product_uom_qty
+        total_reserved = sum(self.move_id.move_line_ids.mapped("quantity"))
+        prec = self.env["decimal.precision"].precision_get("Product Unit of Measure")
+        if (
+            float_compare(qty, self.quantity, precision_digits=prec) > 0
+            and float_compare(total_reserved + qty, total_demand, precision_digits=prec)
+            <= 0
+        ):
             values["quantity"] = qty
         self.write(values)
         return True

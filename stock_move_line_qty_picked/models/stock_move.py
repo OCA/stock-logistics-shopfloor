@@ -22,7 +22,7 @@ class StockMove(models.Model):
     def _compute_quantity(self):
         picked_moves_ids = []
         for move in self:
-            if move.picked and any(ml.qty_picked for ml in self.move_line_ids):
+            if move.picked and any(ml.qty_picked for ml in move.move_line_ids):
                 picked_moves_ids.append(move.id)
         picked_moves_ids = self.browse(picked_moves_ids)
         data = self.env["stock.move.line"]._read_group(
@@ -40,3 +40,13 @@ class StockMove(models.Model):
 
         not_picked_moves = self - picked_moves_ids
         return super(StockMove, not_picked_moves)._compute_quantity()
+
+    def _quantity_sml(self):
+        if self.picked and any(ml.qty_picked for ml in self.move_line_ids):
+            quantity = 0
+            for move_line in self.move_line_ids:
+                quantity += move_line.product_uom_id._compute_quantity(
+                    move_line.qty_picked, self.product_uom, round=False
+                )
+            return quantity
+        return super()._quantity_sml()
