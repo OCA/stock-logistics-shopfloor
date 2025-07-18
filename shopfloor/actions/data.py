@@ -245,8 +245,7 @@ class DataAction(Component):
     def _move_parser(self):
         return [
             "id",
-            # FIXME: field gone... use a computed on to not change UI?
-            "quantity_done",
+            "quantity_picked:quantity_done",
             "product_uom_qty:quantity",
             ("product_id:product", self._product_parser),
             ("location_id:location_src", self._location_parser),

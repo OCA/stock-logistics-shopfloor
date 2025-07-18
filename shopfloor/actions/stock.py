@@ -26,9 +26,10 @@ class StockAction(Component):
             ):
                 continue
             if move.state in ("partially_available", "assigned"):
-                quantity -= sum(move.move_line_ids.mapped("quantity_product_uom"))
+                # TODO: Add a test hitting this line
+                quantity -= sum(move.move_line_ids.mapped("quantity"))
             elif move.state in ("done"):
-                quantity -= move.product_uom_qty
+                quantity -= move.quantity
         return float_round(
             quantity, precision_rounding=origin_move.product_id.uom_id.rounding
         )
@@ -156,7 +157,8 @@ class StockAction(Component):
         move_lines.write(
             {
                 "shopfloor_user_id": False,
-                "qty_done": 0,
+                "picked": False,
+                "qty_picked": 0,
                 "result_package_id": False,
             }
         )

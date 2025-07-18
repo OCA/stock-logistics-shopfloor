@@ -51,6 +51,8 @@
         # TODO v18: new dependency due to ``available_carriers`` that needs a SO.
         # see picking_form.py
         "sale_stock",
+        # OCA/stock-logistics-workflow
+        "stock_move_line_qty_picked",
     ],
     "data": [
         "data/shopfloor_scenario_data.xml",

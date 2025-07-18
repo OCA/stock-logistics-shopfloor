@@ -41,13 +41,13 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         picking_type = self.picking1.picking_type_id
         move_line = self.picking1.move_line_ids
         move_line.location_dest_id = self.shelf1
-        quantity_done = move_line.quantity
+        quantity_reserved = move_line.quantity
         response = self.service.dispatch(
             "set_destination",
             params={
                 "move_line_id": move_line.id,
                 "barcode": self.packing_location.barcode,
-                "quantity": quantity_done,
+                "quantity": quantity_reserved,
                 "confirmation": None,
             },
         )
@@ -61,7 +61,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
                 move_line.location_dest_id, self.packing_location
             ),
             confirmation_required=self.packing_location.barcode,
-            qty_done=quantity_done,
+            qty_done=quantity_reserved,
         )
         # Confirm the destination with a wrong destination (should not happen)
         response = self.service.dispatch(
@@ -80,7 +80,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             picking_type,
             move_line,
             message=self.service.msg_store.dest_location_not_allowed(),
-            qty_done=quantity_done,
+            qty_done=quantity_reserved,
         )
         # Confirm the destination with the right destination this time
         response = self.service.dispatch(
@@ -111,13 +111,13 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         move_line = self.picking1.move_line_ids
         move_line.move_id.location_dest_id = self.packing_sublocation_a
         move_line.picking_id.location_dest_id = self.packing_sublocation_a
-        quantity_done = move_line.quantity
+        quantity_reserved = move_line.quantity
         response = self.service.dispatch(
             "set_destination",
             params={
                 "move_line_id": move_line.id,
                 "barcode": self.packing_sublocation_b.barcode,
-                "quantity": quantity_done,
+                "quantity": quantity_reserved,
                 "confirmation": self.packing_sublocation_b.barcode,
             },
         )
@@ -128,7 +128,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             picking_type,
             move_line,
             message=self.service.msg_store.dest_location_not_allowed(),
-            qty_done=quantity_done,
+            qty_done=quantity_reserved,
         )
 
     def test_set_destination_location_no_other_move_line_full_qty(self):

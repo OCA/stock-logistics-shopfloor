@@ -171,7 +171,7 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
             response, message=self.service.msg_store.transfer_complete(self.picking)
         )
         for line in move_lines:
-            self.assertEqual(line.move_id.product_uom_qty, line.move_id.quantity_done)
+            self.assertEqual(line.move_id.product_uom_qty, line.move_id.quantity_picked)
             self.assertEqual(line.move_id.state, "done")
         self.assertEqual(self.picking.state, "done")
         self.assertTrue(self.picking.backorder_ids)
@@ -285,7 +285,7 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
         self.assert_response_deliver(
             response, message=self.service.msg_store.transfer_complete(self.picking)
         )
-        self.assertEqual(raw_move2.quantity_done, 1)
+        self.assertEqual(raw_move2.quantity_picked, 1)
         self.assertEqual(raw_move2.state, "done")
 
     def test_scan_deliver_scan_product_not_found(self):
@@ -405,7 +405,7 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
             "scan_deliver", params={"barcode": self.packaging.barcode}
         )
         self.assert_response_deliver(response, picking=self.picking)
-        self.assertEqual(line.move_id.product_qty, line.move_id.quantity_done)
+        self.assertEqual(line.move_id.product_qty, line.move_id.quantity_picked)
         self.assertEqual(line.move_id.state, "assigned")
 
     def test_scan_deliver_scan_product_packaging_partial_qty_with_prepackaged_product(

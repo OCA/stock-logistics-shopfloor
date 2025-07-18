@@ -517,8 +517,8 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         )
         moves_product_c_done = all(move.state == "done" for move in moves_product_c)
         self.assertTrue(moves_product_c_done)
-        moves_product_c_qty_done = sum([move.quantity_done for move in moves_product_c])
-        self.assertEqual(moves_product_c_qty_done, 10)
+        moves_product_c_picked = sum([move.quantity_picked for move in moves_product_c])
+        self.assertEqual(moves_product_c_picked, 10)
         # The picking is still not done as product_d hasn't been processed
         self.assertEqual(original_picking.state, "assigned")
         # Let scan product_d quantity and check picking state

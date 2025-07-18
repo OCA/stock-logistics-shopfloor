@@ -1,16 +1,26 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # Copyright 2022 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
-from odoo import models
+from odoo import api, fields, models
 from odoo.tools.float_utils import float_compare
 
 
 class StockMove(models.Model):
     _inherit = "stock.move"
 
+    quantity_picked = fields.Float(compute="_compute_quantity_picked")
+
+    @api.depends("move_line_ids.picked", "move_line_ids.qty_picked")
+    def _compute_quantity_picked(self):
+        for move in self:
+            move.quantity_picked = sum(
+                ml.qty_picked for ml in move.move_line_ids if ml.picked
+            )
+
     def _qty_is_satisfied(self):
         compare = float_compare(
-            self.quantity_done,
+            # TODO: in theory we should use ``quantity`` + ``picked``
+            self.quantity_picked,
             self.product_uom_qty,
             precision_rounding=self.product_uom.rounding,
         )
@@ -35,6 +45,15 @@ class StockMove(models.Model):
                 qty_to_split = sum(to_move.mapped("quantity"))
             else:
                 qty_to_split = self.product_uom_qty - sum(move_lines.mapped("quantity"))
+            prec = self.env["decimal.precision"].precision_get(
+                "Product Unit of Measure"
+            )
+            # Do not split if we have full quantity to split
+            if (
+                float_compare(qty_to_split, self.product_uom_qty, precision_digits=prec)
+                == 0
+            ):
+                return self.browse()
             split_move_vals = self._split(qty_to_split)
             split_move = self.create(split_move_vals)
             split_move.move_line_ids = to_move

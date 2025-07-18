@@ -177,7 +177,7 @@ class StockMoveLine(models.Model):
         # has to pick some goods from another place because the location
         # contained less items than expected)
         remaining = self.quantity - quantity_done
-        vals = {"quantity": remaining}
+        vals = {"quantity": remaining, "picked": False, "qty_picked": 0}
         vals.update(split_default_vals)
         new_line = self.copy(vals)
         # if we didn't bypass reservation update, the quant reservation
