@@ -12,7 +12,7 @@ class DataAction(Component):
         data = self._jsonify(
             record.with_context(shipment_advice=record.id),
             self._shipment_advice_parser,
-            **kw
+            **kw,
         )
         data["is_planned"] = bool(record.planned_move_ids)
         return data
