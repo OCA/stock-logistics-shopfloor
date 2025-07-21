@@ -61,5 +61,5 @@
         "demo/shopfloor_menu_demo.xml",
         "demo/shopfloor_app_demo.xml",
     ],
-    "installable": True,
+    "installable": False,
 }
