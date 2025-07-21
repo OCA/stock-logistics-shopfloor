@@ -17,18 +17,19 @@ Shopfloor - Delivery with shipment advice
     :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
     :alt: License: AGPL-3
 .. |badge3| image:: https://img.shields.io/badge/github-OCA%2Fwms-lightgray.png?logo=github
-    :target: https://github.com/OCA/wms/tree/14.0/shopfloor_delivery_shipment
+    :target: https://github.com/OCA/wms/tree/18.0/shopfloor_delivery_shipment
     :alt: OCA/wms
 .. |badge4| image:: https://img.shields.io/badge/weblate-Translate%20me-F47D42.png
-    :target: https://translation.odoo-community.org/projects/wms-14-0/wms-14-0-shopfloor_delivery_shipment
+    :target: https://translation.odoo-community.org/projects/wms-18-0/wms-18-0-shopfloor_delivery_shipment
     :alt: Translate me on Weblate
 .. |badge5| image:: https://img.shields.io/badge/runboat-Try%20me-875A7B.png
-    :target: https://runboat.odoo-community.org/builds?repo=OCA/wms&target_branch=14.0
+    :target: https://runboat.odoo-community.org/builds?repo=OCA/wms&target_branch=18.0
     :alt: Try me on Runboat
 
 |badge1| |badge2| |badge3| |badge4| |badge5|
 
-Shopfloor scenario to manage the delivery process based on shipment advices.
+Shopfloor scenario to manage the delivery process based on shipment
+advices.
 
 .. IMPORTANT::
    This is an alpha version, the data model and design can change at any time without warning.
@@ -46,7 +47,7 @@ Bug Tracker
 Bugs are tracked on `GitHub Issues <https://github.com/OCA/wms/issues>`_.
 In case of trouble, please check there if your issue has already been reported.
 If you spotted it first, help us to smash it by providing a detailed and welcomed
-`feedback <https://github.com/OCA/wms/issues/new?body=module:%20shopfloor_delivery_shipment%0Aversion:%2014.0%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**>`_.
+`feedback <https://github.com/OCA/wms/issues/new?body=module:%20shopfloor_delivery_shipment%0Aversion:%2018.0%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**>`_.
 
 Do not contact contributors directly about support or help with technical issues.
 
@@ -54,31 +55,31 @@ Credits
 =======
 
 Authors
-~~~~~~~
+-------
 
 * Camptocamp
 
 Contributors
-~~~~~~~~~~~~
+------------
 
-* Sébastien Alix <sebastien.alix@camptocamp.com>
+-  Sébastien Alix <sebastien.alix@camptocamp.com>
 
 Design
 ~~~~~~
 
-* Joël Grand-Guillaume <joel.grandguillaume@camptocamp.com>
-* Jacques-Etienne Baudoux <je@bcim.be>
+-  Joël Grand-Guillaume <joel.grandguillaume@camptocamp.com>
+-  Jacques-Etienne Baudoux <je@bcim.be>
 
 Other credits
-~~~~~~~~~~~~~
+-------------
 
 **Financial support**
 
-* Cosanum
-* Camptocamp R&D
+-  Cosanum
+-  Camptocamp R&D
 
 Maintainers
-~~~~~~~~~~~
+-----------
 
 This module is maintained by the OCA.
 
@@ -101,6 +102,6 @@ Current `maintainers <https://odoo-community.org/page/maintainer-role>`__:
 
 |maintainer-sebalix| |maintainer-TDu| 
 
-This module is part of the `OCA/wms <https://github.com/OCA/wms/tree/14.0/shopfloor_delivery_shipment>`_ project on GitHub.
+This module is part of the `OCA/wms <https://github.com/OCA/wms/tree/18.0/shopfloor_delivery_shipment>`_ project on GitHub.
 
 You are welcome to contribute. To learn how please visit https://odoo-community.org/page/Contribute.
