@@ -101,7 +101,7 @@ class DeliveryShipmentScanDockCase(DeliveryShipmentCommonCase):
             "scan_dock", params={"barcode": self.dock.barcode}
         )
         lines_to_load = self.picking1.move_line_ids.filtered(
-            lambda l: l.package_id != scanned_package
+            lambda line: line.package_id != scanned_package
         )
         self.assert_response_scan_document(
             response, self.shipment, lines_to_load=lines_to_load

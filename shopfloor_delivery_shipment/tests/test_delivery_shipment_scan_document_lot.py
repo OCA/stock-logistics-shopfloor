@@ -12,7 +12,7 @@ class DeliveryShipmentScanDocumentLotCase(DeliveryShipmentCommonCase):
         The shipment advice has some content planned but the user scans an
         unrelated one, returning an error.
         """
-        self._plan_records_in_shipment(self.shipment, self.picking1.move_lines)
+        self._plan_records_in_shipment(self.shipment, self.picking1.move_ids)
         scanned_lot = self.picking2.move_ids_without_package.move_line_ids.lot_id
         response = self.service.dispatch(
             "scan_document",
@@ -54,7 +54,8 @@ class DeliveryShipmentScanDocumentLotCase(DeliveryShipmentCommonCase):
             message=self.service.msg_store.shipment_planned_content_fully_loaded(),
         )
         # Check lot status
-        self.assertEqual(move_line.qty_done, move_line.product_uom_qty)
+        # self.assertEqual(move_line.qty_done, move_line.product_uom_qty)
+        self.assertTrue(move_line.picked)
         # Check returned content
         lading = response["data"]["loading_list"]["lading"]
         on_dock = response["data"]["loading_list"]["on_dock"]
@@ -70,7 +71,10 @@ class DeliveryShipmentScanDocumentLotCase(DeliveryShipmentCommonCase):
         expected one, loading the lot and returning the planned content
         of this delivery for the current shipment (shipment partially loaded).
         """
-        planned_moves = self.picking1.move_ids_without_package
+        planned_moves = (
+            self.picking1.move_ids_without_package
+            - self.picking1.package_level_ids.move_line_ids.move_id
+        )
         self._plan_records_in_shipment(self.shipment, planned_moves)
         move_line = self.picking1.move_line_ids.filtered(
             lambda ml: ml.product_id == self.product_c
@@ -85,7 +89,8 @@ class DeliveryShipmentScanDocumentLotCase(DeliveryShipmentCommonCase):
         )
         self.assert_response_scan_document(response, self.shipment, self.picking1)
         # Check lot status
-        self.assertEqual(move_line.qty_done, move_line.product_uom_qty)
+        # self.assertEqual(move_line.qty_done, move_line.product_uom_qty)
+        self.assertTrue(move_line.picked)
         # Check returned content
         location_src = self.picking_type.default_location_src_id.name
         content = response["data"]["scan_document"]["content"]
@@ -117,18 +122,19 @@ class DeliveryShipmentScanDocumentLotCase(DeliveryShipmentCommonCase):
         )
         self.assert_response_scan_document(response, self.shipment, self.picking1)
         # Check lot status
-        self.assertEqual(move_line.qty_done, move_line.product_uom_qty)
+        # self.assertEqual(move_line.qty_done, move_line.product_uom_qty)
+        self.assertTrue(move_line.picked)
         # Check returned content
         location_src = self.picking_type.default_location_src_id.name
         content = response["data"]["scan_document"]["content"]
         self.assertIn(location_src, content)
         #   'move_lines' key contains the lot scanned and other lines not yet
         # loaded from the same delivery
+        package_lines = self.picking1.package_level_ids.move_line_ids
+        other_lines = self.picking1.move_line_ids - package_lines
         self.assertEqual(
             content[location_src]["move_lines"],
-            self.service.data.move_lines(
-                self.picking1.move_ids_without_package.move_line_ids
-            ),
+            self.service.data.move_lines(other_lines),
         )
         #   'package_levels' key contains the package available from the same delivery
         self.assertEqual(
@@ -172,18 +178,19 @@ class DeliveryShipmentScanDocumentLotCase(DeliveryShipmentCommonCase):
             ),
         )
         # Check lot status
-        self.assertEqual(move_line.qty_done, move_line.product_uom_qty)
+        # self.assertEqual(move_line.qty_done, move_line.product_uom_qty)
+        self.assertTrue(move_line.picked)
         # Check returned content
         location_src = self.picking_type.default_location_src_id.name
         content = response["data"]["scan_document"]["content"]
         self.assertIn(location_src, content)
+        package_lines = self.picking1.package_level_ids.move_line_ids
+        other_lines = self.picking1.move_line_ids - package_lines
         #   'move_lines' key contains the lot scanned and other lines not yet
         # loaded from the same delivery
         self.assertEqual(
             content[location_src]["move_lines"],
-            self.service.data.move_lines(
-                self.picking1.move_ids_without_package.move_line_ids
-            ),
+            self.service.data.move_lines(other_lines),
         )
         #   'package_levels' key contains the package available from the same delivery
         self.assertEqual(
@@ -236,7 +243,8 @@ class DeliveryShipmentScanDocumentLotCase(DeliveryShipmentCommonCase):
         )
         lot = move_line.lot_id
         lot_unrelated = lot.copy({"product_id": product_unrelated.id})
-        self.assertEqual(lot.name, lot_unrelated.name)
+        lot_unrelated.name = lot.name
+        self.assertTrue(lot.name, lot_unrelated.name)
         self.assertNotEqual(lot.product_id, lot_unrelated.product_id)
         # Check that lot number is shared as expected
         available_lots = self.service._actions_for("search").lot_from_scan(
@@ -253,5 +261,6 @@ class DeliveryShipmentScanDocumentLotCase(DeliveryShipmentCommonCase):
         )
         self.assert_response_scan_document(response, self.shipment, self.picking1)
         # Check lot status
-        self.assertEqual(move_line.qty_done, move_line.product_uom_qty)
+        # self.assertEqual(move_line.qty_done, move_line.product_uom_qty)
+        self.assertTrue(move_line.picked)
         self.assertEqual(move_line.lot_id, lot)

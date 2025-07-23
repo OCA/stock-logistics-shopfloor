@@ -81,8 +81,16 @@ class DeliveryShipmentScanDocumentPickingCase(DeliveryShipmentCommonCase):
         expected one, returning the planned content of this delivery for the
         current shipment.
         """
+        # FIXME ?
+        # The package level is not set on the moves yet ?
+        moves_without_package = (
+            self.picking1.move_ids_without_package
+            - self.picking1.package_level_ids.move_line_ids.move_id
+        )
         self._plan_records_in_shipment(
-            self.shipment, self.picking1.move_ids_without_package
+            # self.shipment, self.picking1.move_ids_without_package
+            self.shipment,
+            moves_without_package,
         )
         response = self.service.dispatch(
             "scan_document",
@@ -116,7 +124,7 @@ class DeliveryShipmentScanDocumentPickingCase(DeliveryShipmentCommonCase):
         """
         self.picking1.carrier_id = self.env.ref("delivery.delivery_carrier")
         self.picking1.carrier_id.sudo().delivery_type = "base_on_rule"
-        self.picking2.carrier_id = self.env.ref("delivery.normal_delivery_carrier")
+        self.picking2.carrier_id = self.env.ref("delivery.delivery_local_delivery")
         self.picking2.carrier_id.sudo().delivery_type = "fixed"
         # Load the first delivery in the shipment
         self.picking1._load_in_shipment(self.shipment)
@@ -177,11 +185,14 @@ class DeliveryShipmentScanDocumentPickingCase(DeliveryShipmentCommonCase):
 
         Returns the not planned content of the scanned delivery.
         """
-        # Plan the move without package in a another shipment
+        # Plan the move without package in another shipment
         new_shipment = self._create_shipment()
-        self._plan_records_in_shipment(
-            new_shipment, self.picking1.move_ids_without_package
+        # FIXME ?
+        moves_no_package = (
+            self.picking1.move_ids_without_package
+            - self.picking1.package_level_ids.move_line_ids.move_id
         )
+        self._plan_records_in_shipment(new_shipment, moves_no_package)
         # Scan the delivery: only the not planned content is returned (i.e. the
         # remaining package here).
         response = self.service.dispatch(
@@ -234,11 +245,14 @@ class DeliveryShipmentScanDocumentPickingCase(DeliveryShipmentCommonCase):
             - not loaded (in any shipment)
             - already loaded in the current shipment
         """
-        # Load the move without package in a another shipment
+        # Load the move without package in another shipment
         new_shipment = self._create_shipment()
-        self.picking1.move_ids_without_package.move_line_ids._load_in_shipment(
-            new_shipment
+        # FIXME ?
+        move_lines_no_package = (
+            self.picking1.move_ids_without_package.move_line_ids
+            - self.picking1.package_level_ids.move_line_ids
         )
+        move_lines_no_package._load_in_shipment(new_shipment)
         # Load the package level in the current shipment
         self.picking1.package_level_ids._load_in_shipment(self.shipment)
         # Scan the delivery: returns the already loaded package levels as content

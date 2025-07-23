@@ -3,8 +3,9 @@
 import collections
 
 from odoo import fields
+from odoo.tools import str2bool
 
-from odoo.addons.base_rest.components.service import to_bool, to_int
+from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
 
 
@@ -207,7 +208,6 @@ class DeliveryShipment(Component):
         move_lines = self._find_move_lines_from_package(
             shipment_advice, package, picking, location
         )
-        # import pdb; pdb.set_trace()
         if move_lines:
             # Check transfer status
             message = self._check_picking_processible(
@@ -358,11 +358,7 @@ class DeliveryShipment(Component):
             # to scan a lot instead of a product
             if product.tracking != "none":
                 lots_not_loaded = move_lines.filtered(
-                    lambda ml: (
-                        not ml.package_level_id
-                        and ml.qty_done != ml.product_uom_qty
-                        and ml.lot_id
-                    )
+                    lambda ml: (not ml.package_level_id and not ml.picked and ml.lot_id)
                 )
                 if len(lots_not_loaded) > 1:
                     return self._response_for_scan_document(
@@ -739,13 +735,13 @@ class DeliveryShipment(Component):
         # Shipment with planned content
         if shipment_advice.planned_move_ids:
             # Restrict to delivery planned moves
-            moves = (shipment_advice.planned_move_ids & picking.move_lines).filtered(
+            moves = (shipment_advice.planned_move_ids & picking.move_ids).filtered(
                 lambda m: m.state in ("assigned", "partially_available")
             )
         # Shipment without planned content
         else:
             # Restrict to delivery moves not planned
-            moves = picking.move_lines.filtered(lambda m: not m.shipment_advice_id)
+            moves = picking.move_ids.filtered(lambda m: not m.shipment_advice_id)
         return moves.move_line_ids.filtered(
             lambda ml: not ml.shipment_advice_id
             or shipment_advice & ml.shipment_advice_id
@@ -834,7 +830,7 @@ class DeliveryShipment(Component):
     def _find_move_lines_not_loaded_from_shipment(self, shipment_advice):
         """Returns the move lines not loaded at all from the shipment advice."""
         domain = self._find_move_lines_domain(shipment_advice)
-        domain.append(("qty_done", "=", 0))
+        domain.append(("picked", "=", False))
         return self.env["stock.move.line"].search(domain)
 
     def _find_pickings_not_loaded_from_shipment(self, shipment_advice):
@@ -984,7 +980,7 @@ class ShopfloorDeliveryShipmentValidator(Component):
                 "type": "integer",
             },
             "confirmation": {
-                "coerce": to_bool,
+                "coerce": str2bool,
                 "required": False,
                 "nullable": True,
                 "type": "boolean",
@@ -1081,6 +1077,12 @@ class ShopfloorDeliveryShipmentValidatorResponse(Component):
 
     def loading_list(self):
         return self._response_schema(next_states={"loading_list", "scan_dock"})
+
+    def unload_move_line(self):
+        return self._response_schema(next_states={"scan_document", "scan_dock"})
+
+    def unload_package_level(self):
+        return self._response_schema(next_states={"scan_document", "scan_dock"})
 
     def validate(self):
         return self._response_schema(next_states={"validate", "scan_dock"})

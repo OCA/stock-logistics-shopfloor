@@ -9,9 +9,8 @@
             <group name="options" position="inside">
                 <group
                     name="shipment_advice_create"
-                    attrs="{'invisible': [('shipment_advice_create_is_possible', '=', False)]}"
+                    invisible="not shipment_advice_create_is_possible"
                 >
-                    <field name="shipment_advice_create_is_possible" invisible="1" />
                     <field name="allow_shipment_advice_create" />
                 </group>
             </group>

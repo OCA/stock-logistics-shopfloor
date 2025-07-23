@@ -14,7 +14,7 @@ class DeliveryShipmentScanDocumentPackageCase(DeliveryShipmentCommonCase):
         The shipment advice has some content planned but the user scans an
         unrelated one, returning an error.
         """
-        self._plan_records_in_shipment(self.shipment, self.picking1.move_lines)
+        self._plan_records_in_shipment(self.shipment, self.picking1.move_ids)
         scanned_package = self.picking2.package_level_ids.package_id
         response = self.service.dispatch(
             "scan_document",
@@ -189,31 +189,30 @@ class DeliveryShipmentScanDocumentPackageCase(DeliveryShipmentCommonCase):
         pickings = self._create_picking_chain(
             wh, [(self.product_a, 10.0), (self.product_b, 10.0)]
         )
-        out_picking = pickings.filtered(lambda p: p.picking_type_id.code == "outgoing")
         pick_picking = pickings.filtered(lambda p: p.picking_type_id.code == "internal")
         package = self.env["stock.quant.package"].create({})
-        self._fill_stock_for_moves(pick_picking.move_lines, in_package=package)
+        self._fill_stock_for_moves(pick_picking.move_ids, in_package=package)
         pick_picking.action_assign()
-        for move in pick_picking.move_lines:
-            move.quantity_done = move.product_uom_qty
-            move.move_line_ids.qty_done = move.product_uom_qty
+        for move in pick_picking.move_ids:
+            move.move_line_ids.picked = True
         pick_picking._action_done()
+        out_picking = pick_picking.move_ids.move_dest_ids.picking_id
         # create shipment
         shipment = self._create_shipment()
         # Create return for product a
-        move_a = pick_picking.move_lines.filtered(
+        move_a = pick_picking.move_ids.filtered(
             lambda m: m.product_id == self.product_a
         )
         wiz_vals = {
             "picking_id": pick_picking.id,
-            "location_id": pick_picking.location_id.id,
+            # "location_id": pick_picking.location_id.id,
             "product_return_moves": [
                 (
                     0,
                     0,
                     {
                         "product_id": move_a.product_id.id,
-                        "quantity": move_a.quantity_done,
+                        "quantity": move_a.product_uom_qty,
                         "uom_id": move_a.product_uom.id,
                         "move_id": move_a.id,
                     },
@@ -221,8 +220,7 @@ class DeliveryShipmentScanDocumentPackageCase(DeliveryShipmentCommonCase):
             ],
         }
         wiz = self.env["stock.return.picking"].create(wiz_vals)
-        res = wiz.create_returns()
-        return_picking = self.env["stock.picking"].browse(res["res_id"])
+        return_picking = wiz._create_return()
         # Try to ship the goods, it should be prevented
         response = self.service.dispatch(
             "scan_document",

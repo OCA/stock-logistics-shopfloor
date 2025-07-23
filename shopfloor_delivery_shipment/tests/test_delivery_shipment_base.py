@@ -43,9 +43,9 @@ class DeliveryShipmentCommonCase(common.CommonCase):
             )
             cls.pickings |= picking
             setattr(cls, f"picking{i}", picking)
-            pack_moves = picking.move_lines[:2]
-            lot_move = picking.move_lines[2]
-            raw_move = picking.move_lines[3]
+            pack_moves = picking.move_ids[:2]
+            lot_move = picking.move_ids[2]
+            raw_move = picking.move_ids[3]
             cls._fill_stock_for_moves(pack_moves, in_package=True)
             cls._fill_stock_for_moves(lot_move, in_lot=True)
             # For raw move, add stock to the current one (if any)

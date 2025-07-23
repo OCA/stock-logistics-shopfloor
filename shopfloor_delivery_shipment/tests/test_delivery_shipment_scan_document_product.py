@@ -11,7 +11,7 @@ class DeliveryShipmentScanDocumentProductCase(DeliveryShipmentCommonCase):
 
         Returns an error telling the user to first scan an operation.
         """
-        planned_move = self.picking1.move_lines.filtered(
+        planned_move = self.picking1.move_ids.filtered(
             lambda m: m.product_id == self.product_c
         )
         self._plan_records_in_shipment(self.shipment, planned_move)
@@ -35,7 +35,7 @@ class DeliveryShipmentScanDocumentProductCase(DeliveryShipmentCommonCase):
         The shipment advice has some content planned but the user scans an
         unrelated one, returning an error.
         """
-        planned_move = self.picking1.move_lines.filtered(
+        planned_move = self.picking1.move_ids.filtered(
             lambda m: m.product_id == self.product_c
         )
         self._plan_records_in_shipment(self.shipment, planned_move)
@@ -83,7 +83,7 @@ class DeliveryShipmentScanDocumentProductCase(DeliveryShipmentCommonCase):
             message=self.service.msg_store.shipment_planned_content_fully_loaded(),
         )
         # Check product line status
-        self.assertEqual(move_line.qty_done, move_line.product_uom_qty)
+        self.assertTrue(move_line.picked)
         # Check returned content
         lading = response["data"]["loading_list"]["lading"]
         on_dock = response["data"]["loading_list"]["on_dock"]
@@ -112,18 +112,18 @@ class DeliveryShipmentScanDocumentProductCase(DeliveryShipmentCommonCase):
         )
         self.assert_response_scan_document(response, self.shipment, self.picking1)
         # Check product line status
-        self.assertEqual(move_line.qty_done, move_line.product_uom_qty)
+        self.assertTrue(move_line.picked)
         # Check returned content
         location_src = self.picking_type.default_location_src_id.name
         content = response["data"]["scan_document"]["content"]
         self.assertIn(location_src, content)
         #   'move_lines' key contains the product scanned and other lines not
         # yet loaded from the same delivery
+        package_lines = self.picking1.package_level_ids.move_line_ids
+        other_lines = self.picking1.move_line_ids - package_lines
         self.assertEqual(
             content[location_src]["move_lines"],
-            self.service.data.move_lines(
-                self.picking1.move_ids_without_package.move_line_ids
-            ),
+            self.service.data.move_lines(other_lines),
         )
         #   'package_levels' key contains the package available from the same delivery
         self.assertEqual(
@@ -169,18 +169,18 @@ class DeliveryShipmentScanDocumentProductCase(DeliveryShipmentCommonCase):
             ),
         )
         # Check product line status
-        self.assertEqual(move_line.qty_done, move_line.product_uom_qty)
+        self.assertTrue(move_line.picked)
         # Check returned content
         location_src = self.picking_type.default_location_src_id.name
         content = response["data"]["scan_document"]["content"]
         self.assertIn(location_src, content)
         #   'move_lines' key contains the product scanned and other lines not
         # yet loaded from the same delivery
+        package_lines = self.picking1.package_level_ids.move_line_ids
+        other_lines = self.picking1.move_line_ids - package_lines
         self.assertEqual(
             content[location_src]["move_lines"],
-            self.service.data.move_lines(
-                self.picking1.move_ids_without_package.move_line_ids
-            ),
+            self.service.data.move_lines(other_lines),
         )
         #   'package_levels' key contains the package available from the same delivery
         self.assertEqual(
@@ -254,14 +254,14 @@ class DeliveryShipmentScanDocumentProductCase(DeliveryShipmentCommonCase):
         self.pickings.do_unreserve()
         scanned_product = self.product_d
         scanned_product.tracking = "lot"
-        move = self.picking1.move_lines.filtered(
+        move = self.picking1.move_ids.filtered(
             lambda m: m.product_id == scanned_product
         )
         # Put two lots in stock
-        lot1 = self.env["stock.production.lot"].create(
+        lot1 = self.env["stock.lot"].create(
             {"product_id": scanned_product.id, "company_id": self.env.company.id}
         )
-        lot2 = self.env["stock.production.lot"].create(
+        lot2 = self.env["stock.lot"].create(
             {"product_id": scanned_product.id, "company_id": self.env.company.id}
         )
         self.env["stock.quant"]._update_available_quantity(
