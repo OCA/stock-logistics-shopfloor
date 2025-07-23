@@ -24,9 +24,10 @@ class DeliveryShipment(Component):
     Three cases:
 
     * Manager assign shipment advice to loading dock, plan its content and start them
-    * Manager assign shipment advice to loading dock without content planning and start them
-    * Operators create shipment advice on the fly (option “Allow shipment advice creation”
-      in the scenario)
+    * Manager assign shipment advice to loading dock without planned content planning
+      and start them
+    * Operators create shipment advice on the fly
+      (option “Allow shipment advice creation” in the scenario)
 
     Expected:
 
@@ -87,8 +88,8 @@ class DeliveryShipment(Component):
     ):
         """Scan an operation or location; a package, a product or a lot.
 
-        If an operation or a location is scanned, reload the screen with the related planned
-        content or full content of this operation/location for this shipment advice.
+        If an operation or a location is scanned, reload the screen with the related
+        planned content or full content of this operation/location for this shipment.
 
         If a package, a product or a lot is scanned, it will be loaded in the
         current shipment advice and the screen will be reloaded with the related
