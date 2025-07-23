@@ -7,7 +7,7 @@ class DeliveryShipmentScanDocumentLocationCase(DeliveryShipmentCommonCase):
     """Tests for '/scan_document' endpoint when scanning a location to work from."""
 
     @classmethod
-    def setUpClassBaseData(cls, *args, **kwargs):
+    def setUpClassBaseData(cls, *args, **kwargs):  # pylint: disable=missing-return
         super().setUpClassBaseData(*args, **kwargs)
         cls.location = cls.menu.picking_type_ids.default_location_src_id
         cls.sublocation = cls.env.ref("stock.stock_location_14")

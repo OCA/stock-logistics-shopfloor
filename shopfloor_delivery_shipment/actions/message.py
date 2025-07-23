@@ -4,6 +4,8 @@ from odoo import _
 
 from odoo.addons.component.core import Component
 
+# pylint: disable=translation-positional-used
+
 
 class MessageAction(Component):
     _inherit = "shopfloor.message.action"

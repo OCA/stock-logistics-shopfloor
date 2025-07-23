@@ -7,7 +7,7 @@ from odoo.addons.shopfloor.tests import common
 
 class DeliveryShipmentCommonCase(common.CommonCase):
     @classmethod
-    def setUpClassVars(cls, *args, **kwargs):
+    def setUpClassVars(cls, *args, **kwargs):  # pylint: disable=missing-return
         super().setUpClassVars(*args, **kwargs)
         cls.menu = cls.env.ref(
             "shopfloor_delivery_shipment.shopfloor_menu_delivery_shipment"
@@ -23,7 +23,7 @@ class DeliveryShipmentCommonCase(common.CommonCase):
         cls.loc_customers = cls.env.ref("stock.stock_location_customers")
 
     @classmethod
-    def setUpClassBaseData(cls, *args, **kwargs):
+    def setUpClassBaseData(cls, *args, **kwargs):  # pylint: disable=missing-return
         super().setUpClassBaseData(*args, **kwargs)
         # Create 3 deliveries
         cls.product_c.tracking = "lot"
@@ -58,7 +58,7 @@ class DeliveryShipmentCommonCase(common.CommonCase):
         cls.shipment = cls._create_shipment()
 
     @classmethod
-    def setUpShopfloorApp(cls):
+    def setUpShopfloorApp(cls):  # pylint: disable=missing-return
         super().setUpShopfloorApp()
         cls.shopfloor_app.sudo().profile_ids += cls.profile
 
