@@ -413,7 +413,6 @@ const DeliveryShipment = {
         },
     },
     data: function () {
-        const self = this;
         return {
             usage: "delivery_shipment",
             initial_state_key: "scan_dock",
