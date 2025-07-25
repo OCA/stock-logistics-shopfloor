@@ -3,8 +3,8 @@
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
 
-import {ScenarioBaseMixin} from "/shopfloor_mobile_base/static/wms/src/scenario/mixins.js";
-import {process_registry} from "/shopfloor_mobile_base/static/wms/src/services/process_registry.js";
+import {ScenarioBaseMixin} from "/shopfloor_mobile_base/static/src/scenario/mixins.esm.js";
+import {process_registry} from "/shopfloor_mobile_base/static/src/services/process_registry.esm.js";
 
 const DeliveryShipment = {
     mixins: [ScenarioBaseMixin],
@@ -258,13 +258,12 @@ const DeliveryShipment = {
         },
         line_options: function (line) {
             const action =
-                line.qty_done == line.quantity
+                line.qty_done === line.quantity
                     ? () => {
                           this.unload_line(line);
                       }
                     : null;
             return {
-                // main: true,
                 key_title: "product.display_name",
                 on_title_action: action,
                 title_action_icon: "mdi-upload",
@@ -305,12 +304,10 @@ const DeliveryShipment = {
                 color = "success";
             } else if (pick.is_partially_loaded) {
                 color = "warning";
+            } else if (shipment.is_planned) {
+                color = "error";
             } else {
-                if (shipment.is_planned) {
-                    color = "error";
-                } else {
-                    color = "success";
-                }
+                color = "success";
             }
             return color;
         },
@@ -323,9 +320,9 @@ const DeliveryShipment = {
         is_fully_loaded: function (data) {
             // Check if the summary from last screen is fully loaded
             // May need to know if planned or not
-            if (data.total_packages_count != data.loaded_packages_count) {
+            if (data.total_packages_count !== data.loaded_packages_count) {
                 return false;
-            } else if (data.total_bulk_lines_count != data.loaded_bulk_lines_count) {
+            } else if (data.total_bulk_lines_count !== data.loaded_bulk_lines_count) {
                 return false;
             }
             return true;
@@ -402,12 +399,10 @@ const DeliveryShipment = {
                 } else {
                     color = "warning";
                 }
+            } else if (data.total_pickings_count > 0) {
+                color = "error";
             } else {
-                if (data.total_pickings_count > 0) {
-                    color = "error";
-                } else {
-                    color = "success";
-                }
+                color = "success";
             }
             return color;
         },
@@ -439,9 +434,8 @@ const DeliveryShipment = {
                         scan_placeholder: () => {
                             if (_.isEmpty(this.picking())) {
                                 return "Scan a lot, a pack, an operation or a location";
-                            } else {
-                                return "Scan a lot, a product, a pack, an operation or a location";
                             }
+                            return "Scan a lot, a product, a pack, an operation or a location";
                         },
                     },
                     on_scan: (scanned) => {

@@ -4,10 +4,10 @@
 {
     "name": "Shopfloor Delivery Shipment Mobile",
     "summary": "Frontend for delivery shipment scenario for shopfloor",
-    "version": "14.0.1.4.0",
+    "version": "18.0.1.0.0",
     "development_status": "Alpha",
     "category": "Inventory",
-    "website": "https://github.com/OCA/wms",
+    "website": "https://github.com/OCA/stock-logistics-shopfloor",
     "author": "Camptocamp, Odoo Community Association (OCA)",
     "license": "AGPL-3",
     "depends": ["shopfloor_mobile", "shopfloor_delivery_shipment"],

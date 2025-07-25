@@ -3,16 +3,8 @@
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
 
-import {demotools} from "/shopfloor_mobile_base/static/wms/src/demo/demo.core.js";
+import {demotools} from "/shopfloor_mobile_base/static/src/demo/demo.core.esm.js";
 
-// Commented because of the linter
-/**
- *Const delivery_shipment_menu_id = demotools.addAppMenu({
- *   name: "Delivery Shipment",
- *   scenario: "delivery_shipment",
- *   picking_types: [{id: 27, name: "Random type"}],
- *});
- */
 const pick = demotools.makePicking();
 const pack = demotools.makePack();
 const shipment = {
@@ -43,7 +35,6 @@ const DELIVERY_SHIPMENT_CASE = {
         next_state: "scan_document",
         data: {
             scan_document: {
-                // Picking: _.cloneDeep(pick),
                 shipment_advice: _.cloneDeep(shipment),
             },
         },
@@ -70,7 +61,6 @@ const DELIVERY_SHIPMENT_CASE = {
             },
             data: {
                 scan_document: {
-                    // Picking: _.cloneDeep(pick),
                     shipment_advice: _.cloneDeep(shipment),
                     packaging: _.cloneDeep(pack),
                 },
@@ -79,7 +69,6 @@ const DELIVERY_SHIPMENT_CASE = {
         next_state: "loading_list",
         data: {
             loading_list: {
-                // Picking: _.cloneDeep(pick),
                 shipment_advice: _.cloneDeep(shipment),
                 lading: lading,
                 on_dock: on_dock,
@@ -88,13 +77,8 @@ const DELIVERY_SHIPMENT_CASE = {
     },
     loading_list: {
         next_state: "validate_shipment",
-        // Message: {
-        //     message_type: "info",
-        // body: "Loading list state",
-        // },
         data: {
             validate_shipment: {
-                // Picking: _.cloneDeep(pick),
                 shipment_advice: _.cloneDeep(shipment),
             },
         },
