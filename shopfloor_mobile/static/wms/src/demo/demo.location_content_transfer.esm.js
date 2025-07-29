@@ -4,7 +4,7 @@
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
 
-import {demotools} from "/shopfloor_mobile_base/static/wms/src/demo/demo.core.js";
+import {demotools} from "/shopfloor_mobile_base/static/src/demo/demo.core.esm.js";
 
 // Case for recover existing work on single move line
 const recover_single_move_line_menu_id = demotools.addAppMenu({

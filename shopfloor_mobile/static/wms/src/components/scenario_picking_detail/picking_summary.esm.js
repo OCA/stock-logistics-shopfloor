@@ -6,7 +6,7 @@
 
 /* eslint-disable sort-imports */
 import {PickingDetailListMixin} from "./mixins.esm.js";
-import {ItemDetailMixin} from "/shopfloor_mobile_base/static/wms/src/components/detail/detail_mixin.js";
+import {ItemDetailMixin} from "/shopfloor_mobile_base/static/src/components/detail/detail_mixin.esm.js";
 
 Vue.component("picking-summary", {
     mixins: [PickingDetailListMixin],

@@ -5,9 +5,9 @@
  */
 
 /* eslint-disable sort-imports */
-import {ScenarioBaseMixin} from "/shopfloor_mobile_base/static/wms/src/scenario/mixins.js";
-import event_hub from "/shopfloor_mobile_base/static/wms/src/services/event_hub.js";
-import {process_registry} from "/shopfloor_mobile_base/static/wms/src/services/process_registry.js";
+import {ScenarioBaseMixin} from "/shopfloor_mobile_base/static/src/scenario/mixins.esm.js";
+import event_hub from "/shopfloor_mobile_base/static/src/services/event_hub.esm.js";
+import {process_registry} from "/shopfloor_mobile_base/static/src/services/process_registry.esm.js";
 import {checkout_states} from "./checkout_states.esm.js";
 
 const Checkout = {

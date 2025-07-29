@@ -4,7 +4,7 @@
  * @author Simone Orsi <simahawk@gmail.com>
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
-import {utils_registry} from "/shopfloor_mobile_base/static/wms/src/services/utils_registry.js";
+import {utils_registry} from "/shopfloor_mobile_base/static/src/services/utils_registry.esm.js";
 
 export class WMSUtils {
     group_lines_by_location(lines, opts) {
