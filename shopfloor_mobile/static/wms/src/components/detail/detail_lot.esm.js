@@ -44,6 +44,7 @@ Vue.component("detail-lot", {
                 {path: "product_name", label: "Name"},
             ];
         },
+        /* eslint-disable no-unused-vars */
         render_packaging(record, field) {
             return [record.name, "(" + record.code + ")", "= " + record.qty].join(" ");
         },
