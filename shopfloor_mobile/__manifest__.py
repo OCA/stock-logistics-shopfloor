@@ -9,7 +9,7 @@
     "depends": ["shopfloor", "shopfloor_mobile_base"],
     "author": "Camptocamp, BCIM, Akretion, Odoo Community Association (OCA)",
     "maintainers": ["simahawk"],
-    "website": "https://github.com/OCA/wms",
+    "website": "https://github.com/OCA/stock-logistics-shopfloor",
     "category": "Warehouse Management",
     "license": "AGPL-3",
     "installable": False,
