@@ -97,58 +97,6 @@ class StockMoveLine(models.Model):
                     default=default, backorder=True
                 )
 
-    def _split_pickings_from_source_location(self):
-        """Ensure that the related pickings will have the same source location.
-
-        Some pickings related could have other unrelated move lines, as such we
-        have to split them to contain only the move lines related to the expected
-        source location.
-
-        Example:
-
-            Initial data:
-
-                PICK1:
-                    - move line with source location LOC1
-                    - move line with source location LOC2
-                PICK2:
-                    - move line with source location LOC2
-                    - move line with source location LOC3
-
-            Then we process move lines related to LOC2 with this method, we get:
-
-                PICK1:
-                    - move line with source location LOC1
-                PICK2:
-                    - move line with source location LOC3
-                PICK3:
-                    - move line with source location LOC2
-                    - move line with source location LOC2
-
-        Return the pickings containing the given move lines.
-        """
-        _logger.warning(
-            "`_split_pickings_from_source_location` is deprecated "
-            "and replaced by `_extract_in_split_order`"
-        )
-        location_src_to_process = self.location_id
-        if location_src_to_process and len(location_src_to_process) != 1:
-            raise UserError(
-                _("Move lines processed have to share the same source location.")
-            )
-        pickings = self.picking_id
-        move_lines_to_process_ids = []
-        for picking in pickings:
-            location_src = picking.move_line_ids.location_id
-            if len(location_src) == 1:
-                continue
-            (picking.move_line_ids & self)._extract_in_split_order()
-            # Get the related move lines among the picking and split them
-            move_lines_to_process_ids.extend(
-                set(picking.move_line_ids.ids) & set(self.ids)
-            )
-        return self.picking_id
-
     def _split_qty_to_be_done(self, qty_done, split_partial=True, **split_default_vals):
         """Check qty to be done for current move line. Split it if needed.
 

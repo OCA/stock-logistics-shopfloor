@@ -220,7 +220,8 @@ class TestStockSplit(TransactionCase):
         self.assertEqual(len(self.pack_move_a.move_line_ids), 3)
         self.assertEqual(len(self.packing.package_level_ids), 3)
         self.assertEqual(len(move_lines_to_process), 1)
-        new_packing = move_lines_to_process._split_pickings_from_source_location()
+        move_lines_to_process._extract_in_split_order()
+        new_packing = self.packing.backorder_ids
         self.assertEqual(len(self.packing.package_level_ids), 2)
         self.assertEqual(len(new_packing.package_level_ids), 1)
         self.assertEqual(len(new_packing.move_line_ids), 1)
