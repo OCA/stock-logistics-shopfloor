@@ -21,12 +21,12 @@ class ClusterPickingBatchCase(CommonCase, PickingBatchMixin):
         cls.product_a = (
             cls.env["product.product"]
             .sudo()
-            .create({"name": "Product A", "type": "product"})
+            .create({"name": "Product A", "is_storable": True})
         )
         cls.product_b = (
             cls.env["product.product"]
             .sudo()
-            .create({"name": "Product B", "type": "product"})
+            .create({"name": "Product B", "is_storable": True})
         )
         cls.batch1 = cls._create_picking_batch(
             [[cls.BatchProduct(product=cls.product_a, quantity=1)]]

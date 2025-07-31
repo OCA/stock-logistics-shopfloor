@@ -26,9 +26,10 @@ class StockAction(Component):
             ):
                 continue
             if move.state in ("partially_available", "assigned"):
-                quantity -= sum(move.move_line_ids.mapped("reserved_qty"))
+                # TODO: Add a test hitting this line
+                quantity -= sum(move.move_line_ids.mapped("quantity"))
             elif move.state in ("done"):
-                quantity -= move.product_uom_qty
+                quantity -= move.quantity
         return float_round(
             quantity, precision_rounding=origin_move.product_id.uom_id.rounding
         )
@@ -116,7 +117,7 @@ class StockAction(Component):
         check_user=False,
         split=True,
     ):
-        """Set the qty_done and extract lines in new order"""
+        """Set the picked quantity and extract lines in new order"""
         user = user or self.env.user
         if check_user:
             picking_users = move_lines.picking_id.user_id
@@ -125,11 +126,10 @@ class StockAction(Component):
                     _("Someone is already working on these transfers")
                 )
         for line in move_lines:
-            qty_done = quantity if quantity is not None else line.reserved_uom_qty
-            line.qty_done = qty_done
             if split:
                 line._split_partial_quantity()
             data = {
+                "picked": True,
                 "shopfloor_user_id": user.id,
             }
             if package:
@@ -156,7 +156,8 @@ class StockAction(Component):
         move_lines.write(
             {
                 "shopfloor_user_id": False,
-                "qty_done": 0,
+                "picked": False,
+                "qty_picked": 0,
                 "result_package_id": False,
             }
         )

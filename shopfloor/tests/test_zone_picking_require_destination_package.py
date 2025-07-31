@@ -29,7 +29,7 @@ class ZonePickingNoPAcking(ZonePickingCommonCase):
             params={
                 "move_line_id": move_line.id,
                 "barcode": move_line.location_dest_id.barcode,
-                "quantity": move_line.reserved_uom_qty,
+                "quantity": move_line.quantity,
                 "confirmation": None,
             },
         )
@@ -38,7 +38,7 @@ class ZonePickingNoPAcking(ZonePickingCommonCase):
             zone_location,
             picking_type,
             move_line,
-            qty_done=move_line.reserved_uom_qty,
+            qty_done=move_line.quantity,
             message=self.service.msg_store.dest_package_required(),
         )
         self.service.work.menu.sudo().require_destination_package = False
@@ -47,7 +47,7 @@ class ZonePickingNoPAcking(ZonePickingCommonCase):
             params={
                 "move_line_id": move_line.id,
                 "barcode": move_line.location_dest_id.barcode,
-                "quantity": move_line.reserved_uom_qty,
+                "quantity": move_line.quantity,
                 "confirmation": None,
             },
         )

@@ -25,12 +25,12 @@ class CheckoutSetQtyCommonCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
         super().setUp()
         # we assume we have called /select_line on pack one, so by default, we
         # expect the lines for product a and b to have their qty_done set to
-        # their reserved_uom_qty at the start of the tests
+        # their reserved quantity at the start of the tests
         self.selected_lines = self.moves_pack1.move_line_ids
         self.deselected_lines = self.moves_pack2.move_line_ids
         self.service._select_lines(self.selected_lines)
         self.assertTrue(
-            all(line.qty_done == line.reserved_uom_qty for line in self.selected_lines)
+            all(line.qty_done == line.quantity for line in self.selected_lines)
         )
         self.assertTrue(all(line.qty_done == 0 for line in self.deselected_lines))
 
@@ -53,7 +53,7 @@ class CheckoutResetLineQtyCase(CheckoutSetQtyCommonCase):
         self._assert_selected_qties(
             response,
             selected_lines,
-            {line_to_reset: 0, line_with_qty: line_with_qty.reserved_uom_qty},
+            {line_to_reset: 0, line_with_qty: line_with_qty.quantity},
         )
 
     def test_reset_line_qty_not_found(self):
@@ -71,7 +71,7 @@ class CheckoutResetLineQtyCase(CheckoutSetQtyCommonCase):
         self._assert_selected_qties(
             response,
             selected_lines,
-            {line: line.reserved_uom_qty for line in selected_lines},
+            {line: line.quantity for line in selected_lines},
             message={
                 "body": "The record you were working on does not exist anymore.",
                 "message_type": "error",
@@ -96,12 +96,12 @@ class CheckoutSetLineQtyCase(CheckoutSetQtyCommonCase):
                 "move_line_id": line_to_set.id,
             },
         )
-        self.assertEqual(line_to_set.qty_done, line_to_set.reserved_uom_qty)
+        self.assertEqual(line_to_set.qty_done, line_to_set.quantity)
         self.assertEqual(line_no_qty.qty_done, 0)
         self._assert_selected_qties(
             response,
             selected_lines,
-            {line_to_set: line_to_set.reserved_uom_qty, line_no_qty: 0},
+            {line_to_set: line_to_set.quantity, line_no_qty: 0},
         )
 
     def test_set_line_qty_not_found(self):
@@ -119,7 +119,7 @@ class CheckoutSetLineQtyCase(CheckoutSetQtyCommonCase):
         self._assert_selected_qties(
             response,
             selected_lines,
-            {line: line.reserved_uom_qty for line in selected_lines},
+            {line: line.quantity for line in selected_lines},
             message={
                 "body": "The record you were working on does not exist anymore.",
                 "message_type": "error",
@@ -133,7 +133,7 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
         line_to_change = selected_lines[0]
         line_keep_qty = selected_lines[1]
         # Process full qty
-        new_qty = line_to_change.reserved_uom_qty
+        new_qty = line_to_change.quantity
         # we want to check that when we give the package id, we get
         # all its move lines
         response = self.service.dispatch(
@@ -146,11 +146,11 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
             },
         )
         self.assertEqual(line_to_change.qty_done, new_qty)
-        self.assertEqual(line_keep_qty.qty_done, line_keep_qty.reserved_uom_qty)
+        self.assertEqual(line_keep_qty.qty_done, line_keep_qty.quantity)
         self._assert_selected_qties(
             response,
             selected_lines,
-            {line_to_change: new_qty, line_keep_qty: line_keep_qty.reserved_uom_qty},
+            {line_to_change: new_qty, line_keep_qty: line_keep_qty.quantity},
         )
 
     def test_set_custom_qty_not_found(self):
@@ -169,7 +169,7 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
         self._assert_selected_qties(
             response,
             selected_lines,
-            {line: line.reserved_uom_qty for line in selected_lines},
+            {line: line.quantity for line in selected_lines},
             message={
                 "body": "The record you were working on does not exist anymore.",
                 "message_type": "error",
@@ -188,13 +188,13 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
                 "picking_id": self.picking.id,
                 "selected_line_ids": selected_lines.ids,
                 "move_line_id": line1.id,
-                "qty_done": line1.reserved_uom_qty + 1,
+                "qty_done": line1.quantity + 1,
             },
         )
         self._assert_selected_qties(
             response,
             selected_lines,
-            {line1: line1.reserved_uom_qty + 1, line2: line2.reserved_uom_qty},
+            {line1: line1.quantity + 1, line2: line2.quantity},
             message={
                 "body": "Please note that the scanned quantity "
                 "is higher than the maximum allowed.",
@@ -218,7 +218,7 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
         self._assert_selected_qties(
             response,
             selected_lines,
-            {line1: line1.reserved_uom_qty, line2: line2.reserved_uom_qty},
+            {line1: line1.quantity, line2: line2.quantity},
             message={
                 "body": "Negative quantity not allowed.",
                 "message_type": "error",
@@ -230,7 +230,7 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
         line_to_change = selected_lines[0]
         line_keep_qty = selected_lines[1]
         # split 1 qty
-        new_qty = line_to_change.reserved_uom_qty - 1
+        new_qty = line_to_change.quantity - 1
         response = self.service.dispatch(
             "set_custom_qty",
             params={
@@ -241,7 +241,7 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
             },
         )
         self.assertEqual(line_to_change.qty_done, new_qty)
-        self.assertEqual(line_keep_qty.qty_done, line_keep_qty.reserved_uom_qty)
+        self.assertEqual(line_keep_qty.qty_done, line_keep_qty.quantity)
         new_lines = [
             x for x in self.moves_pack1.move_line_ids if x not in selected_lines
         ]
@@ -252,6 +252,6 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
             self.moves_pack1.move_line_ids,
             {
                 line_to_change: new_qty,
-                line_keep_qty: line_keep_qty.reserved_uom_qty,
+                line_keep_qty: line_keep_qty.quantity,
             },
         )

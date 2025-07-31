@@ -12,205 +12,136 @@
                 />
             </field>
             <group name="options" position="inside">
-                <group
-                    name="move_create"
-                    attrs="{'invisible': [('move_create_is_possible', '=', False)]}"
-                >
-                    <field name="move_create_is_possible" invisible="1" />
+                <group name="move_create" invisible="not move_create_is_possible">
                     <field name="allow_move_create" />
                 </group>
                 <group
                     name="unreserve_other_moves"
-                    attrs="{'invisible': [('unreserve_other_moves_is_possible', '=', False)]}"
+                    invisible="not unreserve_other_moves_is_possible"
                 >
-                    <field name="unreserve_other_moves_is_possible" invisible="1" />
                     <field name="allow_unreserve_other_moves" />
                 </group>
                 <group
                     name="ignore_no_putaway_available"
-                    attrs="{'invisible': [('ignore_no_putaway_available_is_possible', '=', False)]}"
+                    invisible="not ignore_no_putaway_available_is_possible"
                 >
-                    <field
-                        name="ignore_no_putaway_available_is_possible"
-                        invisible="1"
-                    />
                     <field name="ignore_no_putaway_available" />
                 </group>
                 <group
                     name="require_destination_package"
-                    attrs="{'invisible': [('require_destination_package_is_possible', '=', False)]}"
+                    invisible="not require_destination_package_is_possible"
                 >
-                    <field
-                        name="require_destination_package_is_possible"
-                        invisible="1"
-                    />
                     <field name="require_destination_package" />
                 </group>
                 <group
                     name="pick_pack_same_time"
-                    attrs="{'invisible': [('pick_pack_same_time_is_possible', '=', False)]}"
+                    invisible="not pick_pack_same_time_is_possible"
                 >
-                    <field name="pick_pack_same_time_is_possible" invisible="1" />
                     <field name="pick_pack_same_time" />
                 </group>
                 <group
                     name="force_reservation"
-                    attrs="{'invisible': [('allow_force_reservation_is_possible', '=', False)]}"
+                    invisible="not allow_force_reservation_is_possible"
                 >
-                    <field name="allow_force_reservation_is_possible" invisible="1" />
                     <field name="allow_force_reservation" />
                 </group>
                 <group
                     name="prepackaged_product"
-                    attrs="{'invisible': [('prepackaged_product_is_possible', '=', False)]}"
+                    invisible="not prepackaged_product_is_possible"
                 >
-                    <field name="prepackaged_product_is_possible" invisible="1" />
                     <field name="allow_prepackaged_product" />
                 </group>
                 <group
                     name="unload_at_destination"
-                    attrs="{'invisible': [('unload_package_at_destination_is_possible', '=', False)]}"
+                    invisible="not unload_package_at_destination_is_possible"
                 >
                     <field
-                        name="unload_package_at_destination_is_possible"
-                        invisible="1"
-                    />
-                    <field
                         name="unload_package_at_destination"
-                        attrs="{'readonly': [('pick_pack_same_time', '=', True)]}"
+                        readonly="pick_pack_same_time"
                     />
                 </group>
                 <group
                     name="disable_full_bin_action"
-                    attrs="{'invisible': [('disable_full_bin_action_is_possible', '=', False)]}"
+                    invisible="not disable_full_bin_action_is_possible"
                 >
-                    <field name="disable_full_bin_action_is_possible" invisible="1" />
                     <field name="disable_full_bin_action" />
                 </group>
                 <group
                     name="multiple_move_single_pack"
-                    attrs="{'invisible': [('multiple_move_single_pack_is_possible', '=', False)]}"
+                    invisible="not multiple_move_single_pack_is_possible"
                 >
-                    <field name="multiple_move_single_pack_is_possible" invisible="1" />
                     <field
                         name="multiple_move_single_pack"
-                        attrs="{'readonly': [('pick_pack_same_time', '=', True)]}"
+                        readonly="pick_pack_same_time"
                     />
                 </group>
-                <group
-                    name="get_work"
-                    attrs="{'invisible': [('allow_get_work_is_possible', '=', False)]}"
-                >
-                    <field name="allow_get_work_is_possible" invisible="1" />
+                <group name="get_work" invisible="not allow_get_work_is_possible">
                     <field name="allow_get_work" />
                 </group>
-                <group
-                    name="no_prefill_qty"
-                    attrs="{'invisible': [('no_prefill_qty_is_possible', '=', False)]}"
-                >
-                    <field name="no_prefill_qty_is_possible" invisible="1" />
+                <group name="no_prefill_qty" invisible="not no_prefill_qty_is_possible">
                     <field name="no_prefill_qty" />
                 </group>
                 <group
                     name="show_oneline_package_content"
-                    attrs="{'invisible': [('show_oneline_package_content_is_possible', '=', False)]}"
+                    invisible="not show_oneline_package_content_is_possible"
                 >
-                    <field
-                        name="show_oneline_package_content_is_possible"
-                        invisible="1"
-                    />
                     <field name="show_oneline_package_content" />
                 </group>
                 <group
                     name="scan_location_or_pack_first"
-                    attrs="{'invisible': [('scan_location_or_pack_first_is_possible', '=', False)]}"
+                    invisible="not scan_location_or_pack_first_is_possible"
                 >
-                    <field name="scenario_key" invisible="1" />
-                    <field
-                        name="scan_location_or_pack_first_is_possible"
-                        invisible="1"
-                    />
                     <field name="scan_location_or_pack_first" />
-                    <div
-                        class="text-muted"
-                        attrs="{'invisible': [('scenario_key', '!=', 'checkout')]}"
-                    >
+                    <div class="text-muted" invisible="scenario_key != 'checkout'">
                     When choosing an order to pack, do not allow to scan a product.
                   </div>
-                    <div
-                        class="text-muted"
-                        attrs="{'invisible': [('scenario_key', '!=', 'zone_picking')]}"
-                    >
+                    <div class="text-muted" invisible="scenario_key != 'zone_picking'">
                     When selecting a move line, force the user to first scan a package or a location and not a product or a lot.
                   </div>
                     <div
                         class="text-muted"
-                        attrs="{'invisible': [('scenario_key', '!=', 'cluster_picking')]}"
+                        invisible="scenario_key != 'cluster_picking'"
                     >
                     When selecting a move line, force the user to first scan a package or a location and not a product or a lot.
                   </div>
                 </group>
-                <group
-                    name="auto_post_line"
-                    attrs="{'invisible': [('auto_post_line_is_possible', '=', False)]}"
-                >
-                    <field name="auto_post_line_is_possible" invisible="1" />
+                <group name="auto_post_line" invisible="not auto_post_line_is_possible">
                     <field name="auto_post_line" />
                 </group>
                 <group
                     name="allow_alternative_destination"
-                    attrs="{'invisible': [('allow_alternative_destination_is_possible', '=', False)]}"
+                    invisible="not allow_alternative_destination_is_possible"
                 >
-                    <field
-                        name="allow_alternative_destination_is_possible"
-                        invisible="1"
-                    />
                     <field name="allow_alternative_destination" />
                 </group>
-                <group
-                    name="allow_return"
-                    attrs="{'invisible': [('allow_return_is_possible', '=', False)]}"
-                >
-                    <field name="allow_return_is_possible" invisible="1" />
+                <group name="allow_return" invisible="not allow_return_is_possible">
                     <field name="allow_return" />
                 </group>
                 <group
                     name="allow_alternative_destination_package"
-                    attrs="{'invisible': [('allow_alternative_destination_package_is_possible', '=', False)]}"
+                    invisible="not allow_alternative_destination_package_is_possible"
                 >
-                    <field
-                        name="allow_alternative_destination_package_is_possible"
-                        invisible="1"
-                    />
                     <field name="allow_alternative_destination_package" />
                 </group>
                 <group
                     name="search_move_line"
-                    attrs="{'invisible': [('move_line_search_sort_order_is_possible', '=', False), ('move_line_search_additional_domain_is_possible', '=', False)]}"
+                    invisible="not move_line_search_sort_order_is_possible and not move_line_search_additional_domain_is_possible"
                 >
-                    <field
-                        name="move_line_search_additional_domain_is_possible"
-                        invisible="1"
-                    />
                     <field
                         name="move_line_search_additional_domain"
                         widget="domain"
                         options="{'model': 'stock.move.line'}"
-                        attrs="{'invisible': [('move_line_search_additional_domain_is_possible', '=', False)]}"
-                    />
-                    <field
-                        name="move_line_search_sort_order_is_possible"
-                        invisible="1"
+                        invisible="not move_line_search_additional_domain_is_possible"
                     />
                     <field
                         name="move_line_search_sort_order"
-                        attrs="{'invisible': [('move_line_search_sort_order_is_possible', '=', False)]}"
+                        invisible="not move_line_search_sort_order_is_possible"
                     />
                     <div
                         class="o_cell o_wrap_label"
                         style="margin-top: 4px;"
                         colspan="2"
-                        attrs="{'invisible': ['|', ('move_line_search_sort_order_is_possible', '=', False), ('move_line_search_sort_order', '!=', 'custom_code')]}"
+                        invisible="not move_line_search_sort_order_is_possible or move_line_search_sort_order != 'custom_code'"
                     >
                         <label
                             class="text-900"
@@ -235,7 +166,7 @@
                         </ul>
                         <field
                             name="move_line_search_sort_order_custom_code"
-                            attrs="{'invisible': ['|', ('move_line_search_sort_order_is_possible', '=', False), ('move_line_search_sort_order', '!=', 'custom_code')]}"
+                            invisible="not move_line_search_sort_order_is_possible or move_line_search_sort_order != 'custom_code'"
                             nolabel="1"
                         />
                     </div>

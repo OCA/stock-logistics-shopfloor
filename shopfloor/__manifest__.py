@@ -6,7 +6,7 @@
 {
     "name": "Shopfloor",
     "summary": "manage warehouse operations with barcode scanners",
-    "version": "16.0.2.8.0",
+    "version": "18.0.0.1.0",
     "development_status": "Beta",
     "category": "Inventory",
     "website": "https://github.com/OCA/stock-logistics-shopfloor",
@@ -22,13 +22,15 @@
         "base_rest",
         "base_sparse_field",
         #  OCA / stock-logistics-warehouse
-        "stock_helper",
+        "stock_location_is_sublocation",
         "stock_picking_completion_info",
         #  OCA / stock-logistics-workflow
         "stock_move_line_change_lot",
+        "stock_picking_progress",
+        #  OCA / stock-logistics-tracking
         "stock_quant_package_dimension",
         "stock_quant_package_product_packaging",
-        "stock_picking_progress",
+        #  OCA / product-attribute
         # TODO: used for manuf info on prod detail.
         # This must be an optional dep
         "product_manufacturer",
@@ -46,6 +48,11 @@
         "product_packaging_level",
         #  OCA / delivery
         "stock_picking_delivery_link",
+        # TODO v18: new dependency due to ``available_carriers`` that needs a SO.
+        # see picking_form.py
+        "sale_stock",
+        # OCA/stock-logistics-workflow
+        "stock_move_line_qty_picked",
     ],
     "data": [
         "data/shopfloor_scenario_data.xml",
@@ -61,5 +68,5 @@
         "demo/shopfloor_menu_demo.xml",
         "demo/shopfloor_app_demo.xml",
     ],
-    "installable": False,
+    "installable": True,
 }

@@ -35,7 +35,7 @@ class TestStockMoveActionAssign(CommonCase):
         An override of ``StockPicking._check_move_lines_map_quant_package()`` ensures
         that we ignore:
 
-        * picked lines (qty_done > 0)
+        * picked lines
         * lines with a different result package already
         """
         package = self.env["stock.quant.package"].create({"name": "Src Pack"})
@@ -56,7 +56,7 @@ class TestStockMoveActionAssign(CommonCase):
         line = move.move_line_ids
 
         # we are no longer moving the entire package
-        line.qty_done = 20
+        line._pick_qty(20)
         line.result_package_id = dest_package1
 
         # create remaining quantity
@@ -65,7 +65,12 @@ class TestStockMoveActionAssign(CommonCase):
             picking.location_id, self.product_a, 30, package=new_package
         )
 
+        # Starting from Odoo 17.0+, if a move has been picked (even partially)
+        # no reservation can be done anymore on it (see '_action_assign()' method).
+        # To allow the 2nd reservation we have to unpicked first the 20 units.
+        line.picked = False
         move._action_assign()
+        line.picked = True  # Re-pick the 20 units
         new_line = move.move_line_ids - line
 
         # At the end of _action_assign(), StockPicking._check_entire_pack() is
@@ -81,7 +86,17 @@ class TestStockMoveActionAssign(CommonCase):
         self.assertRecordValues(
             line + new_line,
             [
-                {"qty_done": 20, "result_package_id": dest_package1.id},
-                {"qty_done": 0, "result_package_id": new_package.id},
+                {
+                    "quantity": 20,
+                    "qty_picked": 20,
+                    "picked": True,
+                    "result_package_id": dest_package1.id,
+                },
+                {
+                    "quantity": 30,
+                    "qty_picked": 0,
+                    "picked": False,
+                    "result_package_id": new_package.id,
+                },
             ],
         )

@@ -35,7 +35,7 @@ class CheckoutSummaryCase(CheckoutCommonCase):
         self.picking.action_assign()
         # satisfy only few lines
         for ml in self.picking.move_line_ids[:2]:
-            ml.qty_done = ml.reserved_uom_qty
+            ml.qty_done = ml.quantity
             ml.shopfloor_checkout_done = True
         response = self.service.dispatch(
             "summary", params={"picking_id": self.picking.id}
@@ -54,7 +54,7 @@ class CheckoutSummaryCase(CheckoutCommonCase):
         self.picking.action_assign()
         # satisfy only all lines
         for ml in self.picking.move_line_ids:
-            ml.qty_done = ml.reserved_uom_qty
+            ml.qty_done = ml.quantity
             ml.shopfloor_checkout_done = True
         response = self.service.dispatch(
             "summary", params={"picking_id": self.picking.id}

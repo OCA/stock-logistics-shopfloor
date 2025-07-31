@@ -24,7 +24,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
         move_lines = self.env["stock.move.line"].search(
             [
                 ("location_id", "child_of", location.id),
-                ("reserved_qty", ">", 0),
+                ("quantity_product_uom", ">", 0),
                 ("state", "not in", ("done", "cancel")),
             ]
         )
@@ -148,6 +148,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
                 "carrier_id": carrier.id,
             }
         )
+        picking.move_ids[0].quantity = 5.0
         picking.move_ids.write({"date": "2020-05-13"})
         data = self.data_detail.picking_detail(picking, with_progress=True)
         self.assert_schema(self.schema_detail.picking_detail(), data)
@@ -160,7 +161,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "note": Markup("<p>read me</p>"),
             "origin": "created by test",
             "ship_carrier": None,
-            "weight": 110.0,
+            "weight": 100.0,
             "partner": {"id": self.customer.id, "name": self.customer.name},
             "carrier": {"id": picking.carrier_id.id, "name": picking.carrier_id.name},
             "priority": "Urgent",
@@ -170,7 +171,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             },
             "move_lines": self.data_detail.move_lines(picking.move_line_ids),
             "picking_type_code": "outgoing",
-            "progress": 0.0,
+            "progress": 87.5,
         }
         self.assertEqual(data.pop("scheduled_date").split("T")[0], "2020-05-13")
         self.assertDictEqual(data, expected)
@@ -180,20 +181,21 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
         result_package = self.env["stock.quant.package"].create(
             {"product_packaging_id": self.packaging.id}
         )
-        move_line.write({"qty_done": 3.0, "result_package_id": result_package.id})
+        move_line.result_package_id = result_package
+        move_line._pick_qty(3.0)
         data = self.data_detail.move_line(move_line)
         self.assert_schema(self.schema_detail.move_line(), data)
         product = self.product_a.with_context(location=move_line.location_id.id)
         expected = {
             "id": move_line.id,
             "qty_done": 3.0,
-            "quantity": move_line.reserved_uom_qty,
+            "quantity": move_line.quantity,
             "product": self._expected_product_detail(product),
             "lot": None,
             "package_src": {
                 "id": move_line.package_id.id,
                 "name": move_line.package_id.name,
-                "weight": 20.0,
+                "weight": move_line.package_id.shopfloor_weight,
                 "storage_type": None,
                 "total_quantity": sum(
                     move_line.package_id.quant_ids.mapped("quantity")
@@ -202,7 +204,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "package_dest": {
                 "id": result_package.id,
                 "name": result_package.name,
-                "weight": 6.0,
+                "weight": result_package.shopfloor_weight,
                 "storage_type": None,
                 "total_quantity": sum(
                     move_line.result_package_id.quant_ids.mapped("quantity")
@@ -211,7 +213,6 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),
             "priority": "1",
-            "progress": 30.0,
         }
         self.assertDictEqual(data, expected)
         data = self.data_detail.move_line(move_line, with_package_move_line_count=True)
@@ -226,8 +227,8 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
         product = self.product_b.with_context(location=move_line.location_id.id)
         expected = {
             "id": move_line.id,
-            "qty_done": 0.0,
-            "quantity": move_line.reserved_uom_qty,
+            "qty_done": 0,
+            "quantity": move_line.quantity,
             "product": self._expected_product_detail(product),
             "lot": {
                 "id": move_line.lot_id.id,
@@ -240,7 +241,6 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),
             "priority": "1",
-            "progress": 0.0,
         }
         self.assertDictEqual(data, expected)
 
@@ -251,8 +251,8 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
         product = self.product_c.with_context(location=move_line.location_id.id)
         expected = {
             "id": move_line.id,
-            "qty_done": 0.0,
-            "quantity": move_line.reserved_uom_qty,
+            "qty_done": 0,
+            "quantity": move_line.quantity,
             "product": self._expected_product_detail(product),
             "lot": {
                 "id": move_line.lot_id.id,
@@ -263,7 +263,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "package_src": {
                 "id": move_line.package_id.id,
                 "name": move_line.package_id.name,
-                "weight": 30.0,
+                "weight": move_line.package_id.shopfloor_weight,
                 "storage_type": None,
                 "total_quantity": sum(
                     move_line.package_id.quant_ids.mapped("quantity")
@@ -272,7 +272,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "package_dest": {
                 "id": move_line.result_package_id.id,
                 "name": move_line.result_package_id.name,
-                "weight": 0.0,
+                "weight": move_line.result_package_id.shopfloor_weight,
                 "storage_type": None,
                 "total_quantity": sum(
                     move_line.result_package_id.quant_ids.mapped("quantity")
@@ -281,7 +281,6 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),
             "priority": "1",
-            "progress": 0.0,
         }
         self.assertDictEqual(data, expected)
         data = self.data_detail.move_line(move_line, with_package_move_line_count=True)
@@ -296,8 +295,8 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
         product = self.product_d.with_context(location=move_line.location_id.id)
         expected = {
             "id": move_line.id,
-            "qty_done": 0.0,
-            "quantity": move_line.reserved_uom_qty,
+            "qty_done": 0,
+            "quantity": move_line.quantity,
             "product": self._expected_product_detail(product),
             "lot": None,
             "package_src": None,
@@ -305,7 +304,6 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "location_src": self._expected_location(move_line.location_id),
             "location_dest": self._expected_location(move_line.location_dest_id),
             "priority": "1",
-            "progress": 0.0,
         }
         self.assertDictEqual(data, expected)
 

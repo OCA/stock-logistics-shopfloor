@@ -149,7 +149,7 @@ class MenuCountersCommonCase(CommonMenuCase):
             .create(
                 {
                     "name": "Product E",
-                    "type": "product",
+                    "is_storable": True,
                     "default_code": "E",
                     "barcode": "E",
                     "weight": 3,
@@ -162,7 +162,7 @@ class MenuCountersCommonCase(CommonMenuCase):
             .create(
                 {
                     "name": "Product F",
-                    "type": "product",
+                    "is_storable": True,
                     "default_code": "F",
                     "barcode": "F",
                     "weight": 3,
@@ -175,7 +175,7 @@ class MenuCountersCommonCase(CommonMenuCase):
             .create(
                 {
                     "name": "Product G",
-                    "type": "product",
+                    "is_storable": True,
                     "default_code": "G",
                     "barcode": "G",
                     "weight": 3,
@@ -188,7 +188,7 @@ class MenuCountersCommonCase(CommonMenuCase):
             .create(
                 {
                     "name": "Product H",
-                    "type": "product",
+                    "is_storable": True,
                     "default_code": "H",
                     "barcode": "H",
                     "weight": 3,

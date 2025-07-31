@@ -160,7 +160,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             qty_done=10.0,
         )
         # first line done
-        move_line.qty_done = move_line.reserved_uom_qty
+        move_line.qty_done = move_line.quantity
         # get the next one
         response = self.service.dispatch(
             "scan_source",
@@ -625,7 +625,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         self.service.set_destination(
             move_line.id,
             self.free_package.name,
-            move_line.reserved_uom_qty,
+            move_line.quantity,
         )
         self.assertEqual(move_line.shopfloor_user_id, self.env.user)
         # The second user scans the same source location
@@ -670,7 +670,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             params={
                 "move_line_id": move_line.id,
                 "barcode": self.free_package.name,
-                "quantity": move_line.reserved_uom_qty,
+                "quantity": move_line.quantity,
             },
         )
         # unload goods
@@ -702,7 +702,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
                 params={
                     "move_line_id": move_line.id,
                     "barcode": package_dest.name,
-                    "quantity": move_line.reserved_uom_qty,
+                    "quantity": move_line.quantity,
                 },
             )
         # unload goods

@@ -65,7 +65,7 @@ class ChangePackageLot(Component):
         self, move_line, lot, response_ok_func, response_error_func
     ):
         previous_lot = move_line.lot_id
-        previous_reserved_uom_qty = move_line.reserved_uom_qty
+        previous_reserved_qty = move_line.quantity
 
         inventory = self._actions_for("inventory")
 
@@ -79,9 +79,7 @@ class ChangePackageLot(Component):
                     }
                 )
                 rounding = move_line.product_id.uom_id.rounding
-                if float_is_zero(
-                    move_line.reserved_uom_qty, precision_rounding=rounding
-                ):
+                if float_is_zero(move_line.quantity, precision_rounding=rounding):
                     # The lot is not found at all, but the user scanned it, which means
                     # it's an error in the stock data!
                     raise InventoryError("Lot not available")
@@ -108,8 +106,8 @@ class ChangePackageLot(Component):
         message = self.msg_store.lot_replaced_by_lot(previous_lot, lot)
         if (
             float_compare(
-                move_line.reserved_uom_qty,
-                previous_reserved_uom_qty,
+                move_line.quantity,
+                previous_reserved_qty,
                 precision_rounding=rounding,
             )
             != 0

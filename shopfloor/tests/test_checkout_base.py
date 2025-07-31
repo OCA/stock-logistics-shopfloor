@@ -91,6 +91,6 @@ class CheckoutCommonCase(CommonCase):
                 "message_type": "warning",
                 "body": "The quantity scanned for one or more lines cannot be "
                 "higher than the maximum allowed. "
-                f"({line.product_id.name} : {str(line.qty_done)} > {str(line.reserved_uom_qty)})",  # noqa
+                f"({line.product_id.name} : {str(line.qty_done)} > {str(line.quantity)})",  # noqa
             },
         )

@@ -26,7 +26,7 @@ class StockLocation(models.Model):
         return self.env["stock.move.line"].search(
             [
                 ("location_id", "child_of", self.id),
-                ("reserved_uom_qty", ">", 0),
+                ("quantity", ">", 0),
                 ("state", "not in", ("done", "cancel")),
             ]
         )
@@ -40,7 +40,7 @@ class StockLocation(models.Model):
 
         Used for the "zero check". We need to know if a location is empty, but since
         we set the move lines to "done" only at the end of the unload workflow, we
-        have to look at the qty_done of the move lines from this location.
+        have to look at the picked quantity of the move lines from this location.
 
         With `move_lines` we can force the use of the given move lines for the check.
         This allows to know that the location will be empty if we process only
@@ -51,18 +51,18 @@ class StockLocation(models.Model):
             [("quantity", ">", 0), ("location_id", "=", self.id)]
         )
         remaining = sum(quants.mapped("quantity"))
-        move_line_qty_field = "qty_done"
+        move_line_qty_field = "qty_picked"
         if move_lines:
             move_lines = move_lines.filtered(
                 lambda m: m.state not in ("cancel", "done")
             )
-            move_line_qty_field = "reserved_uom_qty"
+            move_line_qty_field = "quantity"
         else:
             move_lines = self.env["stock.move.line"].search(
                 [
                     ("state", "not in", ("cancel", "done")),
                     ("location_id", "=", self.id),
-                    ("qty_done", ">", 0),
+                    ("picked", "=", True),
                 ]
             )
         planned = remaining - sum(move_lines.mapped(move_line_qty_field))

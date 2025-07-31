@@ -3,7 +3,7 @@
 from collections import namedtuple
 
 from odoo import models
-from odoo.tests.common import Form
+from odoo.tests import Form
 
 from odoo.addons.shopfloor_base.tests.common import CommonCase as BaseCommonCase
 
@@ -62,8 +62,8 @@ class CommonCase(BaseCommonCase):
             .create(
                 {
                     "name": "Product A",
-                    "type": "product",
-                    "default_code": "A",
+                    "is_storable": True,
+                    "default_code": "SF#A",
                     "barcode": "A",
                     "weight": 2,
                 }
@@ -87,8 +87,8 @@ class CommonCase(BaseCommonCase):
             .create(
                 {
                     "name": "Product B",
-                    "type": "product",
-                    "default_code": "B",
+                    "is_storable": True,
+                    "default_code": "SF#B",
                     "barcode": "B",
                     "weight": 3,
                 }
@@ -111,8 +111,8 @@ class CommonCase(BaseCommonCase):
             .create(
                 {
                     "name": "Product C",
-                    "type": "product",
-                    "default_code": "C",
+                    "is_storable": True,
+                    "default_code": "SF#C",
                     "barcode": "C",
                     "weight": 3,
                 }
@@ -136,8 +136,8 @@ class CommonCase(BaseCommonCase):
             .create(
                 {
                     "name": "Product D",
-                    "type": "product",
-                    "default_code": "D",
+                    "is_storable": True,
+                    "default_code": "SF#D",
                     "barcode": "D",
                     "weight": 3,
                 }

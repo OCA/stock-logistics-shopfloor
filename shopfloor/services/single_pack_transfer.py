@@ -31,7 +31,7 @@ class SinglePackTransfer(Component):
             "name": package.name,
             "weight_uom": package.weight_uom_id.name,
             "weight": package.pack_weight,
-            "estimated_weight_kg": package.estimated_pack_weight_kg,
+            "estimated_weight_kg": package.shopfloor_weight,
             "location_src": self.data.location(package.location_id),
             "location_dest": self.data.location(package_level.location_dest_id),
             "products": self.data.products(move_lines.product_id),

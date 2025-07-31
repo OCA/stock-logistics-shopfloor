@@ -41,11 +41,11 @@ class StockQuantPackage(models.Model):
         for rec in self:
             rec.update({"reserved_move_line_ids": rec._get_reserved_move_lines()})
 
-    @api.depends("pack_weight", "estimated_pack_weight_kg")
+    @api.depends("pack_weight", "weight")
     @api.depends_context("picking_id")
     def _compute_shopfloor_weight(self):
         for rec in self:
-            rec.shopfloor_weight = rec.pack_weight or rec.estimated_pack_weight_kg
+            rec.shopfloor_weight = rec.pack_weight or rec.weight
 
     # TODO: we should refactor this like
 

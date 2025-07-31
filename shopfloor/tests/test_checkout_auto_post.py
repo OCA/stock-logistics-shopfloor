@@ -59,9 +59,9 @@ class CheckoutAutoPostCase(CheckoutCommonCase):
         line_b_in_original_picking = picking.move_line_ids.filtered(
             lambda x: x.product_id == selected_move_line_b.product_id
         )
-        self.assertEqual(line_a_in_original_picking.reserved_uom_qty, 3)
-        self.assertEqual(line_b_in_original_picking.reserved_uom_qty, 11)
-        self.assertEqual(selected_move_line_c.reserved_uom_qty, 30)
+        self.assertEqual(line_a_in_original_picking.quantity, 3)
+        self.assertEqual(line_b_in_original_picking.quantity, 11)
+        self.assertEqual(selected_move_line_c.quantity, 30)
 
         self.assertEqual(line_a_in_original_picking.qty_done, 0)
         self.assertEqual(line_b_in_original_picking.qty_done, 0)

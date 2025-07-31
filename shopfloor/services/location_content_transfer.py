@@ -770,7 +770,7 @@ class LocationContentTransfer(Component):
         backorders = stock.validate_moves(move_line.move_id)
         if backorders:
             for move_line in backorders.mapped("move_line_ids"):
-                move_line.qty_done = move_line.reserved_uom_qty
+                move_line.qty_done = move_line.quantity
             backorders.user_id = self.env.user
             # process first backorder of current line
             move_lines = backorders.move_line_ids

@@ -31,7 +31,13 @@ class ActionsDataCaseBase(CommonCase, ActionsDataTestMixin):
         cls.packaging = (
             cls.env["product.packaging"]
             .sudo()
-            .create({"name": "Pallet", "packaging_level_id": cls.packaging_type.id})
+            .create(
+                {
+                    "name": "Pallet",
+                    "packaging_level_id": cls.packaging_type.id,
+                    "product_id": cls.product_b.id,
+                }
+            )
         )
         cls.delivery_packaging = (
             cls.env["stock.package.type"]
@@ -87,7 +93,7 @@ class ActionsDataCaseBase(CommonCase, ActionsDataTestMixin):
         cls.product_a_variant = cls.product_a.copy(
             {
                 "name": "Product A variant 1",
-                "type": "product",
+                "is_storable": True,
                 "default_code": "A-VARIANT",
                 "barcode": "A-VARIANT",
             }
@@ -176,7 +182,7 @@ class ActionsDataCaseBase(CommonCase, ActionsDataTestMixin):
         data = {
             "id": record.id,
             "name": record.name,
-            "weight": record.pack_weight or record.estimated_pack_weight_kg,
+            "weight": record.shopfloor_weight,
             "storage_type": None,
             "total_quantity": sum(record.quant_ids.mapped("quantity")),
         }

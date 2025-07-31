@@ -28,8 +28,8 @@ class CheckoutNewPackageCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
 
         move_line1, move_line2, move_line3 = selected_lines
         # we'll put only the first 2 lines (product A and B) in the new package
-        move_line1.qty_done = move_line1.reserved_uom_qty
-        move_line2.qty_done = move_line2.reserved_uom_qty
+        move_line1.qty_done = move_line1.quantity
+        move_line2.qty_done = move_line2.quantity
         move_line3.qty_done = 0
 
         response = self.service.dispatch(
@@ -77,7 +77,7 @@ class CheckoutNewPackageCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
         # and the user shouldn't be allowed to select a package.
         selected_lines = moves.move_line_ids
         line = fields.first(selected_lines)
-        line.qty_done = line.reserved_uom_qty + 1
+        line.qty_done = line.quantity + 1
         response = self.service.dispatch(
             "list_dest_package",
             params={

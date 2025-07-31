@@ -101,7 +101,7 @@ class InventoryAction(Component):
         other_lines = self._stock_issue_get_related_move_lines(
             move, location, package, lot
         )
-        qty_to_keep = sum(other_lines.mapped("reserved_qty"))
+        qty_to_keep = sum(other_lines.mapped("quantity_product_uom"))
         self.create_stock_correction(move, location, package, lot, qty_to_keep)
         move._action_assign()
 

@@ -81,7 +81,7 @@ class MoveLineSearch(Component):
             the domain will not be filtered on any picking type.
         """
         domain = [
-            ("qty_done", "=", 0),
+            ("qty_picked", "=", 0),
             ("state", "in", ("assigned", "partially_available")),
         ]
         picking_types = picking_type if picking_type is not None else self.picking_types

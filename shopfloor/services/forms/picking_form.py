@@ -34,7 +34,10 @@ class ShopfloorPickingForm(Component):
         company_carriers = self.env["delivery.carrier"].search(
             ["|", ("company_id", "=", False), ("company_id", "=", record.company_id.id)]
         )
-        available_carriers = company_carriers.available_carriers(record.partner_id)
+        # TODO: this imply a dependency on sale_stock
+        available_carriers = company_carriers.available_carriers(
+            record.partner_id, record.sale_id
+        )
         return available_carriers
 
 

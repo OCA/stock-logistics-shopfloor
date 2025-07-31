@@ -72,7 +72,8 @@ class SearchAction(Component):
 
         Plain barcodes
         """
-        barcode = barcode or ""
+        if not barcode or isinstance(barcode, str) and not barcode.strip():
+            return self._make_search_result(type="none")
         return self.generic_find(barcode, types=types, handler_kw=handler_kw)
 
     def _find_record_by_type(self, barcode, btype, handler_kw=None):

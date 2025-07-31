@@ -566,7 +566,7 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
             params={
                 "location_id": self.content_loc.id,
                 "move_line_id": move_line.id,
-                "quantity": move_line.reserved_uom_qty,
+                "quantity": move_line.quantity,
                 "barcode": self.shelf1.barcode,
             },
         )
@@ -817,7 +817,7 @@ class LocationContentTransferSingleSpecialCase(LocationContentTransferCommonCase
         self.assertEqual(len(self.picking.move_ids), 2)
         self.assertEqual(len(self.move_product_b.move_line_ids), 2)
         move_line = self.move_product_b.move_line_ids.filtered(
-            lambda ml: ml.reserved_uom_qty == 4  # 4/10 to stock out
+            lambda ml: ml.quantity == 4  # 4/10 to stock out
         )
         self.assertEqual(self.product_b.qty_available, 10)
         response = self.service.dispatch(
@@ -855,7 +855,7 @@ class LocationContentTransferSingleSpecialCase(LocationContentTransferCommonCase
         self.env.user = self.shopfloor_manager
         self.assertTrue(self.env.user != self.picking.create_uid)
         move_line = self.move_product_b.move_line_ids.filtered(
-            lambda ml: ml.reserved_uom_qty == 4  # 4/10 to stock out
+            lambda ml: ml.quantity == 4  # 4/10 to stock out
         )
         move_line.shopfloor_user_id = self.env.user
         self.service.dispatch(

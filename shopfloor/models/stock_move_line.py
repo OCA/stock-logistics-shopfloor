@@ -29,6 +29,8 @@ class StockMoveLine(models.Model):
     # allow domain on picking_id.xxx without too much perf penalty
     picking_id = fields.Many2one(auto_join=True)
 
+    is_shopfloor_created = fields.Boolean()
+
     def _split_partial_quantity(self):
         """Create new move line for the quantity remaining to do
 
@@ -36,23 +38,23 @@ class StockMoveLine(models.Model):
         """
         self.ensure_one()
         rounding = self.product_uom_id.rounding
-        if float_is_zero(self.qty_done, precision_rounding=rounding):
+        if float_is_zero(self.qty_picked, precision_rounding=rounding):
             return self.browse()
         compare = float_compare(
-            self.qty_done, self.reserved_uom_qty, precision_rounding=rounding
+            self.qty_picked, self.quantity, precision_rounding=rounding
         )
         qty_lesser = compare == -1
         qty_greater = compare == 1
         assert not qty_greater, "Quantity done cannot exceed quantity to do"
         if qty_lesser:
-            remaining = self.reserved_uom_qty - self.qty_done
-            new_line = self.copy({"reserved_uom_qty": remaining, "qty_done": 0})
+            remaining = self.quantity - self.qty_picked
+            new_line = self.copy(
+                {"quantity": remaining, "qty_picked": 0, "picked": False}
+            )
             # if we didn't bypass reservation update, the quant reservation
             # would be reduced as much as the deduced quantity, which is wrong
             # as we only moved the quantity to a new move line
-            self.with_context(
-                bypass_reservation_update=True
-            ).reserved_uom_qty = self.qty_done
+            self.with_context(bypass_reservation_update=True).quantity = self.qty_picked
             return new_line
         return self.browse()
 
@@ -95,58 +97,6 @@ class StockMoveLine(models.Model):
                     default=default, backorder=True
                 )
 
-    def _split_pickings_from_source_location(self):
-        """Ensure that the related pickings will have the same source location.
-
-        Some pickings related could have other unrelated move lines, as such we
-        have to split them to contain only the move lines related to the expected
-        source location.
-
-        Example:
-
-            Initial data:
-
-                PICK1:
-                    - move line with source location LOC1
-                    - move line with source location LOC2
-                PICK2:
-                    - move line with source location LOC2
-                    - move line with source location LOC3
-
-            Then we process move lines related to LOC2 with this method, we get:
-
-                PICK1:
-                    - move line with source location LOC1
-                PICK2:
-                    - move line with source location LOC3
-                PICK3:
-                    - move line with source location LOC2
-                    - move line with source location LOC2
-
-        Return the pickings containing the given move lines.
-        """
-        _logger.warning(
-            "`_split_pickings_from_source_location` is deprecated "
-            "and replaced by `_extract_in_split_order`"
-        )
-        location_src_to_process = self.location_id
-        if location_src_to_process and len(location_src_to_process) != 1:
-            raise UserError(
-                _("Move lines processed have to share the same source location.")
-            )
-        pickings = self.picking_id
-        move_lines_to_process_ids = []
-        for picking in pickings:
-            location_src = picking.move_line_ids.location_id
-            if len(location_src) == 1:
-                continue
-            (picking.move_line_ids & self)._extract_in_split_order()
-            # Get the related move lines among the picking and split them
-            move_lines_to_process_ids.extend(
-                set(picking.move_line_ids.ids) & set(self.ids)
-            )
-        return self.picking_id
-
     def _split_qty_to_be_done(self, qty_done, split_partial=True, **split_default_vals):
         """Check qty to be done for current move line. Split it if needed.
 
@@ -154,14 +104,12 @@ class StockMoveLine(models.Model):
         :param split_partial: split if qty is less than expected
             otherwise rely on a backorder.
         """
-        if self.reserved_uom_qty < 0:
+        if self.quantity < 0:
             raise UserError(_("The demand cannot be negative"))
         # store a new line if we have split our line (not enough qty)
         new_line = self.env["stock.move.line"]
         rounding = self.product_uom_id.rounding
-        compare = float_compare(
-            qty_done, self.reserved_uom_qty, precision_rounding=rounding
-        )
+        compare = float_compare(qty_done, self.quantity, precision_rounding=rounding)
         qty_lesser = compare == -1
         qty_greater = compare == 1
         if qty_greater:
@@ -180,16 +128,14 @@ class StockMoveLine(models.Model):
         # split the move line which will be processed later (maybe the user
         # has to pick some goods from another place because the location
         # contained less items than expected)
-        remaining = self.reserved_uom_qty - quantity_done
-        vals = {"reserved_uom_qty": remaining, "qty_done": 0}
+        remaining = self.quantity - quantity_done
+        vals = {"quantity": remaining, "picked": False, "qty_picked": 0}
         vals.update(split_default_vals)
         new_line = self.copy(vals)
         # if we didn't bypass reservation update, the quant reservation
         # would be reduced as much as the deduced quantity, which is wrong
         # as we only moved the quantity to a new move line
-        self.with_context(
-            bypass_reservation_update=True
-        ).reserved_uom_qty = quantity_done
+        self.with_context(bypass_reservation_update=True).quantity = quantity_done
         return new_line
 
     def replace_package(self, new_package):
@@ -205,9 +151,7 @@ class StockMoveLine(models.Model):
         )
 
         # we can't change already picked lines
-        unreservable_lines = other_reserved_lines.filtered(
-            lambda line: line.qty_done == 0
-        )
+        unreservable_lines = other_reserved_lines.filtered(lambda line: not line.picked)
         to_assign_moves = unreservable_lines.move_id
 
         # if we leave the package level, it will try to reserve the same
@@ -266,26 +210,29 @@ class StockMoveLine(models.Model):
             "lot_id": quant.lot_id.id,
             "owner_id": quant.owner_id.id,
             "result_package_id": False,
+            # Always set the 'quantity' value in 'values', this ensure quants are
+            # synchronized with the data set on the move line starting from Odoo
+            # 18.0 (see '<stock.move.line.write()' method in 'stock' module).
+            "quantity": self.quantity,
         }
 
         available_quantity = quant.quantity - quant.reserved_quantity
         if is_lesser(
-            available_quantity, self.reserved_qty, quant.product_uom_id.rounding
+            available_quantity, self.quantity_product_uom, quant.product_uom_id.rounding
         ):
             new_uom_qty = self.product_id.uom_id._compute_quantity(
                 available_quantity, self.product_uom_id, rounding_method="HALF-UP"
             )
-            values["reserved_uom_qty"] = new_uom_qty
+            values["quantity"] = new_uom_qty
 
         self.write(values)
 
-        # try reassign the move in case we had a partial qty, also, it will
-        # recreate a package level if it applies
-        if "reserved_uom_qty" in values:
-            # when we change the quantity of the move, the state
-            # will still be "assigned" and be skipped by "_action_assign",
-            # recompute the state to be "partially_available"
-            self.move_id._recompute_state()
+        # Try reassign the move in case we had a partial qty, also, it will
+        # recreate a package level if it applies.
+        # When we change the quantity of the move, the state
+        # will still be "assigned" and be skipped by "_action_assign",
+        # recompute the state to be "partially_available"
+        self.move_id._recompute_state()
 
         # if the new package has less quantities, assign will create new move
         # lines
@@ -312,9 +259,9 @@ class StockMoveLine(models.Model):
     def shopfloor_postpone(self, *recordsets):
         """
         Specific behavior for move lines.
-        As we need to reset qty_done.
+        As we need to reset the quantity picked.
 
         """
         res = super().shopfloor_postpone(*recordsets)
-        self.qty_done = 0.0
+        self.picked = False
         return res

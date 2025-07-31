@@ -217,8 +217,8 @@ class DataAction(Component):
     def _move_line_parser(self):
         return [
             "id",
-            "qty_done",
-            "reserved_uom_qty:quantity",
+            "qty_picked:qty_done",
+            "quantity",
             ("product_id:product", self._product_parser),
             ("lot_id:lot", self._lot_parser),
             ("location_id:location_src", self._location_parser),
@@ -227,7 +227,8 @@ class DataAction(Component):
                 "move_id:priority",
                 lambda rec, fname: rec.move_id.priority or "",
             ),
-            "progress",
+            # TODO: progress is not available on move lines anymore, what to do for UI?
+            # "progress",
         ]
 
     @ensure_model("stock.move")
@@ -243,7 +244,7 @@ class DataAction(Component):
     def _move_parser(self):
         return [
             "id",
-            "quantity_done",
+            "quantity_picked:quantity_done",
             "product_uom_qty:quantity",
             ("product_id:product", self._product_parser),
             ("location_id:location_src", self._location_parser),
@@ -357,8 +358,8 @@ class DataAction(Component):
         operations_to_do = 0
         operations_done = 0
         for line in lines:
-            operations_done += line.qty_done
-            operations_to_do += line.reserved_uom_qty - line.qty_done
+            operations_done += line.qty_picked
+            operations_to_do += line.quantity - line.qty_picked
         return {
             "done": operations_done,
             "to_do": operations_to_do,
