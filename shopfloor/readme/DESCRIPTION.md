@@ -20,3 +20,18 @@ you must trigger the registry sync on the shopfloor.app in a
 post_init_hook or a post-migrate script.  
 See an example
 [here](https://github.com/OCA/wms/pull/520/commits/bccdfd445a9bc943998c4848f183a076e8459a98).
+
+
+**WARNING v18**
+
+Scenario will be migrated one by one.
+
+Current availability status:
+
+- [ ] checkout
+- [ ] cluster picking
+- [ ] zone picking
+- [ ] delivery
+- [ ] location content transfer
+- [ ] single pack transfer (to be discarded in favor of shopfloor_single_product_transfer)
+- [ ] zone picking
