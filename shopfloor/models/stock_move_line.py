@@ -54,7 +54,7 @@ class StockMoveLine(models.Model):
             # if we didn't bypass reservation update, the quant reservation
             # would be reduced as much as the deduced quantity, which is wrong
             # as we only moved the quantity to a new move line
-            self.with_context(bypass_reservation_update=True).quantity = self.qty_picked
+            self.quantity = self.qty_picked
             return new_line
         return self.browse()
 
