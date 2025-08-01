@@ -105,8 +105,6 @@ class CheckoutListDeliveryPackagingCase(CheckoutCommonCase, CheckoutSelectPackag
         self._fill_stock_for_moves(self.picking.move_ids, in_package=True)
         self.picking.action_assign()
         selected_lines = self.picking.move_line_ids
-        # for line in selected_lines:
-        #     line.qty_done = line.quantity
         response = self.service.dispatch(
             "list_delivery_packaging",
             params={

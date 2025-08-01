@@ -742,7 +742,7 @@ class MessageAction(Component):
             "body": _("The picked quantity must be a value above zero."),
         }
 
-    def selected_lines_qty_done_higher_than_allowed(self, line):
+    def selected_lines_qty_picked_higher_than_allowed(self, line):
         """
         :param line: The selected line
         """
@@ -753,12 +753,12 @@ class MessageAction(Component):
                 "higher than the maximum allowed. "
                 "(%(product_name)s : %(quantity_done)s > %(quantity_reserved)s)",
                 product_name=line.product_id.name,
-                quantity_done=str(line.qty_done),
+                quantity_done=str(line.qty_picked),
                 quantity_reserved=str(line.quantity),
             ),
         }
 
-    def line_scanned_qty_done_higher_than_allowed(self):
+    def line_scanned_qty_picked_higher_than_allowed(self):
         return {
             "message_type": "warning",
             "body": _(

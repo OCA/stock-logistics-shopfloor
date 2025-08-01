@@ -137,9 +137,9 @@ class CheckoutScanSetDestPackageCase(CheckoutCommonCase, SelectDestPackageMixin)
         # them
         cls.move_line1.result_package_id = cls.delivery_package
         # We'll put only product A and B in the destination package
-        cls.move_line1.qty_done = cls.move_line1.quantity
-        cls.move_line2.qty_done = cls.move_line2.quantity
-        cls.move_line3.qty_done = 0
+        cls.move_line1.qty_picked = cls.move_line1.quantity
+        cls.move_line2.qty_picked = cls.move_line2.quantity
+        cls.move_line3.qty_picked = 0
 
         cls.picking = picking
 
@@ -161,7 +161,7 @@ class CheckoutScanSetDestPackageCase(CheckoutCommonCase, SelectDestPackageMixin)
                     "result_package_id": self.delivery_package.id,
                     "shopfloor_checkout_done": True,
                 },
-                # qty_done was zero so we don't set it as packed
+                # picked qty was zero so we don't set it as packed
                 {"result_package_id": self.pack1.id, "shopfloor_checkout_done": False},
             ],
         )
@@ -232,9 +232,9 @@ class CheckoutScanSetDestPackageCase(CheckoutCommonCase, SelectDestPackageMixin)
         )
         self._assert_package_set(response)
 
-    def test_set_dest_package_ok_on_partial_qty_done(self):
+    def test_set_dest_package_ok_on_partial_qty_picked(self):
         # Partially process line three 3 quantiy out of 10
-        self.move_line3.qty_done = 3
+        self.move_line3.qty_picked = 3
         response = self.service.dispatch(
             "set_dest_package",
             params={
@@ -250,23 +250,30 @@ class CheckoutScanSetDestPackageCase(CheckoutCommonCase, SelectDestPackageMixin)
                 {
                     "result_package_id": self.delivery_package.id,
                     "shopfloor_checkout_done": True,
+                    "quantity": 10,
+                    "qty_picked": 10,
+                    "picked": True,
                 },
                 {
                     "result_package_id": self.delivery_package.id,
                     "shopfloor_checkout_done": True,
+                    "quantity": 10,
+                    "qty_picked": 10,
+                    "picked": True,
                 },
                 # Line 3 has been split
                 {
                     "result_package_id": self.delivery_package.id,
                     "shopfloor_checkout_done": True,
-                    "product_uom_qty": 3,
-                    "qty_done": 3,
+                    "quantity": 3,
+                    "qty_picked": 3,
+                    "picked": True,
                 },
             ],
         )
         # Left quantity to do from line 3
         new_move_line = self.picking.move_line_ids.filtered(
-            lambda line: line.qty_done == 0 and line.quantity == 7
+            lambda line: not line.picked and line.quantity == 7
         )
         self.assertTrue(new_move_line)
         self.assertFalse(new_move_line.shopfloor_checkout_done)
@@ -313,12 +320,12 @@ class CheckoutScanSetDestPackageCase(CheckoutCommonCase, SelectDestPackageMixin)
             message=self.service.msg_store.dest_package_not_valid(package),
         )
 
-    def test_set_dest_package_error_qty_done_above(self):
-        # If the qty_done of a selected line goes beyond
+    def test_set_dest_package_error_qty_picked_above(self):
+        # If the picked qty of a selected line goes beyond
         # the maximum allowed, a message should be displayed
         # and the user shouldn't be allowed to select a package.
         line = fields.first(self.picking.move_line_ids)
-        line.qty_done = line.quantity + 1
+        line.qty_picked = line.quantity + 1
         response = self.service.dispatch(
             "list_dest_package",
             params={

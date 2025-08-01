@@ -24,15 +24,15 @@ class CheckoutSetQtyCommonCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
     def setUp(self):
         super().setUp()
         # we assume we have called /select_line on pack one, so by default, we
-        # expect the lines for product a and b to have their qty_done set to
+        # expect the lines for product a and b to have their picked qty set to
         # their reserved quantity at the start of the tests
         self.selected_lines = self.moves_pack1.move_line_ids
         self.deselected_lines = self.moves_pack2.move_line_ids
         self.service._select_lines(self.selected_lines)
         self.assertTrue(
-            all(line.qty_done == line.quantity for line in self.selected_lines)
+            all(line.qty_picked == line.quantity for line in self.selected_lines)
         )
-        self.assertTrue(all(line.qty_done == 0 for line in self.deselected_lines))
+        self.assertTrue(all(not line.picked for line in self.deselected_lines))
 
 
 class CheckoutResetLineQtyCase(CheckoutSetQtyCommonCase):
@@ -83,7 +83,7 @@ class CheckoutSetLineQtyCase(CheckoutSetQtyCommonCase):
     def test_set_line_qty_ok(self):
         selected_lines = self.moves_pack1.move_line_ids
         # do as if the user removed the qties of the 2 selected lines
-        selected_lines.qty_done = 0
+        selected_lines.qty_picked = 0
         line_to_set = selected_lines[0]
         line_no_qty = selected_lines[1]
         # we want to check that when we give the package id, we get
@@ -96,8 +96,9 @@ class CheckoutSetLineQtyCase(CheckoutSetQtyCommonCase):
                 "move_line_id": line_to_set.id,
             },
         )
-        self.assertEqual(line_to_set.qty_done, line_to_set.quantity)
-        self.assertEqual(line_no_qty.qty_done, 0)
+        self.assertEqual(line_to_set.qty_picked, line_to_set.quantity)
+        self.assertEqual(line_no_qty.qty_picked, 0)
+        self.assertFalse(line_no_qty.picked)
         self._assert_selected_qties(
             response,
             selected_lines,
@@ -145,8 +146,8 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
                 "qty_done": new_qty,
             },
         )
-        self.assertEqual(line_to_change.qty_done, new_qty)
-        self.assertEqual(line_keep_qty.qty_done, line_keep_qty.quantity)
+        self.assertEqual(line_to_change.qty_picked, new_qty)
+        self.assertEqual(line_keep_qty.qty_picked, line_keep_qty.quantity)
         self._assert_selected_qties(
             response,
             selected_lines,
@@ -180,7 +181,7 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
         selected_lines = self.moves_pack1.move_line_ids
         line1 = selected_lines[0]
         # modify so we can check that a too high quantity set the max
-        line1.qty_done = 1
+        line1.qty_picked = 1
         line2 = selected_lines[1]
         response = self.service.dispatch(
             "set_custom_qty",
@@ -240,8 +241,8 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
                 "qty_done": new_qty,
             },
         )
-        self.assertEqual(line_to_change.qty_done, new_qty)
-        self.assertEqual(line_keep_qty.qty_done, line_keep_qty.quantity)
+        self.assertEqual(line_to_change.qty_picked, new_qty)
+        self.assertEqual(line_keep_qty.qty_picked, line_keep_qty.quantity)
         new_lines = [
             x for x in self.moves_pack1.move_line_ids if x not in selected_lines
         ]

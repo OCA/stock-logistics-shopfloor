@@ -23,27 +23,28 @@ from . import test_actions_stock
 # from . import test_cluster_picking_stock_issue
 # from . import test_cluster_picking_change_pack_lot
 # from . import test_cluster_picking_unload
-# from . import test_checkout_base
-# from . import test_checkout_scan
-# from . import test_checkout_select
-# from . import test_checkout_scan_line
-# from . import test_checkout_scan_line_no_prefill_qty
-# from . import test_checkout_scan_line_base
-# from . import test_checkout_scan_dest_location
-# from . import test_checkout_select_line
-# from . import test_checkout_select_package_base
-# from . import test_checkout_set_qty
-# from . import test_checkout_scan_package_action
-# from . import test_checkout_scan_package_action_no_prefill_qty
-# from . import test_checkout_new_package
-# from . import test_checkout_no_package
-# from . import test_checkout_auto_post
-# from . import test_checkout_list_delivery_packaging
-# from . import test_checkout_list_package
-# from . import test_checkout_summary
-# from . import test_checkout_change_packaging
-# from . import test_checkout_cancel_line
-# from . import test_checkout_done
+from . import test_checkout_base
+from . import test_checkout_scan
+from . import test_checkout_select
+from . import test_checkout_scan_line
+from . import test_checkout_scan_line_no_prefill_qty
+from . import test_checkout_scan_line_base
+from . import test_checkout_scan_dest_location
+from . import test_checkout_select_line
+from . import test_checkout_select_package_base
+from . import test_checkout_set_qty
+from . import test_checkout_scan_package_action
+from . import test_checkout_scan_package_action_no_prefill_qty
+from . import test_checkout_new_package
+from . import test_checkout_no_package
+from . import test_checkout_auto_post
+from . import test_checkout_list_delivery_packaging
+from . import test_checkout_list_package
+from . import test_checkout_summary
+from . import test_checkout_change_packaging
+from . import test_checkout_cancel_line
+from . import test_checkout_done
+
 # from . import test_delivery_base
 # from . import test_delivery_done
 # from . import test_delivery_scan_deliver

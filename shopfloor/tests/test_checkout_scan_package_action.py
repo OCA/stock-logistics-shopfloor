@@ -21,7 +21,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
 
         # we have selected the pack that contains product a
         line_a = picking.move_line_ids[0]
-        line_a.qty_done = origin_qty_func(line_a)
+        line_a.qty_picked = origin_qty_func(line_a)
 
         response = self.service.dispatch(
             "scan_package_action",
@@ -33,7 +33,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
         )
 
         # since we scanned the barcode of the product and we had a
-        # qty_done, the qty_done should flip to 0
+        # picked qty, the picked qty should flip to 0
         self._assert_selected_qties(
             response, line_a, {line_a: expected_qty_func(line_a)}
         )
@@ -86,7 +86,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
         self._fill_stock_for_moves(picking.move_ids, in_package=True)
         picking.action_assign()
         move_line = picking.move_line_ids
-        origin_qty_done = move_line.qty_done
+        origin_qty_picked = move_line.qty_picked
         response = self.service.dispatch(
             "scan_package_action",
             params={
@@ -99,7 +99,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
             response,
             move_line,
             # no change as the scan was not valid
-            {move_line: origin_qty_done},
+            {move_line: origin_qty_picked},
             message={
                 "message_type": "warning",
                 "body": "Product tracked by lot, please scan one.",
@@ -135,9 +135,9 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
 
         move_line1, move_line2, move_line3 = selected_lines
         # We'll put only product A and B in the package
-        move_line1.qty_done = move_line1.quantity
-        move_line2.qty_done = move_line2.quantity
-        move_line3.qty_done = 0
+        move_line1.qty_picked = move_line1.quantity
+        move_line2.qty_picked = move_line2.quantity
+        move_line3.qty_picked = 0
 
         response = self.service.dispatch(
             "scan_package_action",
@@ -161,7 +161,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
         )
         self.assertRecordValues(
             move_line3,
-            # qty_done was zero so it hasn't been done anyway
+            # picked qty was zero so it hasn't been done anyway
             [{"result_package_id": pack1.id, "shopfloor_checkout_done": False}],
         )
         self.assert_response(
@@ -243,7 +243,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
 
         selected_lines = pack1_moves.move_line_ids
         # they are all selected
-        selected_lines.write({"qty_done": 10.0})
+        selected_lines.write({"qty_picked": 10.0})
 
         response = self.service.dispatch(
             "scan_package_action",
@@ -296,9 +296,9 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
 
         move_line1, move_line2, move_line3 = selected_lines
         # we'll put only the first 2 lines (product A and B) in the new package
-        move_line1.qty_done = move_line1.quantity
-        move_line2.qty_done = move_line2.quantity
-        move_line3.qty_done = 0
+        move_line1.qty_picked = move_line1.quantity
+        move_line2.qty_picked = move_line2.quantity
+        move_line3.qty_picked = 0
 
         packaging = (
             self.env["stock.package.type"]
@@ -349,7 +349,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
         )
         self.assertRecordValues(
             move_line3,
-            # qty_done was zero so we don't set it as packed and it remains in
+            # picked qty was zero so we don't set it as packed and it remains in
             # the same package
             [{"result_package_id": pack1.id, "shopfloor_checkout_done": False}],
         )
@@ -368,7 +368,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
         self._fill_stock_for_moves(pack1_moves, in_package=True)
         picking.action_assign()
         selected_lines = pack1_moves.move_line_ids
-        selected_lines.qty_done = selected_lines.quantity
+        selected_lines.qty_picked = selected_lines.quantity
 
         packaging = (
             self.env["stock.package.type"]

@@ -109,7 +109,7 @@ class CheckoutSelectLineCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
     def test_select_line_all_lines_done(self):
         # set all lines as done
         self.picking.move_line_ids.write(
-            {"qty_done": 10.0, "shopfloor_checkout_done": True}
+            {"qty_picked": 10.0, "shopfloor_checkout_done": True}
         )
         response = self.service.dispatch(
             "select_line",
