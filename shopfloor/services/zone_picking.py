@@ -6,9 +6,10 @@ import functools
 from collections import defaultdict
 
 from odoo.fields import first
+from odoo.tools import str2bool
 from odoo.tools.float_utils import float_compare, float_is_zero
 
-from odoo.addons.base_rest.components.service import to_bool, to_int
+from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
 
 from ..exceptions import ConcurentWorkOnTransfer
@@ -1802,7 +1803,7 @@ class ShopfloorZonePickingValidator(Component):
     def is_zero(self):
         return {
             "move_line_id": {"coerce": to_int, "required": True, "type": "integer"},
-            "zero": {"coerce": to_bool, "required": True, "type": "boolean"},
+            "zero": {"coerce": str2bool, "required": True, "type": "boolean"},
         }
 
     def stock_issue(self):

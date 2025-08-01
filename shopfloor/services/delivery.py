@@ -2,9 +2,10 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import _, fields
 from odoo.osv import expression
+from odoo.tools import str2bool
 from odoo.tools.float_utils import float_is_zero
 
-from odoo.addons.base_rest.components.service import to_bool, to_int
+from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
 
 
@@ -797,7 +798,7 @@ class ShopfloorDeliveryValidator(Component):
     def done(self):
         return {
             "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
-            "confirm": {"coerce": to_bool, "required": False, "type": "boolean"},
+            "confirm": {"coerce": str2bool, "required": False, "type": "boolean"},
         }
 
 

@@ -4,8 +4,9 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import _, fields
 from odoo.osv import expression
+from odoo.tools import str2bool
 
-from odoo.addons.base_rest.components.service import to_bool, to_int
+from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
 
 from ..utils import to_float
@@ -1385,7 +1386,7 @@ class ShopfloorClusterPickingValidator(Component):
         return {
             "picking_batch_id": {"coerce": to_int, "required": True, "type": "integer"},
             "move_line_id": {"coerce": to_int, "required": True, "type": "integer"},
-            "zero": {"coerce": to_bool, "required": True, "type": "boolean"},
+            "zero": {"coerce": str2bool, "required": True, "type": "boolean"},
         }
 
     def skip_line(self):
