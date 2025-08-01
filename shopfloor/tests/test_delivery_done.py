@@ -44,8 +44,7 @@ class DeliveryDoneCase(DeliveryCommonCase):
     def test_done_all_qty_done(self):
         # Do not use the /set_qty_done_line endpoint to set done qties to not
         # update the picking to 'done' state automatically
-        for move_line in self.picking.move_line_ids:
-            move_line.qty_done = move_line.quantity
+        self.picking.move_line_ids.picked = True
         response = self.service.dispatch("done", params={"picking_id": self.picking.id})
         self.assert_response_deliver(
             response,

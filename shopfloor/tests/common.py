@@ -182,8 +182,10 @@ class CommonCase(BaseCommonCase):
         )
         # this method adds the quantity to the current quantity, so remove it
         quantity -= sum(quants.mapped("quantity"))
+        if not quantity:
+            return
         cls.env["stock.quant"]._update_available_quantity(
-            product, location, quantity, package_id=package, lot_id=lot
+            product, location, quantity=quantity, package_id=package, lot_id=lot
         )
 
     @classmethod

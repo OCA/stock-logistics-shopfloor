@@ -44,7 +44,7 @@ class DeliverySetQtyDonePackCase(DeliveryCommonCase):
             "set_qty_done_pack",
             params={"package_id": package.id, "picking_id": self.picking.id},
         )
-        self.assert_qty_done(move_lines, qties=qties)
+        self.assert_qty_picked(move_lines, qties=qties)
         self.assert_response_deliver(response, picking=self.picking)
 
     def test_set_qty_done_pack_picking_not_found(self):

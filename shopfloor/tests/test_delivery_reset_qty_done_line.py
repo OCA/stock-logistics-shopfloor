@@ -72,14 +72,14 @@ class DeliveryResetQtyDoneLineCase(DeliveryCommonCase):
             "set_qty_done_line",
             params={"move_line_id": move_line.id, "picking_id": self.picking.id},
         )
-        self.assertTrue(move_line.qty_done == move_line.quantity)
+        self.assertTrue(move_line.qty_picked == move_line.quantity)
         # Reset it, no related move lines are "done"
         response = self.service.dispatch(
             "reset_qty_done_line",
             params={"move_line_id": move_line.id, "picking_id": self.picking.id},
         )
         self.assert_response_deliver(response, picking=self.picking)
-        self.assertFalse(move_line.qty_done)
+        self.assertFalse(move_line.qty_picked)
 
     def test_reset_qty_done_line_with_package(self):
         move_line = self.pack1_moves[0].mapped("move_line_ids")

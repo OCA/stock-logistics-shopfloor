@@ -129,7 +129,7 @@ class DeliveryCommonCase(CommonCase):
             message=message,
         )
 
-    def assert_qty_done(self, move_lines, qties=None):
+    def assert_qty_picked(self, move_lines, qties=None):
         """Ensure that the quantities done are the expected ones.
 
         If `qties` is not defined, the expected qties are `product_uom_qty`
@@ -140,9 +140,9 @@ class DeliveryCommonCase(CommonCase):
             assert len(move_lines) == len(qties), "'qties' doesn't match 'move_lines'"
             expected_qties = []
             for qty in qties:
-                expected_qties.append({"qty_done": qty})
+                expected_qties.append({"qty_picked": qty})
         else:
-            expected_qties = [{"qty_done": line.quantity} for line in move_lines]
+            expected_qties = [{"qty_picked": line.quantity} for line in move_lines]
         self.assertRecordValues(move_lines, expected_qties)
         package_level = move_lines.package_level_id
         if package_level:

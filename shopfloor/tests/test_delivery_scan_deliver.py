@@ -139,7 +139,7 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
 
     def _test_scan_set_done_ok(self, move_lines, barcode, qties=None):
         response = self.service.dispatch("scan_deliver", params={"barcode": barcode})
-        self.assert_qty_done(move_lines, qties)
+        self.assert_qty_picked(move_lines, qties)
         picking = move_lines.move_id.picking_id
         if picking.state == "done":
             self.assert_response_deliver(
@@ -189,7 +189,7 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
 
     def test_scan_deliver_scan_product_not_in_package(self):
         """Check scanning product increment quantity done by one."""
-        for qty_done in range(1, 3):
+        for qty_picked in range(1, 3):
             response = self.service.dispatch(
                 "scan_deliver",
                 params={
@@ -197,7 +197,7 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
                     "picking_id": self.picking.id,
                 },
             )
-            self.assertEqual(self.raw_move.move_line_ids.qty_done, qty_done)
+            self.assertEqual(self.raw_move.move_line_ids.qty_picked, qty_picked)
 
         self.assert_response_deliver(
             response,
@@ -306,7 +306,7 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
             response,
             picking=self.picking,
         )
-        self.assertEqual(line.qty_done, 1)
+        self.assertEqual(line.qty_picked, 1)
         self.assertEqual(line.state, "assigned")
         for _ in range(int(line.quantity) - 1):
             self.service.dispatch(
@@ -316,7 +316,7 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
                     "picking_id": self.picking.id,
                 },
             )
-        self.assertEqual(line.qty_done, self.raw_lot_move.product_uom_qty)
+        self.assertEqual(line.qty_picked, self.raw_lot_move.product_uom_qty)
 
     def test_scan_deliver_scan_lot_with_prepackaged_product(self):
         """Check scanning a lot process only one piece/unit of this lot.
@@ -330,7 +330,7 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
         self.assert_response_deliver(
             response, message=self.service.msg_store.transfer_complete(self.picking)
         )
-        self.assertEqual(line.qty_done, 1)
+        self.assertEqual(line.qty_picked, 1)
         self.assertEqual(line.move_id.state, "done")
         self.assertEqual(self.picking.state, "done")
         self.assertTrue(self.picking.backorder_ids)
@@ -364,7 +364,7 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
             "scan_deliver", params={"barcode": self.packaging.barcode}
         )
         self.assert_response_deliver(response, picking=self.picking)
-        self.assertEqual(line.qty_done, self.packaging.qty)
+        self.assertEqual(line.qty_picked, self.packaging.qty)
 
     def test_scan_deliver_scan_product_packaging_with_prepackaged_product(self):
         """Check scanning a product packaging use the packaging quantity.
@@ -383,7 +383,7 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
         self.assert_response_deliver(
             response, message=self.service.msg_store.transfer_complete(self.picking)
         )
-        self.assertEqual(line.qty_done, self.packaging.qty)
+        self.assertEqual(line.qty_picked, self.packaging.qty)
 
     def test_scan_deliver_scan_product_packaging_partial_qty(self):
         # Scan a product packaging with a smaller qty than the move line
@@ -398,7 +398,7 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
             "scan_deliver", params={"barcode": self.packaging.barcode}
         )
         self.assert_response_deliver(response, picking=self.picking)
-        self.assertEqual(line.qty_done, self.packaging.qty)
+        self.assertEqual(line.qty_picked, self.packaging.qty)
         self.assertTrue(line.move_id.product_qty > self.packaging.qty)
         # Process the remaining qties, still by scanning the packaging
         response = self.service.dispatch(
@@ -428,7 +428,7 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
             response,
             message=self.service.msg_store.transfer_complete(self.picking),
         )
-        self.assertEqual(line.qty_done, self.packaging.qty)
+        self.assertEqual(line.qty_picked, self.packaging.qty)
         self.assertEqual(line.move_id.product_qty, self.packaging.qty)
         self.assertEqual(line.move_id.state, "done")
         self.assertTrue(self.picking.backorder_ids)
@@ -688,7 +688,7 @@ class DeliveryScanDeliverSpecialCase(DeliveryCommonCase):
         picking = self._create_picking(lines=[(self.product_a, 10)])
         self._fill_stock_for_moves(picking.move_ids, in_package=True)
         picking.action_assign()
-        picking.move_line_ids.qty_done = picking.move_line_ids.quantity
+        picking.move_line_ids.picked = True
         picking._action_done()
         response = self.service.dispatch(
             "scan_deliver", params={"barcode": picking.name}
