@@ -45,6 +45,21 @@ class CommonCase(BaseCommonCase):
         return vals
 
     @classmethod
+    def _shopfloor_manager_values(cls):
+        vals = super()._shopfloor_manager_values()
+        vals["groups_id"] = [
+            (
+                6,
+                0,
+                [
+                    cls.env.ref("stock.group_stock_manager").id,
+                    cls.env.ref("stock.group_stock_multi_locations").id,
+                ],
+            )
+        ]
+        return vals
+
+    @classmethod
     def setUpClassBaseData(cls):
         super().setUpClassBaseData()
         cls.customer = cls.env["res.partner"].sudo().create({"name": "Customer"})

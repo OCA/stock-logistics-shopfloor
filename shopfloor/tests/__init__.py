@@ -9,8 +9,8 @@ from . import test_actions_search_move_line
 from . import test_actions_search
 from . import test_actions_stock
 
-# from . import test_single_pack_transfer
-# from . import test_single_pack_transfer_putaway
+from . import test_single_pack_transfer
+from . import test_single_pack_transfer_putaway
 from . import test_cluster_picking_base
 from . import test_cluster_picking_batch
 from . import test_cluster_picking_select

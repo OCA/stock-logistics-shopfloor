@@ -2,6 +2,7 @@
 # Copyright 2020 Akretion (http://www.akretion.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
+from odoo.fields import Command
 from odoo.tests import Form
 
 from .test_single_pack_transfer_base import SinglePackTransferCommonBase
@@ -64,12 +65,14 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         picking.action_assign()
         return picking
 
-    def _simulate_started(self, package):
+    def _simulate_started(self, package, picking=None):
         """Replicate what the /start endpoint would do on the given package.
 
         Used to test the next endpoints (/validate and /cancel)
         """
-        package_level = self.picking.move_line_ids.package_level_id.filtered(
+        if picking is None:
+            picking = self.picking
+        package_level = picking.move_line_ids.package_level_id.filtered(
             lambda pl: pl.package_id == package
         )
         package_level.is_done = True
@@ -480,28 +483,116 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         # activate the computation of this field, so we have a chance to
         # transition to the 'show completion info' screen.
         self.picking_type.sudo().display_completion_info = True
-
-        # create a chained picking after the current one
-        next_picking = self.picking.copy(
+        # In v18 we cannot rely on the same data than in previous versions because
+        #  Odoo automatically breaks move dest links in stock.move._action_done
+        #  when calling stock.move._push_apply
+        # Therefore, we have to use dedicated procurement rule to generate the pickings
+        #  as they are in this test and ensure completion info still works as expected
+        reserve_location = self.env.ref(
+            "stock_storage_type.stock_location_pallets_reserve"
+        )
+        reserve_bin_1_location = self.env.ref(
+            "stock_storage_type.stock_location_pallets_reserve_bin_1"
+        )
+        reserve_bin_2_location = self.env.ref(
+            "stock_storage_type.stock_location_pallets_reserve_bin_2"
+        )
+        pallets_location = self.env.ref("stock_storage_type.stock_location_pallets")
+        pallets_location.barcode = "PALLETS"
+        pack_a = self.env["stock.quant.package"].create(
+            {"location_id": reserve_location.id}
+        )
+        self.env["stock.quant"].sudo().create(
             {
-                "picking_type_id": self.wh.out_type_id.id,
-                "location_id": self.picking.location_dest_id.id,
-                "location_dest_id": self.customer_location.id,
+                "product_id": self.product_a.id,
+                "location_id": reserve_bin_1_location.id,
+                "quantity": 1,
+                "package_id": pack_a.id,
             }
         )
-        next_picking.move_ids.write(
-            {"move_orig_ids": [(6, 0, self.picking.move_ids.ids)]}
+        pack_b = self.env["stock.quant.package"].create(
+            {"location_id": reserve_location.id}
         )
-        next_picking.action_confirm()
+        self.env["stock.quant"].sudo().create(
+            {
+                "product_id": self.product_b.id,
+                "location_id": reserve_bin_2_location.id,
+                "quantity": 1,
+                "package_id": pack_b.id,
+            }
+        )
+        deliver_pallet_type = self.wh.sudo().out_type_id.copy(
+            {"default_location_src_id": pallets_location.id}
+        )
+        deliver_pallet_route = (
+            self.env["stock.route"]
+            .sudo()
+            .create(
+                {
+                    "name": "Deliver pallets",
+                    "rule_ids": [
+                        Command.create(
+                            {
+                                "name": "WH: Pallets → Customers",
+                                "location_dest_id": self.customer_location.id,
+                                "location_src_id": pallets_location.id,
+                                "procure_method": "make_to_order",
+                                "picking_type_id": deliver_pallet_type.id,
+                            }
+                        ),
+                        Command.create(
+                            {
+                                "name": "WH: Reserve Pallets → Pallets",
+                                "location_dest_id": pallets_location.id,
+                                "location_src_id": reserve_location.id,
+                                "procure_method": "make_to_stock",
+                                "picking_type_id": self.picking_type.id,
+                            }
+                        ),
+                    ],
+                }
+            )
+        )
+        procurement_group = self.env["procurement.group"].create(
+            {"name": "Test completion info"}
+        )
+        procurements = []
+        for product in [self.product_a, self.product_b]:
+            procurements.append(
+                self.env["procurement.group"].Procurement(
+                    product,
+                    1.0,
+                    product.uom_id,
+                    self.customer_location,
+                    product.display_name,
+                    f"TEST {product.name}",
+                    self.wh.company_id,
+                    {
+                        "group_id": procurement_group,
+                        "route_ids": deliver_pallet_route,
+                        "warehouse_id": self.wh,
+                        "location_final_id": self.customer_location,
+                        "company_id": self.wh.company_id,
+                    },
+                )
+            )
+
+        self.env["procurement.group"].run(procurements)
+        pickings = self.env["stock.picking"].search(
+            [("group_id", "=", procurement_group.id)]
+        )
+
+        picking = pickings.filtered("package_level_ids")
+        next_picking = pickings - picking
 
         # process the first package
-        package_level_a = self._simulate_started(self.pack_a)
+        package_level_a = self._simulate_started(pack_a, picking=picking)
         # validate the first package
         response = self.service.dispatch(
             "validate",
             params={
                 "package_level_id": package_level_a.id,
-                "location_barcode": self.shelf2.barcode,
+                "location_barcode": pallets_location.barcode,
             },
         )
         self.assertEqual(package_level_a.picking_id.state, "done")
@@ -516,13 +607,13 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
             },
         )
         # process the second package
-        package_level_b = self._simulate_started(self.pack_b)
+        package_level_b = self._simulate_started(pack_b, picking=picking)
         # validate the second package
         response = self.service.dispatch(
             "validate",
             params={
                 "package_level_id": package_level_b.id,
-                "location_barcode": self.shelf2.barcode,
+                "location_barcode": pallets_location.barcode,
             },
         )
         self.assertEqual(package_level_b.picking_id.state, "done")
@@ -533,7 +624,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
             response,
             next_state="start",
             popup={
-                "body": f"Last operation of transfer {self.picking.name}. "
+                "body": f"Last operation of transfer {picking.name}. "
                 f"Next operation ({next_picking.name}) is ready to proceed."
             },
             message={
@@ -804,20 +895,36 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         """
         # setup the picking as we need, like if the move line
         # was already started by the first step (start operation)
+        self.assertRecordValues(self.picking, [{"state": "assigned"}])
+        for move in self.picking.move_ids:
+            self.assertRecordValues(move, [{"state": "assigned", "picked": False}])
+        for pack_level in self.picking.package_level_ids:
+            self.assertFalse(pack_level.is_done)
         package_level = self._simulate_started(self.pack_a)
+
         self.menu.sudo().allow_move_create = True
         self.env.user = self.shopfloor_manager
+
         self.assertTrue(package_level.is_done)
 
         # keep references for later checks
         move = package_level.move_line_ids.move_id
         picking = move.picking_id
 
+        self.assertRecordValues(move, [{"state": "assigned", "picked": True}])
+        self.assertRecordValues(picking, [{"state": "assigned"}])
+
+        manager_service = self.get_service(
+            "single_pack_transfer",
+            menu=self.menu,
+            profile=self.profile,
+            env=self.env(user=self.shopfloor_manager),
+        )
         # now, call the service to cancel
-        response = self.service.dispatch(
+        response = manager_service.dispatch(
             "cancel", params={"package_level_id": package_level.id}
         )
-        self.assertRecordValues(move, [{"state": "assigned"}])
+        self.assertRecordValues(move, [{"state": "assigned", "picked": False}])
         self.assertRecordValues(picking, [{"state": "assigned"}])
         self.assertTrue(move.move_line_ids.exists())
         self.assertFalse(move.move_line_ids.shopfloor_user_id)
