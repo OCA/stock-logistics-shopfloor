@@ -23,7 +23,7 @@ class TestLocationContentTransferGetWork(LocationContentTransferCommonCase):
             [("location_id", "=", cls.stock_location.id)]
         )
         cls.move_lines = cls.pickings.move_line_ids.filtered(
-            lambda line: line.qty_done == 0
+            lambda line: not line.picked
             and line.state in ("assigned", "partially_available")
             and not line.shopfloor_user_id
         )

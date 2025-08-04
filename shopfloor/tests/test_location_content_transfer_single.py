@@ -631,11 +631,9 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         the assigned user will be removed.
 
         """
-        self.env.user = self.shopfloor_manager
-        self.assertTrue(self.env.user != self.picking1.create_uid)
         package_level = self.picking1.move_line_ids.package_level_id
         move_lines_before = self.picking1.move_line_ids
-        move_lines_before.shopfloor_user_id = self.env.user
+        move_lines_before.shopfloor_user_id = self.env.ref("base.user_admin")
         response = self.service.dispatch(
             "stock_out_package",
             params={
@@ -852,12 +850,10 @@ class LocationContentTransferSingleSpecialCase(LocationContentTransferCommonCase
         compare to the previous test.
 
         """
-        self.env.user = self.shopfloor_manager
-        self.assertTrue(self.env.user != self.picking.create_uid)
         move_line = self.move_product_b.move_line_ids.filtered(
             lambda ml: ml.quantity == 4  # 4/10 to stock out
         )
-        move_line.shopfloor_user_id = self.env.user
+        move_line.shopfloor_user_id = self.env.ref("base.user_admin")
         self.service.dispatch(
             "stock_out_line",
             params={"location_id": self.content_loc.id, "move_line_id": move_line.id},

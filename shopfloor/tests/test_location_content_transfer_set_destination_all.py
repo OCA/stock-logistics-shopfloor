@@ -47,10 +47,26 @@ class LocationContentTransferSetDestinationAllCase(LocationContentTransferCommon
         self.assertRecordValues(
             self.pickings.move_line_ids,
             [
-                {"qty_done": 10.0, "state": "done", "location_dest_id": destination.id},
-                {"qty_done": 10.0, "state": "done", "location_dest_id": destination.id},
-                {"qty_done": 10.0, "state": "done", "location_dest_id": destination.id},
-                {"qty_done": 10.0, "state": "done", "location_dest_id": destination.id},
+                {
+                    "qty_picked": 10.0,
+                    "state": "done",
+                    "location_dest_id": destination.id,
+                },
+                {
+                    "qty_picked": 10.0,
+                    "state": "done",
+                    "location_dest_id": destination.id,
+                },
+                {
+                    "qty_picked": 10.0,
+                    "state": "done",
+                    "location_dest_id": destination.id,
+                },
+                {
+                    "qty_picked": 10.0,
+                    "state": "done",
+                    "location_dest_id": destination.id,
+                },
             ],
         )
         self.assertRecordValues(
@@ -91,6 +107,7 @@ class LocationContentTransferSetDestinationAllCase(LocationContentTransferCommon
         the current pickings is validated.
         """
         # Put a partial quantity for 'product_d' to get a partially available move
+        self.picking2.move_line_ids.picked = False
         self.picking2.do_unreserve()
         self._update_qty_in_location(self.content_loc, self.product_d, 5)
         self.picking2.action_assign()
@@ -138,6 +155,7 @@ class LocationContentTransferSetDestinationAllCase(LocationContentTransferCommon
         remaining qties stay in their current picking.
         """
         # Put a partial quantity for 'product_d' to get a partially available move
+        self.picking2.move_line_ids.picked = False
         self.picking2.do_unreserve()
         self._update_qty_in_location(self.content_loc, self.product_d, 5)
         self.picking2.action_assign()
