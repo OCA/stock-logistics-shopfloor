@@ -126,11 +126,12 @@ class StockAction(Component):
                     _("Someone is already working on these transfers")
                 )
         for line in move_lines:
+            qty_picked = quantity if quantity is not None else line.quantity
+            line.qty_picked = qty_picked
             if split:
                 line._split_partial_quantity()
             data = {
                 "shopfloor_user_id": user.id,
-                "qty_picked": quantity or line.quantity,
             }
             if package:
                 # destination package is set to the scanned one
