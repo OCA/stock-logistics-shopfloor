@@ -80,13 +80,39 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
                 "warehouse_id": cls.wh.id,
                 "picking_type_id": cls.wh.out_type_id.id,
                 "procure_method": "make_to_order",
-                "state": "draft",
+                "state": "waiting",
             }
         )
-        cls.ship_move_a._assign_picking()
-        cls.ship_move_a._action_confirm()
-        cls.pack_move_a = cls.ship_move_a.move_orig_ids[0]
-        cls.pick_move_a = cls.pack_move_a.move_orig_ids[0]
+        cls.pack_move_a = cls.env["stock.move"].create(
+            {
+                "name": cls.product_a.display_name,
+                "product_id": cls.product_a.id,
+                "product_uom_qty": 10.0,
+                "product_uom": cls.product_a.uom_id.id,
+                "location_id": cls.pack_location.id,
+                "location_dest_id": cls.ship_location.id,
+                "warehouse_id": cls.wh.id,
+                "picking_type_id": cls.wh.pack_type_id.id,
+                "procure_method": "make_to_order",
+                "move_dest_ids": [(4, cls.ship_move_a.id)],
+                "state": "waiting",
+            }
+        )
+        cls.pick_move_a = cls.env["stock.move"].create(
+            {
+                "name": cls.product_a.display_name,
+                "product_id": cls.product_a.id,
+                "product_uom_qty": 10.0,
+                "product_uom": cls.product_a.uom_id.id,
+                "location_id": cls.stock_location.id,
+                "location_dest_id": cls.pack_location.id,
+                "warehouse_id": cls.wh.id,
+                "picking_type_id": cls.wh.pick_type_id.id,
+                "move_dest_ids": [(4, cls.pack_move_a.id)],
+                "state": "confirmed",
+            }
+        )
+        (cls.ship_move_a | cls.pack_move_a | cls.pick_move_a)._assign_picking()
         cls.picking1 = cls.pick_move_a.picking_id
         cls.packing1 = cls.pack_move_a.picking_id
         cls.picking1.action_assign()
@@ -177,7 +203,7 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
                 )
                 assert response["message"]["message_type"] == "success"
                 assert move_line.state == "done"
-                assert move_line.qty_done == qty
+                assert move_line.qty_picked == qty
         return response
 
     def test_with_zone_picking1(self):
@@ -306,12 +332,12 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
             lambda x: not x.shopfloor_user_id and x.location_id == dest_location1
         )
         self.assertEqual(pack_first_pallet.quantity, 6)
-        self.assertEqual(pack_first_pallet.qty_done, 0)
+        self.assertEqual(pack_first_pallet.qty_picked, 0)
         pack_second_pallet = pack_move_a.move_line_ids.filtered(
             lambda x: not x.shopfloor_user_id and x.location_id == dest_location2
         )
         self.assertEqual(pack_second_pallet.quantity, 4)
-        self.assertEqual(pack_second_pallet.qty_done, 0)
+        self.assertEqual(pack_second_pallet.qty_picked, 0)
         # Operator-2 with the "location content transfer" scenario scan
         # the location where the first pallet is.
         # This pallet/move line will be put in its own transfer as its sibling
@@ -327,7 +353,7 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
             response_packages[0]["package_src"]["id"], pack_first_pallet.package_id.id
         )
         # Ensure that the second pallet is untouched
-        self.assertEqual(pack_second_pallet.qty_done, 0)
+        self.assertEqual(pack_second_pallet.qty_picked, 0)
         # Operator-3 with the "location content transfer" scenario scan
         # the location where the first pallet is: he should found nothing
         response = self._location_content_transfer_process_line(
@@ -356,11 +382,11 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
                 pack_first_pallet.location_dest_id,
             ),
         )
-        self.assertEqual(pack_first_pallet.qty_done, 6)
+        self.assertEqual(pack_first_pallet.qty_picked, 6)
         self.assertEqual(pack_first_pallet.state, "done")
         self.assertEqual(pack_first_pallet.move_id.product_uom_qty, qty)
         # Ensure that the second pallet is untouched
-        self.assertEqual(pack_second_pallet.qty_done, 0)
+        self.assertEqual(pack_second_pallet.qty_picked, 0)
         # Operator-2 (still with the "location content transfer" scenario) scan
         # the location where the second pallet is
         pack_move_a = pick_move_line2.move_id.move_dest_ids.filtered(
@@ -447,7 +473,7 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
             lambda x: not x.shopfloor_user_id and x.location_id == dest_location1
         )
         self.assertEqual(pack_first_pallet.quantity, 6)
-        self.assertEqual(pack_first_pallet.qty_done, 0)
+        self.assertEqual(pack_first_pallet.qty_picked, 0)
         # Operator-2 with the "location content transfer" scenario scan
         # the location where the first pallet is.
         # This pallet/move line will be put in its own move and transfer by convenience
@@ -473,7 +499,7 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
             lambda x: not x.shopfloor_user_id and x.location_id == dest_location2
         )
         self.assertEqual(pack_second_pallet.quantity, 4)
-        self.assertEqual(pack_second_pallet.qty_done, 0)
+        self.assertEqual(pack_second_pallet.qty_picked, 0)
         # The last action has updated the pack operation (new move line) in the
         # transfer previously processed by Operator-2.
         self.assertEqual(original_pack_transfer.state, "assigned")
@@ -492,7 +518,7 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
                 pack_first_pallet.location_dest_id,
             ),
         )
-        self.assertEqual(pack_first_pallet.qty_done, 6)
+        self.assertEqual(pack_first_pallet.qty_picked, 6)
         self.assertEqual(pack_first_pallet.state, "done")
         self.assertEqual(pack_first_pallet.move_id.product_uom_qty, qty)
         # Operator-2 with the "location content transfer" scenario scan

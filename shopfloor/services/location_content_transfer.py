@@ -186,7 +186,7 @@ class LocationContentTransfer(Component):
             self._domain_recover_pickings()
         )
         started_pickings = candidate_pickings.filtered(
-            lambda picking: any(line.qty_done for line in picking.move_line_ids)
+            lambda picking: any(line.picked for line in picking.move_line_ids)
         )
         return started_pickings
 
@@ -416,8 +416,7 @@ class LocationContentTransfer(Component):
         return [
             ("location_id", "=", location.id),
             ("state", "in", ("assigned", "partially_available")),
-            ("qty_done", ">", 0),
-            # TODO check generated SQL
+            ("picked", "=", True),
             ("picking_id.user_id", "=", self.env.uid),
         ]
 
@@ -431,7 +430,7 @@ class LocationContentTransfer(Component):
     # hook used in module shopfloor_checkout_sync
     def _write_destination_on_lines(self, lines, location):
         lines.location_dest_id = location
-        lines.package_level_id.picking_id.location_dest_id = location
+        lines.package_level_id.location_dest_id = location
 
     def _set_all_destination_lines_and_done(self, pickings, move_lines, dest_location):
         self._write_destination_on_lines(move_lines, dest_location)
@@ -762,7 +761,7 @@ class LocationContentTransfer(Component):
 
         self._lock_lines(move_line)
 
-        move_line.qty_done = quantity
+        move_line.qty_picked = quantity
         self._write_destination_on_lines(move_line, scanned_location)
 
         stock = self._actions_for("stock")
@@ -770,7 +769,7 @@ class LocationContentTransfer(Component):
         backorders = stock.validate_moves(move_line.move_id)
         if backorders:
             for move_line in backorders.mapped("move_line_ids"):
-                move_line.qty_done = move_line.quantity
+                move_line.picked = True
             backorders.user_id = self.env.user
             # process first backorder of current line
             move_lines = backorders.move_line_ids
@@ -858,9 +857,8 @@ class LocationContentTransfer(Component):
             # split the move to process only the lines related to the package.
             package_move.split_other_move_lines(package_move_lines)
             lot = package_move.move_line_ids.lot_id
-            # We need to set qty_done at 0 because otherwise
-            # the move_line will not be deleted
-            package_move.move_line_ids.write({"qty_done": 0})
+            # We need to unpick the line because otherwise it won't be deleted
+            package_move.move_line_ids.picked = False
             package = package_level.package_id
             if (
                 self.is_allow_move_create()
@@ -912,9 +910,8 @@ class LocationContentTransfer(Component):
         move = move_line.move_id
         package = move_line.package_id
         lot = move_line.lot_id
-        # We need to set qty_done at 0 because otherwise
-        # the move_line will not be deleted
-        move_line.qty_done = 0
+        # We need to unpick the line because otherwise it won't be deleted
+        move_line.picked = False
         if self.is_allow_move_create() and self.env.user == move.picking_id.create_uid:
             # Owned by the user deleting the move
             move._action_cancel()
@@ -1072,7 +1069,7 @@ class ShopfloorLocationContentTransferValidatorResponse(Component):
         """
         return {
             "start": {},
-            "scan_location": {},
+            "scan_location": self._schema_scan_location,
             "get_work": {},
             "scan_destination_all": self._schema_all,
             "start_single": self._schema_single,
@@ -1109,6 +1106,15 @@ class ShopfloorLocationContentTransferValidatorResponse(Component):
                 "nullable": True,
                 "required": False,
             },
+        }
+
+    @property
+    def _schema_scan_location(self):
+        return {
+            "location": self.schemas._schema_dict_of(
+                self.schemas.location(),
+                required=False,
+            ),
         }
 
     def start_or_recover(self):
@@ -1204,4 +1210,17 @@ class ShopfloorLocationContentTransferValidatorResponse(Component):
     def dismiss_package_level(self):
         return self._response_schema(
             next_states={"scan_location", "get_work", "start_single"}
+        )
+
+    def cancel_work(self):
+        return self._response_schema(next_states={"scan_location", "get_work"})
+
+    def find_work(self):
+        return self._response_schema(
+            next_states={
+                "scan_location",
+                "get_work",
+                "scan_destination_all",
+                "start_single",
+            }
         )

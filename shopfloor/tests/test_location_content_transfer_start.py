@@ -114,9 +114,9 @@ class TestLocationContentTransferStart(LocationContentTransferCommonCase):
         self.assertRecordValues(
             processed_move_lines,
             [
-                {"qty_done": 10.0},
-                {"qty_done": 10.0},
-                {"qty_done": 10.0},
+                {"qty_picked": 10.0},
+                {"qty_picked": 10.0},
+                {"qty_picked": 10.0},
             ],
         )
         self.assertRecordValues(
@@ -142,9 +142,9 @@ class TestLocationContentTransferStart(LocationContentTransferCommonCase):
         self.assertRecordValues(
             processed_move_lines,
             [
-                {"qty_done": 10.0},
-                {"qty_done": 10.0},
-                {"qty_done": 10.0},
+                {"qty_picked": 10.0},
+                {"qty_picked": 10.0},
+                {"qty_picked": 10.0},
             ],
         )
         self.assertRecordValues(
@@ -239,7 +239,7 @@ class LocationContentTransferStartSpecialCase(LocationContentTransferCommonCase)
         self.assertRecordValues(new_picking, [{"user_id": self.env.uid}])
         self.assertRecordValues(
             new_picking.move_line_ids,
-            [{"qty_done": 10.0}, {"qty_done": 10.0}],
+            [{"qty_picked": 10.0}, {"qty_picked": 10.0}],
         )
         self.assertRecordValues(new_picking.package_level_ids, [{"is_done": True}])
 
@@ -249,12 +249,12 @@ class LocationContentTransferStartSpecialCase(LocationContentTransferCommonCase)
             picking.move_line_ids,
             [
                 {
-                    "qty_done": 0.0,
+                    "qty_picked": 0.0,
                     "location_id": self.shelf1.id,
                     "package_id": other_pack_a.id,
                 },
                 {
-                    "qty_done": 0.0,
+                    "qty_picked": 0.0,
                     "location_id": self.shelf1.id,
                     "package_id": other_pack_b.id,
                 },
@@ -285,7 +285,7 @@ class LocationContentTransferStartSpecialCase(LocationContentTransferCommonCase)
             picking.move_ids, in_package=True, location=self.content_loc
         )
         picking.action_assign()
-        picking.move_line_ids[0].qty_done = 10
+        picking.move_line_ids[0].qty_picked = 10
         response = self.service.dispatch(
             "scan_location", params={"barcode": self.content_loc.barcode}
         )
@@ -315,7 +315,7 @@ class LocationContentTransferStartSpecialCase(LocationContentTransferCommonCase)
         )
         picking.action_assign()
         # a user picked qty
-        picking.move_line_ids[0].qty_done = 10
+        picking.move_line_ids[0].qty_picked = 10
         response = self.service.dispatch(
             "scan_location", params={"barcode": self.content_loc.barcode}
         )

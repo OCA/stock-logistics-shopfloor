@@ -89,12 +89,11 @@ class LocationContentTransferCommonCase(CommonCase):
         It means a user scanned the location with the pickings. They are:
 
         * assigned to the user
-        * the qty_done of all their move lines is set to they reserved qty
+        * all reserved qty are picked
 
         """
         pickings.user_id = cls.env.uid
-        for line in pickings.mapped("move_line_ids"):
-            line.qty_done = line.quantity
+        pickings.move_line_ids.picked = True
 
     def assert_response_start(self, response, message=None, popup=None):
         self.assert_response(
