@@ -35,7 +35,7 @@ class CheckoutRemovePackageCase(CheckoutCommonCase):
         new_package = self.env["stock.quant.package"].create({})
         (pack1_lines | raw_line).write(
             {
-                "qty_done": 10,
+                "qty_picked": 10,
                 "result_package_id": new_package.id,
                 "shopfloor_checkout_done": True,
             }
@@ -43,7 +43,7 @@ class CheckoutRemovePackageCase(CheckoutCommonCase):
         new_package2 = self.env["stock.quant.package"].create({})
         pack2_lines.write(
             {
-                "qty_done": 10,
+                "qty_picked": 10,
                 "result_package_id": new_package2.id,
                 "shopfloor_checkout_done": True,
             }
@@ -59,26 +59,30 @@ class CheckoutRemovePackageCase(CheckoutCommonCase):
             pack1_lines + raw_line + pack2_lines,
             [
                 {
-                    "qty_done": 0,
+                    "qty_picked": 0,
+                    "picked": False,
                     # reset to origin package
                     "result_package_id": pack1_lines.mapped("package_id").id,
                     "shopfloor_checkout_done": False,
                 },
                 {
-                    "qty_done": 0,
+                    "qty_picked": 0,
+                    "picked": False,
                     # reset to origin package
                     "result_package_id": pack1_lines.mapped("package_id").id,
                     "shopfloor_checkout_done": False,
                 },
                 {
-                    "qty_done": 0,
+                    "qty_picked": 0,
+                    "picked": False,
                     # result to an empty package (raw product)
                     "result_package_id": False,
                     "shopfloor_checkout_done": False,
                 },
                 # different package, leave untouched
                 {
-                    "qty_done": 10,
+                    "qty_picked": 10,
+                    "picked": True,
                     "result_package_id": new_package2.id,
                     "shopfloor_checkout_done": True,
                 },
@@ -97,7 +101,7 @@ class CheckoutRemovePackageCase(CheckoutCommonCase):
 
         raw_line = self.raw_move.move_line_ids
 
-        raw_line.write({"qty_done": 10, "shopfloor_checkout_done": True})
+        raw_line.write({"qty_picked": 10, "shopfloor_checkout_done": True})
 
         # and now, we want to drop the new_package
         response = self.service.dispatch(
@@ -107,7 +111,7 @@ class CheckoutRemovePackageCase(CheckoutCommonCase):
 
         self.assertRecordValues(
             raw_line,
-            [{"qty_done": 0, "shopfloor_checkout_done": False}],
+            [{"qty_picked": 0, "picked": False, "shopfloor_checkout_done": False}],
         )
 
         self.assert_response(

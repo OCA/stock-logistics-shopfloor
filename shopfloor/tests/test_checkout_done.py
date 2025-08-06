@@ -10,7 +10,7 @@ class CheckoutDoneCase(CheckoutCommonCase):
         self._fill_stock_for_moves(picking.move_ids, in_package=True)
         picking.action_assign()
         # line is done
-        picking.move_line_ids.write({"qty_done": 10, "shopfloor_checkout_done": True})
+        picking.move_line_ids.write({"qty_picked": 10, "shopfloor_checkout_done": True})
         response = self.service.dispatch("done", params={"picking_id": picking.id})
 
         self.assertRecordValues(picking, [{"state": "done"}])
@@ -37,8 +37,8 @@ class CheckoutDonePartialCase(CheckoutCommonCase):
         picking.action_assign()
         cls.line1 = picking.move_line_ids[0]
         cls.line2 = picking.move_line_ids[1]
-        cls.line1.write({"qty_done": 10, "shopfloor_checkout_done": True})
-        cls.line2.write({"qty_done": 2, "shopfloor_checkout_done": True})
+        cls.line1.write({"qty_picked": 10, "shopfloor_checkout_done": True})
+        cls.line2.write({"qty_picked": 2, "shopfloor_checkout_done": True})
 
         cls.dest_location = picking.location_dest_id
         cls.child_location = (
@@ -119,12 +119,12 @@ class CheckoutDoneRawUnpackedCase(CheckoutCommonCase):
         cls.package = cls.env["stock.quant.package"].create({})
         cls.line1.write(
             {
-                "qty_done": 10,
+                "qty_picked": 10,
                 "shopfloor_checkout_done": True,
                 "result_package_id": cls.package.id,
             }
         )
-        cls.line2.write({"qty_done": 10, "shopfloor_checkout_done": False})
+        cls.line2.write({"qty_picked": 10, "shopfloor_checkout_done": False})
 
     def test_done_partial(self):
         # line is done

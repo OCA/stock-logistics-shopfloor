@@ -382,7 +382,9 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         self._fill_stock_for_moves(picking.move_ids, in_package=True)
         picking.action_assign()
         # set all lines as done
-        picking.move_line_ids.write({"qty_done": 10.0, "shopfloor_checkout_done": True})
+        picking.move_line_ids.write(
+            {"qty_picked": 10.0, "shopfloor_checkout_done": True}
+        )
         response = self.service.dispatch(
             "scan_line",
             params={

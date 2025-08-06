@@ -117,13 +117,13 @@ class StockMoveLine(models.Model):
         elif qty_lesser:
             if not split_partial:
                 return (new_line, "lesser")
-            new_line = self._split_partial_quantity_to_be_done(
+            new_line = self._split_partial_quantity_to_be_picked(
                 qty_done, split_default_vals
             )
             return (new_line, "lesser")
         return (new_line, "full")
 
-    def _split_partial_quantity_to_be_done(self, quantity_done, split_default_vals):
+    def _split_partial_quantity_to_be_picked(self, quantity_done, split_default_vals):
         """Create a new move line with the remaining quantity to process."""
         # split the move line which will be processed later (maybe the user
         # has to pick some goods from another place because the location

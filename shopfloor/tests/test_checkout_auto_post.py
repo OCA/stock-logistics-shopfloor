@@ -14,11 +14,11 @@ class CheckoutAutoPostCase(CheckoutCommonCase):
         selected_move_line_a = picking.move_line_ids.filtered(
             lambda x: x.product_id == self.product_a
         )
-        selected_move_line_a.qty_done = 7
+        selected_move_line_a.qty_picked = 7
         selected_move_line_b = picking.move_line_ids.filtered(
             lambda x: x.product_id == self.product_b
         )
-        selected_move_line_b.qty_done = 9
+        selected_move_line_b.qty_picked = 9
         selected_move_line_c = picking.move_line_ids.filtered(
             lambda x: x.product_id == self.product_c
         )
@@ -44,10 +44,10 @@ class CheckoutAutoPostCase(CheckoutCommonCase):
         )
         self.assertEqual(picking, selected_move_line_c.picking_id)
 
-        # The lines in the new picking must have the expected qty_done,
+        # The lines in the new picking must have the expected picked qty,
         # and the split picking must be marked as "done".
-        self.assertEqual(selected_move_line_a.qty_done, 7)
-        self.assertEqual(selected_move_line_b.qty_done, 9)
+        self.assertEqual(selected_move_line_a.qty_picked, 7)
+        self.assertEqual(selected_move_line_b.qty_picked, 9)
         self.assertEqual(selected_move_line_a.picking_id.state, "done")
 
         # In the original picking, we should have three lines:
@@ -63,6 +63,7 @@ class CheckoutAutoPostCase(CheckoutCommonCase):
         self.assertEqual(line_b_in_original_picking.quantity, 11)
         self.assertEqual(selected_move_line_c.quantity, 30)
 
-        self.assertEqual(line_a_in_original_picking.qty_done, 0)
-        self.assertEqual(line_b_in_original_picking.qty_done, 0)
-        self.assertEqual(selected_move_line_c.qty_done, 0)
+        self.assertEqual(line_a_in_original_picking.qty_picked, 0)
+        self.assertEqual(line_b_in_original_picking.qty_picked, 0)
+        self.assertEqual(selected_move_line_c.qty_picked, 0)
+        self.assertFalse(selected_move_line_c.picked)

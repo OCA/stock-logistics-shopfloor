@@ -21,7 +21,7 @@ class CheckoutScanPackageActionCaseNoPrefillQty(
         self._fill_stock_for_moves(picking.move_ids, in_package=False)
         picking.action_assign()
         move_line = picking.move_line_ids
-        origin_qty_done = move_line.qty_done = 2
+        origin_qty_picked = move_line.qty_picked = 2
         response = self.service.dispatch(
             "scan_package_action",
             params={
@@ -33,7 +33,7 @@ class CheckoutScanPackageActionCaseNoPrefillQty(
         self._assert_selected_qties(
             response,
             move_line,
-            {move_line: origin_qty_done + 1},
+            {move_line: origin_qty_picked + 1},
         )
 
     def test_scan_package_action_scan_product2_to_increment_qty(self):
@@ -68,7 +68,7 @@ class CheckoutScanPackageActionCaseNoPrefillQty(
 
         # First line is fully processed,
         # so we expect the second line to be incremented.
-        move_lines[0].qty_done = 3.0
+        move_lines[0].qty_picked = 3.0
         self.service.dispatch(
             "scan_package_action",
             params={
@@ -77,8 +77,8 @@ class CheckoutScanPackageActionCaseNoPrefillQty(
                 "barcode": self.product_a.barcode,
             },
         )
-        self.assertEqual(move_lines[0].qty_done, 3.0)
-        self.assertEqual(move_lines[1].qty_done, 1.0)
+        self.assertEqual(move_lines[0].qty_picked, 3.0)
+        self.assertEqual(move_lines[1].qty_picked, 1.0)
 
     def test_scan_package_action_scan_lot_to_increment_qty(self):
         """ """
@@ -86,7 +86,7 @@ class CheckoutScanPackageActionCaseNoPrefillQty(
         self._fill_stock_for_moves(picking.move_ids, in_lot=True)
         picking.action_assign()
         move_line = picking.move_line_ids
-        origin_qty_done = move_line.qty_done = 2
+        origin_qty_picked = move_line.qty_picked = 2
         response = self.service.dispatch(
             "scan_package_action",
             params={
@@ -98,7 +98,7 @@ class CheckoutScanPackageActionCaseNoPrefillQty(
         self._assert_selected_qties(
             response,
             move_line,
-            {move_line: origin_qty_done + 1},
+            {move_line: origin_qty_picked + 1},
         )
 
     def test_scan_package_action_scan_packaging_to_increment_qty(self):
@@ -107,7 +107,7 @@ class CheckoutScanPackageActionCaseNoPrefillQty(
         self._fill_stock_for_moves(picking.move_ids, in_package=True, in_lot=False)
         picking.action_assign()
         move_line = picking.move_line_ids
-        origin_qty_done = move_line.qty_done = 0
+        origin_qty_picked = move_line.qty_picked = 0
         response = self.service.dispatch(
             "scan_package_action",
             params={
@@ -119,5 +119,5 @@ class CheckoutScanPackageActionCaseNoPrefillQty(
         self._assert_selected_qties(
             response,
             move_line,
-            {move_line: origin_qty_done + self.product_a_packaging.qty},
+            {move_line: origin_qty_picked + self.product_a_packaging.qty},
         )

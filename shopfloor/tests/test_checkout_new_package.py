@@ -28,9 +28,9 @@ class CheckoutNewPackageCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
 
         move_line1, move_line2, move_line3 = selected_lines
         # we'll put only the first 2 lines (product A and B) in the new package
-        move_line1.qty_done = move_line1.quantity
-        move_line2.qty_done = move_line2.quantity
-        move_line3.qty_done = 0
+        move_line1.qty_picked = move_line1.quantity
+        move_line2.qty_picked = move_line2.quantity
+        move_line3.qty_picked = 0
 
         response = self.service.dispatch(
             "new_package",
@@ -50,7 +50,7 @@ class CheckoutNewPackageCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
         )
         self.assertRecordValues(
             move_line3,
-            # qty_done was zero so we don't set it as packed and it remains in
+            # picked qty was zero so we don't set it as packed and it remains in
             # the same package
             [{"result_package_id": pack1.id, "shopfloor_checkout_done": False}],
         )
@@ -62,7 +62,7 @@ class CheckoutNewPackageCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
             message=self.msg_store.goods_packed_in(new_package),
         )
 
-    def test_set_dest_package_error_qty_done_above(self):
+    def test_set_dest_package_error_qty_picked_above(self):
         picking = self._create_picking(
             lines=[
                 (self.product_a, 10),
@@ -72,12 +72,12 @@ class CheckoutNewPackageCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
         moves = picking.move_ids
         self._fill_stock_for_moves(moves, in_package=True)
         picking.action_assign()
-        # If the qty_done of a selected line goes beyond
+        # If the picked qty of a selected line goes beyond
         # the maximum allowed, a message should be displayed
         # and the user shouldn't be allowed to select a package.
         selected_lines = moves.move_line_ids
         line = fields.first(selected_lines)
-        line.qty_done = line.quantity + 1
+        line.qty_picked = line.quantity + 1
         response = self.service.dispatch(
             "list_dest_package",
             params={

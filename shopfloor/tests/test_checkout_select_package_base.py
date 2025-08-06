@@ -42,9 +42,11 @@ class CheckoutSelectPackageMixin:
             sorted(selected_lines.ids), sorted([line.id for line in lines_quantities])
         )
         for line, quantity in lines_quantities.items():
-            self.assertEqual(line.qty_done, quantity)
+            self.assertEqual(line.qty_picked, quantity)
         for line in deselected_lines:
-            self.assertEqual(line.qty_done, 0, "Lines deselected must have no qty done")
+            self.assertEqual(
+                line.qty_picked, 0, "Lines deselected must have no qty done"
+            )
         self._assert_selected_response(
             response, selected_lines, message=message, packing_info=packing_info
         )
@@ -57,11 +59,11 @@ class CheckoutSelectPackageMixin:
         unselected_lines = picking.move_line_ids - selected_lines
         for line in selected_lines - related_lines:
             self.assertEqual(
-                line.qty_done,
+                line.qty_picked,
                 line.quantity,
                 "Scanned lines must have their qty done set to the reserved quantity",
             )
         for line in unselected_lines + related_lines:
-            self.assertEqual(line.qty_done, 0)
+            self.assertEqual(line.qty_picked, 0)
         package_lines = selected_lines + related_lines
         self._assert_selected_response(response, package_lines, message=message, **kw)
