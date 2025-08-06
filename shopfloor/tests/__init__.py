@@ -10,19 +10,19 @@ from . import test_actions_stock
 
 # from . import test_single_pack_transfer
 # from . import test_single_pack_transfer_putaway
-# from . import test_cluster_picking_base
-# from . import test_cluster_picking_batch
-# from . import test_cluster_picking_select
-# from . import test_cluster_picking_scan_line
-# from . import test_cluster_picking_scan_line_location_or_pack_first
-# from . import test_cluster_picking_scan_line_no_prefill_qty
-# from . import test_cluster_picking_scan_destination
-# from . import test_cluster_picking_scan_destination_no_prefill_qty
-# from . import test_cluster_picking_is_zero
-# from . import test_cluster_picking_skip
-# from . import test_cluster_picking_stock_issue
-# from . import test_cluster_picking_change_pack_lot
-# from . import test_cluster_picking_unload
+from . import test_cluster_picking_base
+from . import test_cluster_picking_batch
+from . import test_cluster_picking_select
+from . import test_cluster_picking_scan_line
+from . import test_cluster_picking_scan_line_location_or_pack_first
+from . import test_cluster_picking_scan_line_no_prefill_qty
+from . import test_cluster_picking_scan_destination
+from . import test_cluster_picking_scan_destination_no_prefill_qty
+from . import test_cluster_picking_is_zero
+from . import test_cluster_picking_skip
+from . import test_cluster_picking_stock_issue
+from . import test_cluster_picking_change_pack_lot
+from . import test_cluster_picking_unload
 from . import test_checkout_base
 from . import test_checkout_scan
 from . import test_checkout_select
