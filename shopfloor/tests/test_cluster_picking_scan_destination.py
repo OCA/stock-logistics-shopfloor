@@ -45,18 +45,18 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
         """
         line = self.batch.picking_ids.move_line_ids[0]
         next_line = self.batch.picking_ids.move_line_ids[1]
-        qty_done = line.quantity
+        qty_picked = line.quantity
         response = self.service.dispatch(
             "scan_destination_pack",
             params={
                 "picking_batch_id": self.batch.id,
                 "move_line_id": line.id,
                 "barcode": self.bin1.name,
-                "quantity": qty_done,
+                "quantity": qty_picked,
             },
         )
         self.assertRecordValues(
-            line, [{"qty_done": qty_done, "result_package_id": self.bin1.id}]
+            line, [{"qty_picked": qty_picked, "result_package_id": self.bin1.id}]
         )
         self.assert_response(
             response,
@@ -64,7 +64,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
             data=self._line_data(next_line),
             message={
                 "message_type": "success",
-                "body": f"{line.qty_done} {line.product_id.display_name} put in {self.bin1.name}",  # noqa
+                "body": f"{line.qty_picked} {line.product_id.display_name} put in {self.bin1.name}",  # noqa
             },
         )
 
@@ -79,18 +79,18 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
         )
         # this is the only remaining line to pick
         line = self.two_lines_picking.move_line_ids[1]
-        qty_done = line.quantity
+        qty_picked = line.quantity
         response = self.service.dispatch(
             "scan_destination_pack",
             params={
                 "picking_batch_id": self.batch.id,
                 "move_line_id": line.id,
                 "barcode": self.bin2.name,
-                "quantity": qty_done,
+                "quantity": qty_picked,
             },
         )
         self.assertRecordValues(
-            line, [{"qty_done": qty_done, "result_package_id": self.bin2.id}]
+            line, [{"qty_picked": qty_picked, "result_package_id": self.bin2.id}]
         )
         data = self._data_for_batch(self.batch, self.packing_location)
         self.assert_response(
@@ -140,7 +140,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
                 "quantity": line.quantity,
             },
         )
-        self.assertRecordValues(line, [{"qty_done": 0, "result_package_id": False}])
+        self.assertRecordValues(line, [{"qty_picked": 0, "result_package_id": False}])
         self.assert_response(
             response,
             next_state="scan_destination",
@@ -177,7 +177,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
             line,
             [
                 {
-                    "qty_done": 10,
+                    "qty_picked": 10,
                     "result_package_id": self.bin1.id,
                     "quantity": 10,
                 }
@@ -185,7 +185,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
         )
         self.assertRecordValues(
             new_line,
-            [{"qty_done": 0, "result_package_id": False, "quantity": 10}],
+            [{"qty_picked": 0, "result_package_id": False, "quantity": 10}],
         )
 
     def test_scan_destination_pack_bin_not_found(self):
@@ -267,17 +267,17 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
             data=self._line_data(new_line),
             message={
                 "message_type": "success",
-                "body": f"{line.qty_done} {line.product_id.display_name} put in {self.bin1.name}",  # noqa
+                "body": f"{line.qty_picked} {line.product_id.display_name} put in {self.bin1.name}",  # noqa
             },
         )
 
         self.assertRecordValues(
             line,
-            [{"qty_done": 7, "result_package_id": self.bin1.id, "quantity": 7}],
+            [{"qty_picked": 7, "result_package_id": self.bin1.id, "quantity": 7}],
         )
         self.assertRecordValues(
             new_line,
-            [{"qty_done": 0, "result_package_id": False, "quantity": 3}],
+            [{"qty_picked": 0, "result_package_id": False, "quantity": 3}],
         )
         # the reserved quantity on the quant must stay the same
         self.assertRecordValues(quant, [{"quantity": 40.0, "reserved_quantity": 20.0}])
@@ -307,9 +307,9 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
         # ensure we have activated the zero check
         self.one_line_picking.picking_type_id.sudo().shopfloor_zero_check = True
         # Update the quantity in the location to be equal to the line's
-        # so when scan_destination_pack sets the qty_done, the planned
+        # so when scan_destination_pack sets the qty_picked, the planned
         # qty should be zero and trigger a zero check
-        self._update_qty_in_location(location, product, qty)
+        self._update_qty_in_location(location, product, qty / 2)
         # Reserve goods (now the move line has the expected source location)
         self.one_line_picking.move_ids.location_id = location
         self.one_line_picking.action_assign()
@@ -340,7 +340,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
         # ensure we have deactivated the zero check
         self.one_line_picking.picking_type_id.sudo().shopfloor_zero_check = False
         # Update the quantity in the location to be equal to the line's
-        # so when scan_destination_pack sets the qty_done, the planned
+        # so when scan_destination_pack sets the qty_picked, the planned
         # qty should be zero and trigger a zero check
         self._update_qty_in_location(line.location_id, line.product_id, line.quantity)
         response = self.service.dispatch(
@@ -361,6 +361,6 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
             data=self._line_data(next_line),
             message={
                 "message_type": "success",
-                "body": f"{line.qty_done} {line.product_id.display_name} put in {self.bin1.name}",  # noqa
+                "body": f"{line.qty_picked} {line.product_id.display_name} put in {self.bin1.name}",  # noqa
             },
         )

@@ -195,7 +195,7 @@ class ClusterPickingStockIssue(ClusterPickingCommonCase):
             [
                 {
                     "location_id": self.shelf1.id,
-                    "qty_done": 5.0,
+                    "qty_picked": 5.0,
                     "result_package_id": self.dest_package.id,
                 }
             ],
@@ -349,7 +349,8 @@ class ClusterPickingStockIssue(ClusterPickingCommonCase):
             [
                 {
                     "location_id": self.shelf1.id,
-                    "qty_done": 1.0,
+                    "qty_picked": 1.0,
+                    "picked": True,
                     "result_package_id": self.dest_package.id,
                 }
             ],

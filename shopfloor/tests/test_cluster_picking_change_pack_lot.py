@@ -28,7 +28,7 @@ class ClusterPickingChangePackLotCase(ClusterPickingCommonCase):
                 "picking_batch_id": batch.id,
                 "move_line_id": line.id,
                 "barcode": barcode,
-                "quantity": line.qty_done,
+                "quantity": line.qty_picked,
             },
         )
         if success:
