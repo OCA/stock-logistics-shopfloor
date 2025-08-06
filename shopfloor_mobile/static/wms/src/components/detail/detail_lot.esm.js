@@ -4,7 +4,7 @@
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
 
-import {ItemDetailMixin} from "/shopfloor_mobile_base/static/wms/src/components/detail/detail_mixin.js";
+import {ItemDetailMixin} from "/shopfloor_mobile_base/static/src/components/detail/detail_mixin.esm.js";
 
 // TODO: this should be probably merged or combined w/ detail-product
 Vue.component("detail-lot", {
@@ -44,6 +44,7 @@ Vue.component("detail-lot", {
                 {path: "product_name", label: "Name"},
             ];
         },
+        /* eslint-disable no-unused-vars */
         render_packaging(record, field) {
             return [record.name, "(" + record.code + ")", "= " + record.qty].join(" ");
         },

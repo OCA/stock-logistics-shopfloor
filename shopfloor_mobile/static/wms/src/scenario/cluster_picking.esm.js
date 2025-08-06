@@ -4,8 +4,8 @@
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
 
-import {ScenarioBaseMixin} from "/shopfloor_mobile_base/static/wms/src/scenario/mixins.js";
-import {process_registry} from "/shopfloor_mobile_base/static/wms/src/services/process_registry.js";
+import {ScenarioBaseMixin} from "/shopfloor_mobile_base/static/src/scenario/mixins.esm.js";
+import {process_registry} from "/shopfloor_mobile_base/static/src/services/process_registry.esm.js";
 
 // TODO: consider replacing the dynamic "autofocus" in the searchbar by an event.
 // At the moment, we need autofocus to be disabled if there's a user popup.
@@ -189,10 +189,10 @@ const ClusterPicking = {
             scan_destination_qty: 0,
             states: {
                 start: {
-                    on_get_work: (evt) => {
+                    on_get_work: () => {
                         this.wait_call(this.odoo.call("find_batch"));
                     },
-                    on_manual_selection: (evt) => {
+                    on_manual_selection: () => {
                         this.wait_call(this.odoo.call("list_batch"));
                     },
                 },
@@ -375,8 +375,8 @@ const ClusterPicking = {
                         // FIXME: use state_load or traverse the state
                         // this.current_state_key = "unload_all";
                         // this.state.on_scan(scanned, confirmation);
-                        confirmation = this.state.data.confirmation || "";
-                        this.states.unload_all.on_scan(scanned, confirmation);
+                        const confirm = this.state.data.confirmation || confirmation;
+                        this.states.unload_all.on_scan(scanned, confirm);
                     },
                 },
                 unload_single: {
@@ -422,7 +422,8 @@ const ClusterPicking = {
                         this.wait_call(
                             this.odoo.call("unload_scan_destination", {
                                 picking_batch_id: this.current_batch().id,
-                                package_id: null, // FIXME: where does it come from? backend data?
+                                // FIXME: where does it come from? backend data?
+                                package_id: null,
                                 barcode: scanned.text,
                                 confirmation: this.state.data.confirmation || "",
                             })

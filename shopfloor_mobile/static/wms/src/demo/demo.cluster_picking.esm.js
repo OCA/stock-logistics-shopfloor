@@ -4,7 +4,7 @@
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
 
-import {demotools} from "/shopfloor_mobile_base/static/wms/src/demo/demo.core.js";
+import {demotools} from "/shopfloor_mobile_base/static/src/demo/demo.core.esm.js";
 
 const DEMO_CLUSTER_PICKING_1 = {
     find_batch: {

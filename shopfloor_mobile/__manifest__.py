@@ -5,13 +5,13 @@
 {
     "name": "Shopfloor mobile",
     "summary": "Mobile frontend for WMS Shopfloor app",
-    "version": "16.0.1.4.0",
+    "version": "18.0.1.0.0",
     "depends": ["shopfloor", "shopfloor_mobile_base"],
     "author": "Camptocamp, BCIM, Akretion, Odoo Community Association (OCA)",
     "maintainers": ["simahawk"],
     "website": "https://github.com/OCA/stock-logistics-shopfloor",
     "category": "Warehouse Management",
     "license": "AGPL-3",
-    "installable": False,
+    "installable": True,
     "data": ["templates/assets.xml"],
 }
