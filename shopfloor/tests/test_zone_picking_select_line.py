@@ -160,7 +160,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             qty_done=10.0,
         )
         # first line done
-        move_line.qty_done = move_line.quantity
+        move_line._pick_qty(move_line.quantity)
         # get the next one
         response = self.service.dispatch(
             "scan_source",
@@ -223,7 +223,10 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             qty_done=10.0,
         )
 
-    def test_scan_source_barcode_package_not_found(self):
+    # FIXME: this case shouldn't be possible anymore
+    # because a check on stock.quant.package.write in odoo core
+    # prevents to update a location on a package w/o move lines.
+    def FIXME_test_scan_source_barcode_package_not_found(self):
         """Scan source: scanned package has no related move line,
         next step 'select_line' expected.
         """

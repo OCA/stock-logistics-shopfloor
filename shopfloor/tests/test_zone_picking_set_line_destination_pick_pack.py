@@ -68,7 +68,7 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
         move_line = self.picking1.move_line_ids
         move_line.location_dest_id = self.shelf1
         quantity_reserved = move_line.quantity
-        previous_qty_done = move_line.qty_done
+        previous_qty_done = move_line.qty_picked
         # Confirm the destination with the right destination
         response = self.service.dispatch(
             "set_destination",
@@ -78,7 +78,7 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
                 "quantity": quantity_reserved,
             },
         )
-        self.assertEqual(move_line.qty_done, previous_qty_done)
+        self.assertEqual(move_line.qty_picked, previous_qty_done)
         self.assert_response_set_line_destination(
             response,
             zone_location,
@@ -198,6 +198,7 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
                 {
                     "name": "TEST DEFAULT",
                     "package_type_id": self.carrier.test_default_packaging_id.id,
+                    "product_id": self.free_product.id,
                 }
             )
         )
@@ -220,7 +221,7 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
                 {
                     "result_package_id": self.free_package.id,
                     "quantity": 10,
-                    "qty_done": 10,
+                    "qty_picked": 10,
                     "shopfloor_user_id": self.env.user.id,
                 },
             ],

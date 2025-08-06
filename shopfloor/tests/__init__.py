@@ -64,24 +64,25 @@ from . import test_delivery_select
 # from . import test_location_content_transfer_set_destination_package_or_line
 # from . import test_location_content_transfer_putaway
 # from . import test_location_content_transfer_mix
-# from . import test_zone_picking_base
-# from . import test_zone_picking_complete_mix_pack_flux
-# from . import test_zone_picking_start
-# from . import test_zone_picking_select_picking_type
-# from . import test_zone_picking_select_line
-# from . import test_zone_picking_select_line_no_prefill_qty
-# from . import test_zone_picking_select_line_first_scan_location
-# from . import test_zone_picking_set_line_destination
-# from . import test_zone_picking_set_line_destination_no_prefill_qty
-# from . import test_zone_picking_set_line_destination_pick_pack
-# from . import test_zone_picking_zero_check
-# from . import test_zone_picking_stock_issue
+from . import test_zone_picking_base
+from . import test_zone_picking_complete_mix_pack_flux
+from . import test_zone_picking_start
+from . import test_zone_picking_select_picking_type
+from . import test_zone_picking_select_line
+from . import test_zone_picking_select_line_no_prefill_qty
+from . import test_zone_picking_select_line_first_scan_location
+from . import test_zone_picking_set_line_destination
+from . import test_zone_picking_set_line_destination_no_prefill_qty
+from . import test_zone_picking_set_line_destination_pick_pack
+from . import test_zone_picking_zero_check
+from . import test_zone_picking_stock_issue
+
 # from . import test_zone_picking_change_pack_lot
-# from . import test_zone_picking_unload_buffer_lines
-# from . import test_zone_picking_unload_single
-# from . import test_zone_picking_unload_all
-# from . import test_zone_picking_unload_set_destination
-# from . import test_zone_picking_require_destination_package
+from . import test_zone_picking_unload_buffer_lines
+from . import test_zone_picking_unload_single
+from . import test_zone_picking_unload_all
+from . import test_zone_picking_unload_set_destination
+from . import test_zone_picking_require_destination_package
 from . import test_misc
 from . import test_move_action_assign
 from . import test_scan_anything

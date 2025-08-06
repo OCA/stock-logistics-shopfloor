@@ -165,7 +165,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         # Check picking data
         moves_after = self.picking1.move_ids
         self.assertEqual(moves_before, moves_after)
-        self.assertEqual(move_line.qty_done, 10)
+        self.assertEqual(move_line.qty_picked, 10)
         # Check response
         move_lines = self.service._find_location_move_lines()
         move_lines = move_lines.sorted(lambda x: x.move_id.priority, reverse=True)
@@ -273,11 +273,12 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         self.assertEqual(len(move_after), 1)
         self.assertEqual(move_line.move_id.product_uom_qty, 6)
         self.assertEqual(move_line.move_id.state, "done")
-        self.assertEqual(move_line.move_id.move_line_ids.quantity, 0)
+        self.assertEqual(move_line.quantity, 6)
+        self.assertEqual(move_line.qty_picked, 6)
         self.assertEqual(move_after.product_uom_qty, 4)
         self.assertEqual(move_after.state, "assigned")
         self.assertEqual(move_after.move_line_ids.quantity, 4)
-        self.assertEqual(move_line.qty_done, 6)
+        self.assertEqual(move_after.move_line_ids.qty_picked, 0)
         self.assertNotEqual(move_line.move_id, other_move_line.move_id)
         # Check response
         move_lines = self.service._find_location_move_lines()
@@ -407,7 +408,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
                 {
                     "result_package_id": self.free_package.id,
                     "quantity": 10,
-                    "qty_done": 10,
+                    "qty_picked": 10,
                     "shopfloor_user_id": self.env.user.id,
                 },
             ],
@@ -465,7 +466,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
                 {
                     "result_package_id": self.free_package.id,
                     "quantity": 6,
-                    "qty_done": 6,
+                    "qty_picked": 6,
                     "shopfloor_user_id": self.env.user.id,
                 },
             ],
@@ -476,7 +477,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
                 {
                     "result_package_id": new_move_line.package_id.id,  # Unchanged
                     "quantity": 4,
-                    "qty_done": 0,
+                    "qty_picked": 0,
                     "shopfloor_user_id": False,
                 },
             ],

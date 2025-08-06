@@ -451,7 +451,8 @@ class ZonePicking(Component):
     def _find_buffer_move_lines_domain(self, dest_package=None):
         domain = [
             ("picking_id.picking_type_id", "in", self.picking_types.ids),
-            ("qty_done", ">", 0),
+            ("qty_picked", ">", 0),
+            ("picked", "=", True),
             ("state", "not in", ("cancel", "done")),
             ("result_package_id", "!=", False),
             ("shopfloor_user_id", "=", self.env.user.id),
@@ -686,6 +687,9 @@ class ZonePicking(Component):
                     response_error_func=self._response_for_change_pack_lot,
                 )
         else:
+            # FIXME: this case shouldn't be possible anymore
+            # because a check on stock.quant.package.write in odoo core
+            # prevents to update a location on a package w/o move lines.
             response = self._list_move_lines(sublocation or self.zone_location)
             message = self.msg_store.package_has_no_product_to_take(barcode)
         return response, message
@@ -953,7 +957,7 @@ class ZonePicking(Component):
             for _move_line in package.move_line_ids:
                 if _move_line.state not in ("assigned", "partially_available"):
                     continue
-                _move_line.qty_done = move_line.quantity
+                _move_line.qty_picked = move_line.quantity
                 move_lines |= _move_line
         self._write_destination_on_lines(move_lines, location)
 
@@ -976,8 +980,7 @@ class ZonePicking(Component):
         # Zero check
         # Only apply zero check if the product is of type "product".
         zero_check = (
-            move_line.product_id.type == "product"
-            and self.picking_type.shopfloor_zero_check
+            move_line.product_id.is_storable and self.picking_type.shopfloor_zero_check
         )
         if zero_check and move_line.location_id.planned_qty_in_location_is_empty():
             response = self._response_for_zero_check(move_line)
@@ -1059,8 +1062,7 @@ class ZonePicking(Component):
         # Zero check
         # Only apply zero check if the product is of type "product".
         zero_check = (
-            move_line.product_id.type == "product"
-            and self.picking_type.shopfloor_zero_check
+            move_line.product_id.is_storable and self.picking_type.shopfloor_zero_check
         )
         if zero_check and move_line.location_id.planned_qty_in_location_is_empty():
             response = self._response_for_zero_check(move_line)
@@ -1350,7 +1352,7 @@ class ZonePicking(Component):
             ("package_id", "=", package.id),
             ("lot_id", "=", lot.id),
             ("state", "not in", ("cancel", "done")),
-            ("qty_done", "=", 0),
+            ("qty_picked", "=", 0),
         ]
         return domain
 

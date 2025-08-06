@@ -44,7 +44,7 @@ class ZonePickingUnloadSingleCase(ZonePickingCommonCase):
         # wrong package ID, and there is no more move line to unload from the buffer
         # => get back on 'select_line' screen
         move_line.write(
-            {"qty_done": 0, "shopfloor_user_id": False, "result_package_id": False}
+            {"qty_picked": 0, "shopfloor_user_id": False, "result_package_id": False}
         )
         response = self.service.dispatch(
             "unload_scan_pack",
