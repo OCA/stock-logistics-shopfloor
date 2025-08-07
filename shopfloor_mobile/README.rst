@@ -1,7 +1,3 @@
-.. image:: https://odoo-community.org/readme-banner-image
-   :target: https://odoo-community.org/get-involved?utm_source=readme
-   :alt: Odoo Community Association
-
 ================
 Shopfloor mobile
 ================
@@ -17,7 +13,7 @@ Shopfloor mobile
 .. |badge1| image:: https://img.shields.io/badge/maturity-Beta-yellow.png
     :target: https://odoo-community.org/page/development-status
     :alt: Beta
-.. |badge2| image:: https://img.shields.io/badge/license-AGPL--3-blue.png
+.. |badge2| image:: https://img.shields.io/badge/licence-AGPL--3-blue.png
     :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
     :alt: License: AGPL-3
 .. |badge3| image:: https://img.shields.io/badge/github-OCA%2Fstock--logistics--shopfloor-lightgray.png?logo=github
@@ -34,35 +30,35 @@ Shopfloor mobile
 
 Frontend for Shopfloor app.
 
-The work is organized in scenario.
-A scenario represents a process in the warehouse (eg: receive, deliver).
-The app allows to start each process through the main menu.
+The work is organized in scenario. A scenario represents a process in
+the warehouse (eg: receive, deliver). The app allows to start each
+process through the main menu.
 
-Each scenario is linked to a specific menu item which can be configured in the backend.
-Each scenario drives you through the work to do.
-
+Each scenario is linked to a specific menu item which can be configured
+in the backend. Each scenario drives you through the work to do.
 
 Tech details
-~~~~~~~~~~~~
+------------
 
-* This frontend is built on top of `VueJS <vuejs.org>`_  and `VuetifyJS <vuetifyjs.com/>`_
-  and relies on `shopfloor` module that exposes REST API in Odoo
-  (based in turn on `base_rest <https://github.com/OCA/rest-framework/tree/13.0/base_rest>`_).
+- This frontend is built on top of `VueJS <vuejs.org>`__ and
+  `VuetifyJS <vuetifyjs.com/>`__ and relies on shopfloor module that
+  exposes REST API in Odoo (based in turn on
+  `base_rest <https://github.com/OCA/rest-framework/tree/13.0/base_rest>`__).
 
-* The whole business logic comes from `shopfloor` module,
-  this module takes care of providing a nice and reactive UI to work with.
+- The whole business logic comes from shopfloor module, this module
+  takes care of providing a nice and reactive UI to work with.
 
-* No Odoo JS is used, no assets machinery used.
+- No Odoo JS is used, no assets machinery used.
 
   Static assets are loaded straight, served by a specific controller.
   This app is a Single Page App, hence resources are loaded only once.
 
-  The version of the module appended to the URL of each resources
-  makes sure it's not cached when the version changes.
+  The version of the module appended to the URL of each resources makes
+  sure it's not cached when the version changes.
 
-* When developing you can use a demo mode which allows to define interactive scenario
-  with pure JS demo data, without interacting with Odoo.
-  Nothing to deal with Odoo demo data.
+- When developing you can use a demo mode which allows to define
+  interactive scenario with pure JS demo data, without interacting with
+  Odoo. Nothing to deal with Odoo demo data.
 
 **Table of contents**
 
@@ -73,78 +69,92 @@ Usage
 =====
 
 Pre-requisites
-~~~~~~~~~~~~~~
+--------------
 
-* Your Odoo instance is accessible via mobile device
-* You have an API Key configured
+- Your Odoo instance is accessible via mobile device
+- You have an API Key configured
 
 Start the app
-~~~~~~~~~~~~~
+-------------
 
-* Go to "Inventory -> Configuration -> Shopfloor -> Shopfloor App"
-* In the login screen fill in your API key
-* Hit "Login"
+- Go to "Inventory -> Configuration -> Shopfloor -> Shopfloor App"
+- In the login screen fill in your API key
+- Hit "Login"
 
 Select a profile
-~~~~~~~~~~~~~~~~
+----------------
 
-Several profiles can be configured in the backend,
-you must choose one before starting.
+Several profiles can be configured in the backend, you must choose one
+before starting.
 
-* Tap on "Configure profile"
-* Select a profile
+- Tap on "Configure profile"
+- Select a profile
 
 This will load all available menu items for the selected profile.
 
 Change language
-~~~~~~~~~~~~~~~
+---------------
 
-* Go to "Settings -> Language"
-* Select a language
+- Go to "Settings -> Language"
+- Select a language
 
 Customization
-~~~~~~~~~~~~~
+-------------
 
-Please refer to `shopfloor_mobile_custom_example`.
+Please refer to shopfloor_mobile_custom_example.
 
 Known issues / Roadmap
 ======================
 
-* Split module by scenario
-* Improve documentation and demo data
-* Document each component
-* Document demo mode
-* Find / create a nice icon
-* Finish base translations (move all UI strings to translatable terms)
-* Use SCSS
-* Refactor states definition
+- Split module by scenario
 
-  States are now part of the scenario data. They should be specific objects with their own class.
-  They should also provide all the actions that should be displayed w/ their handlers when needed.
-  Actions can be popup actions or buttons at the bottom of the screen.
-  The tricky part here could be how to register this states for the given component.
-  Today states have access to the full object of the scenario component as they are part of it.
-  `_get_state_spec` could probably lookup for registered states
-  (eg: when you register a component in the registry you should provide states as well).
-  When we'll have states in this fashion we should also consider if they should provide their own template.
-  This way the component template will hold only the generic bits of the scenario.
+- Improve documentation and demo data
 
-* Back buttons should be smarter
+- Document each component
 
-  In some cases getting back using history is fine but very often this could lead to outdated data display.
-  To mitigate this in particular scenario's steps, custom handlers for the back action have been implemented.
-  For instance, in cluster_picking when you hit back on manual selection it forces the state to go to start and reload.
-  For starting we should provide `on_back` property to all states where we want to display it
-  (no more specific check on the state to display this button).
-  This part is also related to "Refactor states definition".
+- Document demo mode
 
-* Go through `_.forEach` and similar calls to replace them w/ vanilla JS (eg: `.map()`)
+- Find / create a nice icon
+
+- Finish base translations (move all UI strings to translatable terms)
+
+- Use SCSS
+
+- Refactor states definition
+
+  States are now part of the scenario data. They should be specific
+  objects with their own class. They should also provide all the actions
+  that should be displayed w/ their handlers when needed. Actions can be
+  popup actions or buttons at the bottom of the screen. The tricky part
+  here could be how to register this states for the given component.
+  Today states have access to the full object of the scenario component
+  as they are part of it. \_get_state_spec could probably lookup for
+  registered states (eg: when you register a component in the registry
+  you should provide states as well). When we'll have states in this
+  fashion we should also consider if they should provide their own
+  template. This way the component template will hold only the generic
+  bits of the scenario.
+
+- Back buttons should be smarter
+
+  In some cases getting back using history is fine but very often this
+  could lead to outdated data display. To mitigate this in particular
+  scenario's steps, custom handlers for the back action have been
+  implemented. For instance, in cluster_picking when you hit back on
+  manual selection it forces the state to go to start and reload. For
+  starting we should provide on_back property to all states where we
+  want to display it (no more specific check on the state to display
+  this button). This part is also related to "Refactor states
+  definition".
+
+- Go through \_.forEach and similar calls to replace them w/ vanilla JS
+  (eg: .map())
 
 Changelog
 =========
 
 13.0.1.0.0
-~~~~~~~~~~
+----------
 
 First official version.
 
@@ -162,39 +172,38 @@ Credits
 =======
 
 Authors
-~~~~~~~
+-------
 
 * Camptocamp
 * BCIM
 * Akretion
 
 Contributors
-~~~~~~~~~~~~
+------------
 
-* Simone Orsi <simahawk@gmail.com>
-* Thierry Ducrest <thierry.ducrest@camptocamp.com>
-* Guewen Baconnier <guewen.baconnier@camptocamp.com>
-* Raphaël Reverdy <raphael.reverdy@akretion.com>
-* Sébastien Beau <sebastien.beau@akretion.com>
-* Jacques-Etienne Baudoux <je@bcim.be>
+- Simone Orsi <simahawk@gmail.com>
+- Thierry Ducrest <thierry.ducrest@camptocamp.com>
+- Guewen Baconnier <guewen.baconnier@camptocamp.com>
+- Raphaël Reverdy <raphael.reverdy@akretion.com>
+- Sébastien Beau <sebastien.beau@akretion.com>
+- Jacques-Etienne Baudoux <je@bcim.be>
 
-Design
-~~~~~~
+**Design**
 
-* Joël Grand-Guillaume <joel.grandguillaume@camptocamp.com>
-* Jacques-Etienne Baudoux <je@bcim.be>
+- Joël Grand-Guillaume <joel.grandguillaume@camptocamp.com>
+- Jacques-Etienne Baudoux <je@bcim.be>
 
 Other credits
-~~~~~~~~~~~~~
+-------------
 
 **Financial support**
 
-* Cosanum
-* Camptocamp R&D
-* Akretion R&D
+- Cosanum
+- Camptocamp R&D
+- Akretion R&D
 
 Maintainers
-~~~~~~~~~~~
+-----------
 
 This module is maintained by the OCA.
 
