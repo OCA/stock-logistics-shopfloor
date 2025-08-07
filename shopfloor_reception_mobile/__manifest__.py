@@ -3,11 +3,11 @@
 {
     "name": "Shopfloor reception mobile",
     "summary": "Scenario for receiving products",
-    "version": "16.0.1.0.1",
+    "version": "18.0.1.0.0",
     "development_status": "Beta",
     "depends": ["shopfloor_mobile_base", "shopfloor_reception"],
     "author": "Camptocamp, Odoo Community Association (OCA)",
-    "maintainers": ["JuMiSanAr"],
+    "maintainers": ["JuMiSanAr", "simahawk"],
     "website": "https://github.com/OCA/stock-logistics-shopfloor",
     "category": "Warehouse Management",
     "license": "AGPL-3",
