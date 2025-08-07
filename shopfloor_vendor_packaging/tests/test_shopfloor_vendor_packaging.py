@@ -9,12 +9,12 @@ class TestShopfloorVendorPackaging(ActionsDataCaseBase):
     def setUpClass(cls, *args, **kwargs):
         super().setUpClass(*args, **kwargs)
         cls.product = cls.move_a.move_line_ids.product_id
-        vendor_packaging_type = (
-            cls.env["product.packaging.type"]
+        vendor_packaging_level = (
+            cls.env["product.packaging.level"]
             .sudo()
             .create(
                 {
-                    "name": "Test Vendor Packaging Type",
+                    "name": "Test Vendor Packaging level",
                     "code": "VP",
                     "sequence": 99,
                     "is_vendor_packaging": True,
@@ -28,7 +28,8 @@ class TestShopfloorVendorPackaging(ActionsDataCaseBase):
                 {
                     "name": "Test Vendor Packaging",
                     "qty": 15,
-                    "packaging_type_id": vendor_packaging_type.id,
+                    "packaging_level_id": vendor_packaging_level.id,
+                    "product_id": cls.product.id,
                 }
             )
         )

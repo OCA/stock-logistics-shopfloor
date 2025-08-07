@@ -43,7 +43,7 @@ class DataAction(Component):
             packagings = packagings.filtered(lambda x: x.qty)
         else:
             packagings = packagings.filtered(
-                lambda x: x.qty and not x.packaging_type_id.is_vendor_packaging
+                lambda x: x.qty and not x.packaging_level_id.is_vendor_packaging
             )
         return self._jsonify(
             packagings,

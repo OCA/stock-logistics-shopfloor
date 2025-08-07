@@ -4,7 +4,7 @@
 {
     "name": "Shopfloor Vendor Packaging",
     "summary": "Manage shopfloor behavior for vendor packaging",
-    "version": "14.0.1.0.0",
+    "version": "18.0.1.0.0",
     "development_status": "Alpha",
     "category": "Inventory",
     "website": "https://github.com/OCA/stock-logistics-shopfloor",
@@ -14,6 +14,6 @@
     "data": [
         "views/shopfloor_menu.xml",
     ],
-    "depends": ["shopfloor", "product_packaging_type_vendor"],
-    "auto-install": True,
+    "depends": ["shopfloor", "product_packaging_level_vendor"],
+    "auto_install": True,
 }

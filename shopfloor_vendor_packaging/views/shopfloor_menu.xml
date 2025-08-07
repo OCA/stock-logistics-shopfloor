@@ -7,9 +7,8 @@
             <group name="options" position="inside">
                 <group
                     name="display_vendor_packaging"
-                    attrs="{'invisible': [('display_vendor_packaging_is_possible', '=', False)]}"
+                    invisible="not display_vendor_packaging_is_possible"
                 >
-                    <field name="display_vendor_packaging_is_possible" invisible="1" />
                     <field name="display_vendor_packaging" />
                 </group>
             </group>
