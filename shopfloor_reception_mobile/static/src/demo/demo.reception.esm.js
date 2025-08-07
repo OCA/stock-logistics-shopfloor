@@ -5,7 +5,7 @@
 
 import {demotools} from "/shopfloor_mobile_base/static/wms/src/demo/demo.core.js";
 
-let receipt_pickings = [];
+const receipt_pickings = [];
 for (let i = 0; i < 10; i++) {
     receipt_pickings.push(
         demotools.makePicking(
@@ -24,6 +24,7 @@ const data_for_select_document = {
     },
 };
 
+/* eslint-disable no-unused-vars */
 const DEMO_RECEPTION = {
     receipts: function (data) {
         const res = data_for_select_document;

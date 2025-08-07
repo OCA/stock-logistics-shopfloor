@@ -18,12 +18,12 @@
             <!-- Scenario -->
             <script
                 id="script_scenario_reception"
-                t-attf-src="/shopfloor_reception_mobile/static/src/scenario/reception.js?v=#{mod_version}"
+                t-attf-src="/shopfloor_reception_mobile/static/src/scenario/reception.esm.js?v=#{mod_version}"
                 type="module"
             />
             <script
                 id="script_scenario_reception_states"
-                t-attf-src="/shopfloor_reception_mobile/static/src/scenario/reception_states.js?v=#{mod_version}"
+                t-attf-src="/shopfloor_reception_mobile/static/src/scenario/reception_states.esm.js?v=#{mod_version}"
                 type="module"
             />
         </script>
@@ -39,7 +39,7 @@
             />
             <script
                 id="script_demo_reception"
-                t-attf-src="/shopfloor_reception_mobile/static/src/demo/demo.reception.js?v=#{mod_version}"
+                t-attf-src="/shopfloor_reception_mobile/static/src/demo/demo.reception.esm.js?v=#{mod_version}"
                 type="module"
             />
         </xpath>

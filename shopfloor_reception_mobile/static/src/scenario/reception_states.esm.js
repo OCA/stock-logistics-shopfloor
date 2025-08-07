@@ -8,6 +8,8 @@
     Define states for reception scenario.
     @param this VueJS component instance
 */
+import event_hub from "/shopfloor_mobile_base/static/wms/src/services/event_hub.js";
+
 export const reception_states = function () {
     return {
         init: {

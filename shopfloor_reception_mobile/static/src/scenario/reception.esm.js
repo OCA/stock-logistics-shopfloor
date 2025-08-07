@@ -6,9 +6,9 @@
 
 import {ScenarioBaseMixin} from "/shopfloor_mobile_base/static/wms/src/scenario/mixins.js";
 import {process_registry} from "/shopfloor_mobile_base/static/wms/src/services/process_registry.js";
-import event_hub from "/shopfloor_mobile_base/static/wms/src/services/event_hub.js";
 import {reception_states} from "./reception_states.js";
 
+/* eslint-disable no-unused-vars */
 const Reception = {
     mixins: [ScenarioBaseMixin],
     template: `
@@ -214,9 +214,12 @@ const Reception = {
     `,
     computed: {
         visible_pickings: function () {
-            return !_.isEmpty(this.filtered_pickings)
-                ? this.filtered_pickings
-                : this.state.data.pickings;
+            if (_.isEmpty(this.filtered_pickings)) {
+                return this.state.data && this.state.data.pickings
+                    ? this.state.data.pickings
+                    : [];
+            }
+            return this.filtered_pickings;
         },
         search_input_placeholder_expiry: function () {
             return this.state.display_info.scan_input_placeholder_expiry;
@@ -481,9 +484,8 @@ const Reception = {
         move_card_color: function (move) {
             if (move.progress === 100) {
                 return "screen_step_done";
-            } else {
-                return "screen_step_todo";
             }
+            return "screen_step_todo";
         },
         _apply_search_filter: function (picking, input) {
             if (_.isEmpty(picking.origin)) {
