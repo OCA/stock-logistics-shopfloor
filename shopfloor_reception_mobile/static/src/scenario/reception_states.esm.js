@@ -8,7 +8,7 @@
     Define states for reception scenario.
     @param this VueJS component instance
 */
-import event_hub from "/shopfloor_mobile_base/static/wms/src/services/event_hub.js";
+import event_hub from "/shopfloor_mobile_base/static/src/services/event_hub.esm.js";
 
 export const reception_states = function () {
     return {
