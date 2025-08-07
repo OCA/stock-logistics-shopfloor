@@ -15,6 +15,14 @@ for (let i = 0; i < 10; i++) {
     );
 }
 
+const data_for_start = {
+    next_state: "select_document",
+    data: {
+        start: {
+            pickings: receipt_pickings,
+        },
+    },
+};
 const data_for_select_document = {
     next_state: "select_document",
     data: {
@@ -26,16 +34,37 @@ const data_for_select_document = {
 
 /* eslint-disable no-unused-vars */
 const DEMO_RECEPTION = {
-    receipts: function (data) {
+    start: data_for_start,
+    list_stock_pickings: {
+        next_state: "manual_selection",
+        message: null,
+        data: {
+            manual_selection: {
+                pickings: _.sampleSize(receipt_pickings, _.random(8)),
+            },
+        },
+    },
+    select_line: function (data) {
         const res = data_for_select_document;
         return res;
     },
     scan_document: function (data) {
         return {
-            next_state: "select_line",
+            next_state: "select_move",
             data: {
-                select_line: {
-                    picking: receipt_pickings.find((p) => p.id === data.picking_id),
+                select_move: {
+                    picking: receipt_pickings.find((p) => p.name === data.barcode),
+                },
+            },
+        };
+    },
+    done_action: function (data) {
+        return {
+            next_state: "select_document",
+            message: "Transfer done",
+            data: {
+                select_document: {
+                    pickings: _.sampleSize(receipt_pickings, _.random(8)),
                 },
             },
         };
