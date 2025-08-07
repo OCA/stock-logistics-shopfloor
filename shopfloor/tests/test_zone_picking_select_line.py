@@ -160,7 +160,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             qty_done=10.0,
         )
         # first line done
-        move_line._pick_qty(move_line.quantity)
+        move_line.picked = True
         # get the next one
         response = self.service.dispatch(
             "scan_source",
@@ -751,7 +751,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         )
         self.assertTrue(move_line_will_empty_location)
         # But if we check the location without giving the move line as parameter,
-        # knowing that this move line hasn't its 'qty_done' field filled,
+        # knowing that this move line hasn't its 'qty_picked' field filled,
         # the location won't be considered empty with such pending move line
         move_line_will_empty_location = location_src.planned_qty_in_location_is_empty()
         self.assertFalse(move_line_will_empty_location)

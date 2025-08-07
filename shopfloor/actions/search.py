@@ -149,7 +149,9 @@ class SearchAction(Component):
         if not barcode:
             return model.browse()
         domain = [
+            "|",
             ("company_id", "=", self.env.company.id),
+            ("company_id", "=", False),
             ("name", "=", barcode),
         ]
         if products:

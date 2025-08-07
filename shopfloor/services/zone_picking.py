@@ -63,7 +63,7 @@ class ZonePicking(Component):
        * they scan a location, in which case the move line's destination is
          updated with it and the move is done
        * they scan a package, which becomes the destination package of the move
-         line, the move line is not set to done, its ``qty_done`` is updated
+         line, the move line is not set to done, its ``qty_picked`` is updated
          and a field ``shopfloor_user_id`` is set to the user; consider the
          move line is set in a buffer
 
@@ -451,7 +451,6 @@ class ZonePicking(Component):
     def _find_buffer_move_lines_domain(self, dest_package=None):
         domain = [
             ("picking_id.picking_type_id", "in", self.picking_types.ids),
-            ("qty_picked", ">", 0),
             ("picked", "=", True),
             ("state", "not in", ("cancel", "done")),
             ("result_package_id", "!=", False),
@@ -1152,7 +1151,7 @@ class ZonePicking(Component):
           moved is 0 in the source location after the move (beware: at this
           point the product we put in the buffer is still considered to be in
           the source location, so we have to compute the source location's
-          quantity - qty_done).
+          quantity - picked qty).
         * set_line_destination: the scanned location is invalid, user has to
           scan another one
         * set_line_destination+confirmation_required: the scanned location is not
@@ -1352,7 +1351,7 @@ class ZonePicking(Component):
             ("package_id", "=", package.id),
             ("lot_id", "=", lot.id),
             ("state", "not in", ("cancel", "done")),
-            ("qty_picked", "=", 0),
+            ("picked", "=", False),
         ]
         return domain
 
@@ -1363,11 +1362,11 @@ class ZonePicking(Component):
         because there is physically not enough goods. The move line is deleted
         (unreserve), and an inventory is created to reduce the quantity in the
         source location to prevent future errors until a correction. Beware:
-        the quantity already reserved and having a qty_done set on other lines
+        the quantity already reserved and having a picked qty on other lines
         in the same location should remain reserved so the inventory's quantity
-        must be set to the total of qty_done of other lines.
+        must be set to the total of picked qty of other lines.
 
-        The other lines not yet picked (no qty_done) in the same location for
+        The other lines not yet picked in the same location for
         the same product, lot, package are unreserved as well (moves lines
         deleted, which unreserve their quantity on the move).
 
@@ -1483,7 +1482,7 @@ class ZonePicking(Component):
 
         * in the current zone location and picking type
         * not done or canceled
-        * with a qty_done > 0
+        * picked
         * have a destination package
         * with ``shopfloor_user_id`` equal to the current user
 
