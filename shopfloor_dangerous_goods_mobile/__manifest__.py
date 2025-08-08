@@ -7,7 +7,7 @@
     "version": "14.0.1.1.1",
     "development_status": "Alpha",
     "category": "Inventory",
-    "website": "https://github.com/OCA/wms",
+    "website": "https://github.com/OCA/stock-logistics-shopfloor",
     "author": "Camptocamp, Odoo Community Association (OCA)",
     "license": "AGPL-3",
     "depends": ["shopfloor_mobile", "shopfloor_dangerous_goods"],
