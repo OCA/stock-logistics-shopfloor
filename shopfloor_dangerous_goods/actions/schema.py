@@ -4,7 +4,6 @@ from odoo.addons.component.core import Component
 
 
 class ShopfloorSchemaAction(Component):
-
     _inherit = "shopfloor.schema.action"
 
     def move_line(self, with_packaging=False, with_picking=False):
