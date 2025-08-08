@@ -51,7 +51,7 @@ const DEMO_SINGLE_PRODUCT_TRANSFER = {
         data: {
             set_quantity: {
                 picking,
-                selected_move_line,
+                move_line: selected_move_line,
             },
         },
     },
@@ -60,7 +60,7 @@ const DEMO_SINGLE_PRODUCT_TRANSFER = {
         data: {
             set_quantity: {
                 picking,
-                selected_move_line,
+                move_line: selected_move_line,
             },
         },
     },
