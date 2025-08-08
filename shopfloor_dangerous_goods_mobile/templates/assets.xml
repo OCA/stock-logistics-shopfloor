@@ -13,7 +13,7 @@
             />
             <script
                 id="script_component_picking_select_dangerous_goods"
-                t-attf-src="/shopfloor_dangerous_goods_mobile/static/wms/src/components/picking_select.js?v=#{mod_version}"
+                t-attf-src="/shopfloor_dangerous_goods_mobile/static/wms/src/components/picking_select.esm.js?v=#{mod_version}"
                 type="module"
             />
         </script>
@@ -40,7 +40,7 @@
             />
             <script
                 id="script_demo_checkout"
-                t-attf-src="/shopfloor_dangerous_goods_mobile/static/wms/src/js/demo/demo.checkout.js?v=#{mod_version}"
+                t-attf-src="/shopfloor_dangerous_goods_mobile/static/wms/src/js/demo/demo.checkout.esm.js?v=#{mod_version}"
                 type="module"
             />
         </xpath>
