@@ -4,13 +4,10 @@
 import json
 import logging
 
-from odoo import SUPERUSER_ID, api
-
 _logger = logging.getLogger(__name__)
 
 
-def post_init_hook(cr, registry):
-    env = api.Environment(cr, SUPERUSER_ID, {})
+def post_init_hook(env):
     reception_scenario = env["shopfloor.scenario"].search([("key", "=", "reception")])
     _update_scenario_options(reception_scenario)
     reception_menus = env["shopfloor.menu"].search(
