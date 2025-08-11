@@ -1,9 +1,10 @@
 [project]
 name = "odoo-addons-oca-stock-logistics-shopfloor"
-version = "18.0.20250806.0"
+version = "18.0.20250811.0"
 dependencies = [
     "odoo-addon-shopfloor==18.0.*",
     "odoo-addon-shopfloor_mobile==18.0.*",
+    "odoo-addon-shopfloor_reception==18.0.*",
 ]
 classifiers=[
     "Programming Language :: Python",
