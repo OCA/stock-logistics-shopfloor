@@ -1,9 +1,10 @@
 [project]
 name = "odoo-addons-oca-stock-logistics-shopfloor"
-version = "18.0.20250812.0"
+version = "18.0.20250812.1"
 dependencies = [
     "odoo-addon-shopfloor==18.0.*",
     "odoo-addon-shopfloor_delivery_shipment==18.0.*",
+    "odoo-addon-shopfloor_delivery_shipment_mobile==18.0.*",
     "odoo-addon-shopfloor_mobile==18.0.*",
     "odoo-addon-shopfloor_reception==18.0.*",
 ]
