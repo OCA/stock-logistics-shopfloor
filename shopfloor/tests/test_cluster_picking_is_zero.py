@@ -57,7 +57,10 @@ class ClusterPickingIsZeroCase(ClusterPickingCommonCase):
             data=self._line_data(self.next_line),
             message={
                 "message_type": "success",
-                "body": f"{self.line.qty_done} {self.line.product_id.display_name} put in {self.bin1.name}",  # noqa
+                "body": (
+                    f"{self.line.qty_picked} {self.line.product_id.display_name} "
+                    f"put in {self.bin1.name}"
+                ),
             },
         )
 
@@ -85,6 +88,6 @@ class ClusterPickingIsZeroCase(ClusterPickingCommonCase):
             data=self._line_data(self.next_line),
             message={
                 "message_type": "success",
-                "body": f"{self.line.qty_done} {self.line.product_id.display_name} put in {self.bin1.name}",  # noqa
+                "body": f"{self.line.qty_picked} {self.line.product_id.display_name} put in {self.bin1.name}",  # noqa
             },
         )

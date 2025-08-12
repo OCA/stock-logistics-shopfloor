@@ -155,19 +155,25 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
             [
                 {
                     "shopfloor_unloaded": True,
-                    "qty_done": 10,
+                    "qty_picked": 10,
+                    "quantity": 10,
+                    "picked": True,
                     "state": "done",
                     "location_dest_id": self.packing_location.id,
                 },
                 {
                     "shopfloor_unloaded": True,
-                    "qty_done": 10,
+                    "qty_picked": 10,
+                    "quantity": 10,
+                    "picked": True,
                     "state": "done",
                     "location_dest_id": self.packing_location.id,
                 },
                 {
                     "shopfloor_unloaded": True,
-                    "qty_done": 10,
+                    "qty_picked": 10,
+                    "quantity": 10,
+                    "picked": True,
                     "state": "done",
                     "location_dest_id": self.packing_location.id,
                 },
@@ -178,6 +184,7 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
             response,
             next_state="start",
             message={"message_type": "success", "body": "Batch Transfer complete"},
+            popup=self.ANY,
         )
 
     def test_set_destination_all_remaining_lines(self):
@@ -209,14 +216,18 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
             [
                 {
                     "shopfloor_unloaded": True,
-                    "qty_done": 10,
+                    "qty_picked": 10,
+                    "quantity": 10,
+                    "picked": True,
                     "state": "done",
                     "picking_id": self.one_line_picking.id,
                     "location_dest_id": self.packing_location.id,
                 },
                 {
                     "shopfloor_unloaded": True,
-                    "qty_done": 10,
+                    "qty_picked": 10,
+                    "quantity": 10,
+                    "picked": True,
                     # will be done when the second line of the picking is unloaded
                     "state": "assigned",
                     "picking_id": self.two_lines_picking.id,
@@ -224,7 +235,9 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
                 },
                 {
                     "shopfloor_unloaded": False,
-                    "qty_done": 0,
+                    "qty_picked": 0,
+                    "quantity": 10,
+                    "picked": False,
                     "state": "assigned",
                     "picking_id": self.two_lines_picking.id,
                     "location_dest_id": self.packing_location.id,
@@ -239,6 +252,7 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
             next_state="start_line",
             data=self._line_data(self.move_lines[2]),
             message={"body": "Batch Transfer line done", "message_type": "success"},
+            popup=self.ANY,
         )
 
     def test_set_destination_all_picking_unassigned(self):
@@ -278,6 +292,7 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
             response,
             next_state="start",
             message=self.service.msg_store.batch_transfer_complete(),
+            popup=self.ANY,
         )
 
     def test_set_destination_all_but_different_dest(self):
@@ -358,8 +373,8 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
         """
         move_lines = self.move_lines
         self._set_dest_package_and_done(move_lines, self.bin1)
-        move_lines[0].move_id.location_dest_id = self.packing_a_location
-        move_lines[0].picking_id.location_dest_id = self.packing_a_location
+        # writing dest loc on all moves to avoid entering _are_all_dest_location_same
+        move_lines.picking_id.location_dest_id = self.packing_a_location
 
         response = self.service.dispatch(
             "set_destination_all",
@@ -427,6 +442,7 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
             response,
             next_state="start",
             message={"message_type": "success", "body": "Batch Transfer complete"},
+            popup=self.ANY,
         )
 
     def test_set_destination_all_check_confirmation(self):
@@ -589,7 +605,9 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
             [
                 {
                     "shopfloor_unloaded": True,
-                    "qty_done": 10,
+                    "qty_picked": 10,
+                    "quantity": 10,
+                    "picked": True,
                     "state": "done",
                     "picking_id": self.one_line_picking.id,
                     "location_dest_id": self.packing_a_location.id,
@@ -601,14 +619,18 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
             [
                 {
                     "shopfloor_unloaded": False,
-                    "qty_done": 10,
+                    "qty_picked": 10,
+                    "quantity": 10,
+                    "picked": True,
                     "state": "assigned",
                     "picking_id": self.two_lines_picking.id,
                     "location_dest_id": self.packing_b_location.id,
                 },
                 {
                     "shopfloor_unloaded": False,
-                    "qty_done": 10,
+                    "qty_picked": 10,
+                    "quantity": 10,
+                    "picked": True,
                     "state": "assigned",
                     "picking_id": self.two_lines_picking.id,
                     "location_dest_id": self.packing_b_location.id,
@@ -619,10 +641,15 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
 
         location = self.bin2_lines[0].location_dest_id
         data = self._data_for_batch(self.batch, location, pack=self.bin2)
+        # Odoo might create new destination moves which will yield a popup message.
+        # We are not testing anything else than the next state here, which should
+        # be unload_single, as the only thing that matters here is that we were
+        # able to process the picking.
         self.assert_response(
             response,
             next_state="unload_single",
             data=data,
+            popup=self.ANY,
         )
 
     def test_scan_destination_unload_package_enabled(self):
@@ -705,7 +732,9 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
             [
                 {
                     "shopfloor_unloaded": True,
-                    "qty_done": 10,
+                    "qty_picked": 10,
+                    "quantity": 10,
+                    "picked": True,
                     "state": "assigned",
                     "picking_id": self.two_lines_picking.id,
                     "location_dest_id": self.packing_b_location.id,
@@ -717,7 +746,9 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
             [
                 {
                     "shopfloor_unloaded": False,
-                    "qty_done": 10,
+                    "qty_picked": 10,
+                    "quantity": 10,
+                    "picked": True,
                     "state": "assigned",
                     "picking_id": self.two_lines_picking.id,
                     "location_dest_id": self.packing_b_location.id,
@@ -765,7 +796,9 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
             [
                 {
                     "shopfloor_unloaded": True,
-                    "qty_done": 10,
+                    "qty_picked": 10,
+                    "quantity": 10,
+                    "picked": True,
                     "state": "done",
                     "picking_id": self.two_lines_picking.id,
                     "location_dest_id": self.packing_b_location.id,
@@ -774,10 +807,15 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
         )
         self.assertRecordValues(self.batch, [{"state": "done"}])
 
+        # Odoo might create new destination moves which will yield a popup message.
+        # We are not testing anything else than the next state here, which should
+        # be unload_single, as the only thing that matters here is that we were
+        # able to process the picking.
         self.assert_response(
             response,
             next_state="start",
             message={"body": "Batch Transfer complete", "message_type": "success"},
+            popup=self.ANY,
         )
 
     def test_unload_scan_destination_error_location_not_found(self):
@@ -895,7 +933,13 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
                 {"location_dest_id": self.packing_a_location.id},
             ],
         )
-        self.assert_response(response, next_state="unload_single", data=self.ANY)
+        # Odoo might create new destination moves which will yield a popup message.
+        # We are not testing anything else than the next state here, which should
+        # be unload_single, as the only thing that matters here is that we were
+        # able to process the picking.
+        self.assert_response(
+            response, next_state="unload_single", data=self.ANY, popup=self.ANY
+        )
 
     def test_unload_scan_destination_completion_info(self):
         """/unload_scan_destination that make chained picking ready"""
