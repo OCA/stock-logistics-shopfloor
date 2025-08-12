@@ -271,7 +271,7 @@ class ShopfloorMenu(models.Model):
         default="priority",
     )
     move_line_search_sort_order_custom_code = fields.Text(
-        string="Custom sort key code", help="Python code to sort move lines. "
+        help="Python code to sort move lines on search. "
     )
     require_destination_package = fields.Boolean(
         string="Destination package required",
@@ -300,9 +300,8 @@ class ShopfloorMenu(models.Model):
     )
 
     move_line_processing_sort_order_custom_code = fields.Text(
-        string="Custom sort key code",
         default=CUSTOM_CODE_DEFAULT,
-        help="Python code to sort move lines.",
+        help="Python code to sort processing move lines.",
     )
 
     @api.onchange("unload_package_at_destination")
