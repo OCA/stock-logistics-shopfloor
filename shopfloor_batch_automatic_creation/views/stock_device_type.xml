@@ -15,12 +15,12 @@
                     <p>Two variables are available:</p>
                     <ul>
                         <li><code
-                            >line</code>: The stock move line Record for with the key must be computed.</li>
+                        >line</code>: The stock move line Record for with the key must be computed.</li>
                         <li><code>super</code>: The initial method to compute the key.
 
                         </li>
                         <li>To assign the key value: <code
-                            >key = (line.product_id.weight, ) + super(line)</code></li>
+                        >key = (line.product_id.weight, ) + super(line)</code></li>
                     </ul>
                     <p>Leave blank to use the default method.</p>
                 </div>
@@ -28,5 +28,4 @@
             </xpath>
         </field>
     </record>
-
 </odoo>
