@@ -7,7 +7,6 @@ from odoo.tools.safe_eval import test_python_expr
 
 
 class StockDeviceType(models.Model):
-
     _inherit = "stock.device.type"
 
     line_sort_key_code = fields.Text(

@@ -6,7 +6,7 @@
     "summary": "Create batch transfers for Cluster Picking",
     "version": "16.0.1.1.0",
     "category": "Inventory",
-    "website": "https://github.com/OCA/wms",
+    "website": "https://github.com/OCA/stock-logistics-shopfloor",
     "author": "Camptocamp, Odoo Community Association (OCA)",
     "maintainers": ["guewen"],
     "license": "AGPL-3",

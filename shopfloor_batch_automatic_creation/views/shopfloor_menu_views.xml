@@ -6,7 +6,6 @@
         <field name="inherit_id" ref="shopfloor_base.shopfloor_menu_form_view" />
         <field name="arch" type="xml">
             <group name="options" position="after">
-
                 <group
                     name="batch_create"
                     string="Batch Creation"
