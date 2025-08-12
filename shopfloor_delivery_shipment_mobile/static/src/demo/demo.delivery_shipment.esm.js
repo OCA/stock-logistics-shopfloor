@@ -16,20 +16,37 @@ const shipment = {
         name: "Dock 01",
     },
 };
-const lading = [
-    demotools.makePicking({load_state: _.sample(["all", "partial", "none"])}),
-    demotools.makePicking({load_state: _.sample(["all", "partial", "none"])}),
-    demotools.makePicking({load_state: _.sample(["all", "partial", "none"])}),
-    demotools.makePicking({load_state: _.sample(["all", "partial", "none"])}),
-    demotools.makePicking({load_state: _.sample(["all", "partial", "none"])}),
-];
-const on_dock = [
-    demotools.makePicking({load_state: _.sample(["all", "partial", "none"])}),
-    demotools.makePicking({load_state: _.sample(["all", "partial", "none"])}),
-    demotools.makePicking({load_state: _.sample(["all", "partial", "none"])}),
-    demotools.makePicking({load_state: _.sample(["all", "partial", "none"])}),
-    demotools.makePicking({load_state: _.sample(["all", "partial", "none"])}),
-];
+
+const lading = [];
+for (let i = 0; i < 5; i++) {
+    lading.push(
+        demotools.makePicking({
+            load_state: _.sample(["all", "partial", "none"]),
+            loaded_pickings_count: _.random(0, 5),
+            loaded_packages_count: _.random(0, 5),
+            total_packages_count: _.random(5, 10),
+            loaded_bulk_lines_count: _.random(0, 5),
+            total_bulk_lines_count: _.random(5, 10),
+            loaded_weight: _.random(100, 500),
+        })
+    );
+}
+
+const on_dock = [];
+for (let i = 0; i < 4; i++) {
+    on_dock.push(
+        demotools.makePicking({
+            load_state: _.sample(["all", "partial", "none"]),
+            loaded_pickings_count: _.random(0, 5),
+            loaded_packages_count: _.random(0, 5),
+            total_packages_count: _.random(5, 10),
+            loaded_bulk_lines_count: _.random(0, 5),
+            total_bulk_lines_count: _.random(5, 10),
+            loaded_weight: _.random(100, 500),
+        })
+    );
+}
+
 const DELIVERY_SHIPMENT_CASE = {
     scan_dock: {
         next_state: "scan_document",
@@ -76,14 +93,18 @@ const DELIVERY_SHIPMENT_CASE = {
         },
     },
     loading_list: {
-        next_state: "validate_shipment",
+        next_state: "validate",
         data: {
-            validate_shipment: {
+            validate: {
                 shipment_advice: _.cloneDeep(shipment),
+                lading: lading[0],
+                loaded_weight: 100,
+                on_dock: on_dock,
             },
         },
     },
-    validate_shipment: {
+    // TODO: this should be improved to use real data from submitted request.
+    validate: {
         next_state: "scan_dock",
         message: {
             message_type: "info",
@@ -95,4 +116,13 @@ const DELIVERY_SHIPMENT_CASE = {
     },
 };
 
-demotools.add_case("delivery_shipment", DELIVERY_SHIPMENT_CASE);
+const menuitem_id = demotools.addAppMenu(
+    {
+        name: "Delivery shipment 1",
+        scenario: "delivery_shipment",
+        picking_types: [{id: 27, name: "Random type"}],
+    },
+    "delivery_shipment_1"
+);
+
+demotools.add_case("delivery_shipment", menuitem_id, DELIVERY_SHIPMENT_CASE);
