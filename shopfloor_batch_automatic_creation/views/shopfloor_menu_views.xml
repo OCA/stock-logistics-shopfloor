@@ -9,32 +9,32 @@
                 <group
                     name="batch_create"
                     string="Batch Creation"
-                    attrs="{'invisible': [('scenario', '!=', 'cluster_picking')]}"
+                    invisible="scenario_key != 'cluster_picking'"
                 >
                     <field name="batch_create" />
                     <field
                         name="batch_group_by_commercial_partner"
-                        attrs="{'invisible': [('batch_create', '=', False)]}"
+                        invisible="not batch_create"
                     />
                     <field
                         name="batch_maximum_number_of_preparation_lines"
-                        attrs="{'invisible': [('batch_create', '=', False)]}"
+                        invisible="not batch_create"
                     />
 
                     <label
                         for="stock_device_type_ids"
                         colspan="2"
-                        attrs="{'invisible': [('batch_create', '=', False)]}"
+                        invisible="not batch_create"
                     />
                     <field
                         name="stock_device_type_ids"
                         nolabel="1"
                         colspan="2"
-                        attrs="{'invisible': [('batch_create', '=', False)]}"
+                        invisible="not batch_create"
                     >
-                        <tree>
+                        <list>
                             <field name="name" />
-                        </tree>
+                        </list>
                     </field>
                 </group>
             </group>
