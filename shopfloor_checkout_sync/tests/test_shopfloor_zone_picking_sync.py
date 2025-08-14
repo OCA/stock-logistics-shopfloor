@@ -13,9 +13,9 @@ class ZonePickingUnloadSetDestinationSync(ZonePickingCommonCase, SyncMixin):
 
         # moves may be in different pickings, but they all deliver the same
         # pack
-        cls.move1 = cls.picking1.move_lines
-        cls.move2, cls.move3 = cls.picking2.move_lines
-        cls.move4 = cls.picking3.move_lines
+        cls.move1 = cls.picking1.move_ids
+        cls.move2, cls.move3 = cls.picking2.move_ids
+        cls.move4 = cls.picking3.move_ids
 
         # create the destination moves in the packing zone move[1-4] will go to
         # the same pack picking, so their destination location must be sync'ed
@@ -56,7 +56,7 @@ class ZonePickingUnloadSetDestinationSync(ZonePickingCommonCase, SyncMixin):
         # set the destination package
         self.service._set_destination_package(
             self.move1.move_line_ids,
-            self.move1.move_line_ids.product_uom_qty,
+            self.move1.move_line_ids.quantity,
             self.free_package,
         )
         self.service.dispatch(

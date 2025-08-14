@@ -17,7 +17,7 @@ class ZonePickingUnloadSetDestinationSync(LocationContentTransferCommonCase, Syn
             lines=[(cls.product_a, 10), (cls.product_b, 10), (cls.product_c, 10)]
         )
 
-        cls.move1, cls.move2, cls.move3 = picking.move_lines
+        cls.move1, cls.move2, cls.move3 = picking.move_ids
         # create the destination moves in the packing zone move[1-3] will go to
         # the same pack picking, so their destination location must be sync'ed
         # in the same packing location as soon as the first move line is done

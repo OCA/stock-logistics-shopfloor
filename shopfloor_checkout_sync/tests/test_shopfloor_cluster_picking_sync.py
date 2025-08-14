@@ -15,7 +15,7 @@ class TestShopfloorCheckoutSync(ClusterPickingUnloadingCommonCase, SyncMixin):
 
         # moves may be in different pickings, but they all deliver the same
         # pack
-        cls.move1, cls.move2, cls.move3 = cls.batch.mapped("picking_ids.move_lines")
+        cls.move1, cls.move2, cls.move3 = cls.batch.mapped("picking_ids.move_ids")
         # create the destination moves in the packing zone
         cls.pack_move1 = cls._add_pack_move_after_pick_move(
             cls.move1, cls.wh.pack_type_id
