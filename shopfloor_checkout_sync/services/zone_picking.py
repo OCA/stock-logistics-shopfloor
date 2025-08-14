@@ -12,7 +12,7 @@ class ZonePicking(Component):
         return self._actions_for("checkout.sync")
 
     def _lock_lines(self, lines):
-        super()._lock_lines(self.checkout_sync._all_lines_to_lock(lines))
+        return super()._lock_lines(self.checkout_sync._all_lines_to_lock(lines))
 
     def _write_destination_on_lines(self, lines, location):
         self.checkout_sync._sync_checkout(lines, location)

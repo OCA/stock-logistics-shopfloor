@@ -10,7 +10,7 @@ from .common import SyncMixin
 
 class ZonePickingUnloadSetDestinationSync(LocationContentTransferCommonCase, SyncMixin):
     @classmethod
-    def setUpClassBaseData(cls):
+    def setUpClassBaseData(cls):  # pylint: disable=missing-return
         super().setUpClassBaseData()
         cls.picking_type.sudo().default_location_dest_id = cls.packing_location
         cls.picking = picking = cls._create_picking(
