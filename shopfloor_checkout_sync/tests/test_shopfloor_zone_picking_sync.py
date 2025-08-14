@@ -8,7 +8,7 @@ from .common import SyncMixin
 
 class ZonePickingUnloadSetDestinationSync(ZonePickingCommonCase, SyncMixin):
     @classmethod
-    def setUpClassBaseData(cls):
+    def setUpClassBaseData(cls):  # pylint: disable=missing-return
         super().setUpClassBaseData()
 
         # moves may be in different pickings, but they all deliver the same
