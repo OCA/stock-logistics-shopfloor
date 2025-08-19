@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-08-16 13:26+0000\n"
+"PO-Revision-Date: 2025-08-19 13:33+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -368,6 +368,16 @@ msgid ""
 "products on a pallet, this prevents to spread a same product at different "
 "level on the stack."
 msgstr ""
+"Per priorità e ubicazione:\n"
+"> ogni riga viene ordinata per priorità e poi per ubicazione per eseguire un "
+"percorso intelligente nel magazzino.\n"
+"Per ubicazione raggruppata per prodotto:\n"
+"> in caso di più righe di movimentazione per lo stesso prodotto, "
+"interrompere l'ordinamento per finalizzare un prodotto avviato elaborando "
+"tutte le altre righe di movimentazione per quel prodotto, al fine di "
+"raggruppare un prodotto su un dispositivo di prelievo. Quando si impilano "
+"prodotti su un pallet, questo impedisce di distribuire lo stesso prodotto a "
+"livelli diversi sulla pila."
 
 #. module: shopfloor
 #. odoo-python
@@ -522,6 +532,9 @@ msgid ""
 "Error when evaluating the move lines sorting code:\n"
 " %s"
 msgstr ""
+"Errore durante la valutazione del codice di ordinamento delle righe "
+"movimento:\n"
+"%s"
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_stock_picking_type__shopfloor_zero_check
@@ -610,7 +623,7 @@ msgstr "Ubicazioni di inventario"
 #: model:ir.model.fields,field_description:shopfloor.field_stock_move_line__is_shopfloor_created
 #: model:ir.model.fields,field_description:shopfloor.field_stock_picking__is_shopfloor_created
 msgid "Is Shopfloor Created"
-msgstr ""
+msgstr "Il reparto è creato"
 
 #. module: shopfloor
 #. odoo-python
@@ -655,7 +668,7 @@ msgstr "Trasferimento contenuto ubicazione"
 #. module: shopfloor
 #: model:ir.model.fields.selection,name:shopfloor.selection__shopfloor_menu__move_line_processing_sort_order__location_grouped_product
 msgid "Location Grouping products"
-msgstr ""
+msgstr "Prodotti raggruppamento ubicazione"
 
 #. module: shopfloor
 #: model:shopfloor.scenario,name:shopfloor.scenario_location_content_transfer
@@ -762,12 +775,12 @@ msgstr "Conteggio righe movimenti"
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__move_line_processing_sort_order_custom_code
 msgid "Move Line Processing Sort Order Custom Code"
-msgstr ""
+msgstr "Codice personalizzato tipo processo ordinamento riga movimento"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__move_line_processing_sort_order_is_possible
 msgid "Move Line Processing Sort Order Is Possible"
-msgstr ""
+msgstr "Si può ordinare per processo di ordinamento riga movimento"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__move_line_search_additional_domain_is_possible
@@ -777,7 +790,7 @@ msgstr "È consentita la ricerca dominio addizionale riga movimento"
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__move_line_search_sort_order_custom_code
 msgid "Move Line Search Sort Order Custom Code"
-msgstr ""
+msgstr "Codice personalizzato tipo ordinamento ricerca riga movimento"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__move_line_search_sort_order_is_possible
@@ -1311,17 +1324,17 @@ msgstr "Prodotto elaborato come prodotto grezzo"
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__move_line_search_sort_order_custom_code
 msgid "Python code to sort move lines on search. "
-msgstr ""
+msgstr "Codice Python per ordinare le righe di movimento nella ricerca. "
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__move_line_processing_sort_order_custom_code
 msgid "Python code to sort processing move lines."
-msgstr ""
+msgstr "Codice Python per ordinare l'elaborazione righe movimento."
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_move__quantity_picked
 msgid "Quantity Picked"
-msgstr ""
+msgstr "Quantità prelevata"
 
 #. module: shopfloor
 #: model:ir.model,name:shopfloor.model_stock_quant
@@ -1613,7 +1626,7 @@ msgstr "Qualcuno sta già lavorando su questi trasferimenti"
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__move_line_processing_sort_order
 msgid "Sort method used when processing move lines"
-msgstr ""
+msgstr "Metodo ordinamento usato nell'elaborazione righe di movimento"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__move_line_search_sort_order
