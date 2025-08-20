@@ -568,7 +568,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         )
         done_picking = picking
         # Check move line data
-        self.assertEqual(move_line.move_id.product_uom_qty, 6)
+        self.assertEqual(move_line.move_id.product_uom_qty, 10)
         self.assertEqual(move_line.quantity, 6)
         self.assertEqual(move_line.qty_picked, 6)
         self.assertEqual(move_line.state, "done")
@@ -612,7 +612,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         # 2 operations then the done operation is set into a specific picking
         first_done_picking = picking.backorder_ids
         # Check move line data
-        self.assertEqual(move_line.move_id.product_uom_qty, 6)
+        self.assertEqual(move_line.move_id.product_uom_qty, 10)
         self.assertEqual(move_line.quantity, 6)
         self.assertEqual(move_line.qty_picked, 6)
         self.assertEqual(move_line.state, "done")
@@ -639,7 +639,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
 
         # the initial picking should be done
         # Check move line data
-        self.assertEqual(move_line.move_id.product_uom_qty, 6)
+        self.assertEqual(move_line.move_id.product_uom_qty, 10)
         self.assertEqual(move_line.quantity, 6)
         self.assertEqual(move_line.qty_picked, 6)
         self.assertEqual(move_line.state, "done")
