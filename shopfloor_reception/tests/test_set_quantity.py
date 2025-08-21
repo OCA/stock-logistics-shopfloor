@@ -719,11 +719,10 @@ class TestSetQuantity(CommonCase):
         lines_after = self.env["stock.move.line"].search(
             [("id", "not in", lines_before.ids)]
         )
-        # FIXME: Check _auto_post_line with MMQ?
         # After move_line is posted, its state is done, and its qty_picked is 1.0
         self.assertEqual(move_line_user_1.state, "done")
         # The remaining one is still to be done
-        self.assertEqual(move_line_user_2.state, "partially_available")
+        self.assertEqual(move_line_user_2.state, "assigned")
         # As well as the new one
         self.assertEqual(len(lines_after), 1)
         # The quantity to do is set on 1 of the lines
