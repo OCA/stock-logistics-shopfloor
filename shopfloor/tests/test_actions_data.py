@@ -178,11 +178,14 @@ class ActionsDataCase(ActionsDataCaseBase):
             "partner": {"id": self.customer.id, "name": self.customer.name},
             "carrier": {"id": carrier.id, "name": carrier.name},
             "ship_carrier": None,
-            "progress": 100.0,
+            "progress": 0.0,
             "priority": "0",
         }
         self.assertEqual(data.pop("scheduled_date").split("T")[0], "2020-08-03")
         self.assertDictEqual(data, expected)
+        self.picking.move_line_ids[0].picked = True
+        data = self.data.picking(self.picking, with_progress=True)
+        self.assertEqual(data.pop("progress"), 25.0)
 
     def test_data_product(self):
         (
