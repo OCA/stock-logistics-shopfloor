@@ -148,7 +148,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
                 "carrier_id": carrier.id,
             }
         )
-        picking.move_ids[0].quantity = 5.0
+        picking.move_line_ids[0].qty_picked = 5.0
         picking.move_ids.write({"date": "2020-05-13"})
         data = self.data_detail.picking_detail(picking, with_progress=True)
         self.assert_schema(self.schema_detail.picking_detail(), data)
@@ -161,7 +161,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "note": Markup("<p>read me</p>"),
             "origin": "created by test",
             "ship_carrier": None,
-            "weight": 100.0,
+            "weight": picking.weight,
             "partner": {"id": self.customer.id, "name": self.customer.name},
             "carrier": {"id": picking.carrier_id.id, "name": picking.carrier_id.name},
             "priority": "Urgent",
@@ -171,7 +171,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             },
             "move_lines": self.data_detail.move_lines(picking.move_line_ids),
             "picking_type_code": "outgoing",
-            "progress": 87.5,
+            "progress": 12.5,
         }
         self.assertEqual(data.pop("scheduled_date").split("T")[0], "2020-05-13")
         self.assertDictEqual(data, expected)
