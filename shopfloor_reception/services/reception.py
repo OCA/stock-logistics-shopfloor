@@ -336,6 +336,8 @@ class Reception(Component):
         """
         unassigned_lines = self.env["stock.move.line"]
         for line in move.move_line_ids:
+            if line.progress == 100.0:
+                continue
             if line.shopfloor_user_id.id == self.env.uid:
                 return self._scan_line__recover(picking, line, qty_done)
             elif not line.shopfloor_user_id:
@@ -594,8 +596,11 @@ class Reception(Component):
         """
         lines = picking.move_line_ids.filtered(
             lambda li: (
-                lot == li.lot_id
-                or (lot.name == li.lot_name and lot.product_id == li.product_id)
+                (
+                    lot == li.lot_id
+                    or (lot.name == li.lot_name and lot.product_id == li.product_id)
+                )
+                and not li.progress == 100.0
                 and not li.result_package_id
             )
         )
