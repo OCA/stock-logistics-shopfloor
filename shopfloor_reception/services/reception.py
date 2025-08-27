@@ -648,6 +648,7 @@ class Reception(Component):
         On error, return to the set quantity screen.
 
         """
+        self._prefill_package_type(line, package)
         pack_location = package.location_id
         if not pack_location:
             package_line = fields.first(
@@ -1161,6 +1162,7 @@ class Reception(Component):
                 asking_confirmation=barcode,
             )
         package = self.env["stock.quant.package"].create({"name": barcode})
+        self._prefill_package_type(selected_line, package)
         selected_line.result_package_id = package
         return self._response_for_set_destination(picking, selected_line)
 
@@ -1293,8 +1295,20 @@ class Reception(Component):
         )
         if response:
             return response
-        picking._put_in_pack(selected_line)
+        package = picking._put_in_pack(selected_line)
+        self._prefill_package_type(selected_line, package)
         return self._response_for_set_destination(picking, selected_line)
+
+    def _prefill_package_type(self, line, package):
+        """Prefill the package type on the package before the move is done."""
+        package._assign_packaging(line.product_id, line.qty_picked)
+        if not package.location_id:
+            if hasattr(line, "_recompute_putaways"):
+                # Recompute the putaway location if the module
+                # stock_picking_putaway_recompute is installed
+                line.with_context(
+                    allow_unsafe_putaway_recompute=True
+                )._recompute_putaways()
 
     def process_without_pack(self, picking_id, selected_line_id, quantity):
         picking = self.env["stock.picking"].browse(picking_id)
