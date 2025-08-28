@@ -28,14 +28,30 @@ class Reception(Component):
     def _get_domain_packaging_needs_dimension(self):
         return expression.OR(
             [
-                [("packaging_length", "=", 0)],
-                [("packaging_length", "=", False)],
-                [("width", "=", 0)],
-                [("width", "=", False)],
-                [("height", "=", 0)],
-                [("height", "=", False)],
-                [("weight", "=", 0)],
-                [("weight", "=", False)],
+                [
+                    "|",
+                    ("packaging_length", "=", 0),
+                    ("packaging_length", "=", False),
+                    ("packaging_level_id.shopfloor_collect_length", "=", True),
+                ],
+                [
+                    "|",
+                    ("width", "=", 0),
+                    ("width", "=", False),
+                    ("packaging_level_id.shopfloor_collect_width", "=", True),
+                ],
+                [
+                    "|",
+                    ("height", "=", 0),
+                    ("height", "=", False),
+                    ("packaging_level_id.shopfloor_collect_height", "=", True),
+                ],
+                [
+                    "|",
+                    ("weight", "=", 0),
+                    ("weight", "=", False),
+                    ("packaging_level_id.shopfloor_collect_weight", "=", True),
+                ],
                 [("barcode", "=", False)],
             ]
         )
@@ -49,11 +65,7 @@ class Reception(Component):
             ("id", ">=", next_packaging_id),
         ]
         domain = expression.AND([domain_packaging_id, domain_dimension])
-        packagings = self.env["product.packaging"].search(domain, order="id")
-        for packaging in packagings:
-            if packaging._shopfloor_need_dimension_collection():
-                return packaging
-        return self.env["product.packaging"].browse()
+        return self.env["product.packaging"].search(domain, order="id", limit=1)
 
     def _response_for_set_packaging_dimension(
         self, picking, line, packaging, message=None
