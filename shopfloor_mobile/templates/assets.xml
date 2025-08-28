@@ -175,6 +175,11 @@
                 t-attf-src="/shopfloor_mobile/static/wms/src/demo/demo.location_content_transfer.esm.js?v=#{mod_version}"
                 type="module"
             />
+            <script
+                id="script_demo_components"
+                t-attf-src="/shopfloor_mobile/static/wms/src/demo/demo.components.esm.js?v=#{mod_version}"
+                type="module"
+            />
         </xpath>
     </template>
 </odoo>
