@@ -89,11 +89,13 @@ export var PackagingQtyPickerMixin = {
         _product_qty_by_packaging: function (pkg_by_qty, qty) {
             const self = this;
             const res = {};
+            /* eslint-disable no-param-reassign */
             // Const min_unit = _.last(pkg_by_qty);
             pkg_by_qty.forEach(function (pkg) {
-                const [_qty_per_pkg, _qty] = self._qty_by_pkg(pkg.qty, qty);
-                res[pkg.id] = _qty_per_pkg;
-                if (!_qty) return;
+                let qty_per_pkg = 0;
+                [qty_per_pkg, qty] = self._qty_by_pkg(pkg.qty, qty);
+                res[pkg.id] = qty_per_pkg;
+                if (!qty) return;
             });
             return res;
         },
