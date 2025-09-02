@@ -18,4 +18,20 @@
             />
         </script>
     </template>
+    <template
+        id="shopfloor_app_demo_assets"
+        inherit_id="shopfloor_reception_mobile.shopfloor_app_demo_assets"
+    >
+        <script id="script_demo_reception" position="after">
+            <t
+                t-set="mod_version"
+                t-value="get_version('shopfloor_reception_packaging_dimension_mobile')"
+            />
+            <script
+                id="script_demo_reception_pkg_dimension"
+                t-attf-src="/shopfloor_reception_packaging_dimension_mobile/static/src/demo/demo.reception.pkg.dimension.esm.js?v=#{mod_version}"
+                type="module"
+            />
+        </script>
+    </template>
 </odoo>
