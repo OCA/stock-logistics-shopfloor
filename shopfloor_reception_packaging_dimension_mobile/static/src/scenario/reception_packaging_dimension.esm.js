@@ -3,7 +3,7 @@
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
 
-import {process_registry} from "/shopfloor_mobile_base/static/wms/src/services/process_registry.js";
+import {process_registry} from "/shopfloor_mobile_base/static/src/services/process_registry.esm.js";
 
 const reception_scenario = process_registry.get("reception");
 const _get_states = reception_scenario.component.methods._get_states;
@@ -107,8 +107,8 @@ const ReceptionPackageDimension = process_registry.extend("reception", {
         return ["length", "width", "height", "max_weight", "qty", "barcode"];
     },
     "methods._get_states": function () {
-        let states = _get_states.bind(this)();
-        states["set_packaging_dimension"] = {
+        const states = _get_states.bind(this)();
+        states.set_packaging_dimension = {
             display_info: {
                 title: "Set packaging dimension",
             },
@@ -116,7 +116,7 @@ const ReceptionPackageDimension = process_registry.extend("reception", {
                 go_back: "on_back",
             },
             get_payload_set_packaging_dimension: () => {
-                let values = {
+                const values = {
                     picking_id: this.state.data.picking.id,
                     selected_line_id: this.state.data.selected_move_line.id,
                     packaging_id: this.state.data.packaging.id,
@@ -128,7 +128,7 @@ const ReceptionPackageDimension = process_registry.extend("reception", {
             },
             on_skip: () => {
                 const payload = this.state.get_payload_set_packaging_dimension();
-                payload["cancel"] = true;
+                payload.cancel = true;
                 this.wait_call(this.odoo.call("set_packaging_dimension", payload));
             },
             on_done: () => {
