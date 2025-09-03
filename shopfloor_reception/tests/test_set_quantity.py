@@ -249,7 +249,9 @@ class TestSetQuantity(CommonCase):
             next_state="set_destination",
             data={
                 "picking": data,
-                "selected_move_line": self.data.move_lines(selected_move_line),
+                "selected_move_line": self.data.move_lines(
+                    selected_move_line, with_package_type=True
+                ),
             },
         )
 
@@ -371,7 +373,9 @@ class TestSetQuantity(CommonCase):
             next_state="set_destination",
             data={
                 "picking": picking_data,
-                "selected_move_line": self.data.move_lines(selected_move_line),
+                "selected_move_line": self.data.move_lines(
+                    selected_move_line, with_package_type=True
+                ),
             },
         )
 
@@ -629,7 +633,9 @@ class TestSetQuantity(CommonCase):
             next_state="set_destination",
             data={
                 "picking": picking_data,
-                "selected_move_line": self.data.move_lines(selected_move_line),
+                "selected_move_line": self.data.move_lines(
+                    selected_move_line, with_package_type=True
+                ),
             },
         )
         # there should be 3 lines now
@@ -704,7 +710,9 @@ class TestSetQuantity(CommonCase):
             next_state="set_destination",
             data={
                 "picking": picking_data,
-                "selected_move_line": self.data.move_lines(move_line_user_1),
+                "selected_move_line": self.data.move_lines(
+                    move_line_user_1, with_package_type=True
+                ),
             },
         )
 
@@ -808,7 +816,9 @@ class TestSetQuantity(CommonCase):
             next_state="set_destination",
             data={
                 "picking": data,
-                "selected_move_line": self.data.move_lines(move_line_user_2),
+                "selected_move_line": self.data.move_lines(
+                    move_line_user_2, with_package_type=True
+                ),
             },
         )
         self.assertEqual(move_product_a.quantity_picked, 1.0)
