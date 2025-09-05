@@ -119,7 +119,7 @@ const Checkout = {
                     </v-row>
                 </div>
             </div>
-            <div v-if="state_is('select_delivery_packaging')">
+            <div v-if="state_is('select_package_type')">
                 <item-detail-card
                     v-if="current_doc().record.carrier"
                     :key="make_state_component_key(['picking-carrier', current_doc().record.id])"
@@ -127,8 +127,8 @@ const Checkout = {
                     :options="{main: true, key_title: 'name', title_icon: 'mdi-truck-outline'}"
                     />
                 <manual-select
-                    :records="state.data.packaging"
-                    :options="select_delivery_packaging_manual_select_options()"
+                    :records="state.data.package_type"
+                    :options="select_package_type_manual_select_options()"
                     :key="make_state_component_key(['checkout', 'select-delivery-packaging'])"
                     />
                 <div class="button-list button-vertical-list full">
@@ -184,7 +184,7 @@ const Checkout = {
                     </v-row>
                 </div>
             </div>
-            <div v-if="state_is('change_packaging')">
+            <div v-if="state_is('change_package_type')">
                 <detail-picking-select
                     :record="state.data.picking"
                     :select_records="state.data.packaging"
@@ -344,7 +344,7 @@ const Checkout = {
             };
             return key + "." + possible_paths[key];
         },
-        select_delivery_packaging_manual_select_options: function () {
+        select_package_type_manual_select_options: function () {
             return {
                 showActions: false,
             };

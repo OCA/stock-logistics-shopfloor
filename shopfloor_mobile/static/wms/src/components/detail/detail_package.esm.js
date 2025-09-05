@@ -13,9 +13,7 @@ Vue.component("detail-package", {
             return [
                 {path: "location.name", label: "Location"},
                 {path: "weight", label: "Weight (kg)"},
-                {path: "packaging.name", label: "Packaging"},
-                {path: "storage_type.name", label: "Storage type"},
-                {path: "package_type.name", label: "Package type"},
+                {path: "storage_type.name", label: "Package type"},
             ];
         },
         product_list_options() {
