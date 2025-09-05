@@ -20,7 +20,7 @@ class CheckoutScanLineNoPrefillQtyCase(CheckoutScanLineCaseBase):
             cls._fill_stock_for_moves(move, in_lot=True)
         cls.picking.action_assign()
         cls.move_lines = cls.picking.move_line_ids
-        cls.delivery_packaging = (
+        cls.package_type = (
             cls.env["stock.package.type"]
             .sudo()
             .create(
@@ -106,7 +106,7 @@ class CheckoutScanLineNoPrefillQtyCase(CheckoutScanLineCaseBase):
             "scan_line",
             params={
                 "picking_id": self.picking.id,
-                "barcode": self.delivery_packaging.barcode,
+                "barcode": self.package_type.barcode,
             },
         )
         # Back to select_line asking to set some quantities
@@ -132,7 +132,7 @@ class CheckoutScanLineNoPrefillQtyCase(CheckoutScanLineCaseBase):
             "scan_line",
             params={
                 "picking_id": self.picking.id,
-                "barcode": self.delivery_packaging.barcode,
+                "barcode": self.package_type.barcode,
             },
         )
         # Check the line has been packed

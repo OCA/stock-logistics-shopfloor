@@ -13,12 +13,10 @@ class ActionsDataCase(ActionsDataCaseBase):
         self.assert_schema(self.schema.packaging(), data)
         self.assertDictEqual(data, self._expected_packaging(self.packaging))
 
-    def test_data_delivery_packaging(self):
-        data = self.data.delivery_packaging(self.delivery_packaging)
-        self.assert_schema(self.schema.delivery_packaging(), data)
-        self.assertDictEqual(
-            data, self._expected_delivery_packaging(self.delivery_packaging)
-        )
+    def test_data_package_type(self):
+        data = self.data.package_type(self.package_type)
+        self.assert_schema(self.schema.package_type(), data)
+        self.assertDictEqual(data, self._expected_package_type(self.package_type))
 
     def test_data_location(self):
         location = self.stock_location
@@ -81,13 +79,12 @@ class ActionsDataCase(ActionsDataCaseBase):
         package = self.move_a.move_line_ids.package_id
         package.product_packaging_id = self.packaging.id
         package.package_type_id = self.storage_type_pallet
-        data = self.data.package(package, picking=self.picking, with_packaging=True)
-        self.assert_schema(self.schema.package(with_packaging=True), data)
+        data = self.data.package(package, picking=self.picking, with_package_type=True)
+        self.assert_schema(self.schema.package(with_package_type=True), data)
         expected = {
             "id": package.id,
             "name": package.name,
-            "packaging": self._expected_packaging(package.product_packaging_id),
-            "storage_type": self._expected_storage_type(package.package_type_id),
+            "storage_type": self._expected_package_type(package.package_type_id),
             "total_quantity": 10.0,
             "weight": 20.0,
         }
@@ -95,21 +92,19 @@ class ActionsDataCase(ActionsDataCaseBase):
 
     def test_data_package_with_move_line_count(self):
         package = self.move_a.move_line_ids.package_id
-        package.product_packaging_id = self.packaging.id
         package.package_type_id = self.storage_type_pallet
         data = self.data.package(
             package,
             picking=self.picking,
-            with_packaging=True,
+            with_package_type=True,
             with_package_move_line_count=True,
         )
-        self.assert_schema(self.schema.package(with_packaging=True), data)
+        self.assert_schema(self.schema.package(with_package_type=True), data)
         expected = {
             "id": package.id,
             "name": package.name,
             "move_line_count": 2,
-            "packaging": self._expected_packaging(package.product_packaging_id),
-            "storage_type": self._expected_storage_type(package.package_type_id),
+            "storage_type": self._expected_package_type(package.package_type_id),
             "weight": 20.0,
             "total_quantity": sum(package.quant_ids.mapped("quantity")),
         }
@@ -232,7 +227,6 @@ class ActionsDataCase(ActionsDataCaseBase):
                 "id": move_line.package_id.id,
                 "name": move_line.package_id.name,
                 "weight": move_line.package_id.shopfloor_weight,
-                "storage_type": None,
                 "total_quantity": sum(
                     move_line.package_id.quant_ids.mapped("quantity")
                 ),
@@ -241,7 +235,6 @@ class ActionsDataCase(ActionsDataCaseBase):
                 "id": result_package.id,
                 "name": result_package.name,
                 "weight": move_line.package_id.shopfloor_weight,
-                "storage_type": None,
                 "total_quantity": sum(result_package.quant_ids.mapped("quantity")),
             },
             "location_src": self._expected_location(move_line.location_id),
@@ -297,7 +290,6 @@ class ActionsDataCase(ActionsDataCaseBase):
                 "id": move_line.package_id.id,
                 "name": move_line.package_id.name,
                 "weight": 30.0,
-                "storage_type": None,
                 "total_quantity": sum(
                     move_line.package_id.quant_ids.mapped("quantity")
                 ),
@@ -306,7 +298,6 @@ class ActionsDataCase(ActionsDataCaseBase):
                 "id": move_line.result_package_id.id,
                 "name": move_line.result_package_id.name,
                 "weight": 30.0,
-                "storage_type": None,
                 "total_quantity": sum(
                     move_line.result_package_id.quant_ids.mapped("quantity")
                 ),

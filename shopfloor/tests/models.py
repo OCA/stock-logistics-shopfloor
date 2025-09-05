@@ -17,7 +17,7 @@ class DeliveryCarrierTest(models.Model):
     delivery_type = fields.Selection(
         selection_add=[("test", "TEST")], ondelete={"test": "set default"}
     )
-    test_default_packaging_id = fields.Many2one(
+    test_default_package_type_id = fields.Many2one(
         "stock.package.type", string="Default Package Type"
     )
 

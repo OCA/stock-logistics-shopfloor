@@ -7,14 +7,14 @@
 from .common import CommonCase
 
 
-class TestActionsPackaging(CommonCase):
-    """Tests covering methods to work on product packaging."""
+class TestActionsPacking(CommonCase):
+    """Tests covering methods to work on package type."""
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         with cls.work_on_actions(cls) as work:
-            cls.packaging = work.component(usage="packaging")
+            cls.packing = work.component(usage="packing")
         cls.picking = cls._create_picking(
             lines=[(cls.product_a, 10), (cls.product_b, 10)], confirm=True
         )
@@ -33,11 +33,11 @@ class TestActionsPackaging(CommonCase):
         cls.picking_type = cls.wh.out_type_id
 
     def test_package_is_complete_mix_pack(self):
-        self.assertTrue(self.packaging.is_complete_mix_pack(self.package1))
+        self.assertTrue(self.packing.is_complete_mix_pack(self.package1))
 
     def test_package_partially_reserved(self):
         # Package has 2 products from pick 1 reserved
         pick2 = self._create_picking(lines=[(self.product_c, 10)], confirm=True)
         # But adding 1 more product from pick 2 that is not yet reserved
         self._fill_stock_for_moves(pick2.move_ids, in_package=self.package1)
-        self.assertFalse(self.packaging.is_complete_mix_pack(self.package1))
+        self.assertFalse(self.packing.is_complete_mix_pack(self.package1))

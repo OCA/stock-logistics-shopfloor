@@ -4,6 +4,7 @@ from . import test_openapi
 from . import test_actions_change_package_lot
 from . import test_actions_data
 from . import test_actions_data_detail
+from . import test_actions_packing
 from . import test_actions_search_move_line
 from . import test_actions_search
 from . import test_actions_stock
@@ -38,10 +39,10 @@ from . import test_checkout_scan_package_action_no_prefill_qty
 from . import test_checkout_new_package
 from . import test_checkout_no_package
 from . import test_checkout_auto_post
-from . import test_checkout_list_delivery_packaging
+from . import test_checkout_list_package_type
 from . import test_checkout_list_package
 from . import test_checkout_summary
-from . import test_checkout_change_packaging
+from . import test_checkout_change_package_type
 from . import test_checkout_cancel_line
 from . import test_checkout_done
 from . import test_delivery_base

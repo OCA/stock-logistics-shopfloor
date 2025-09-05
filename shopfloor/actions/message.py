@@ -922,13 +922,13 @@ class MessageAction(Component):
             "body": _("Package has been opened. You can move partial quantities."),
         }
 
-    def packaging_invalid_for_carrier(self, packaging, carrier):
+    def package_type_invalid_for_carrier(self, package_type, carrier):
         return {
             "message_type": "error",
             "body": _(
-                "Packaging '%(package_name)s' is not allowed for carrier "
+                "Package type '%(package_type_name)s' is not allowed for carrier "
                 "%(carrier_name)s.or carrier %(carrier_name)s.",
-                package_name=packaging.name if packaging else _("No value"),
+                package_type_name=package_type.name if package_type else _("No value"),
                 carrier_name=carrier.name,
             ),
         }
@@ -945,7 +945,7 @@ class MessageAction(Component):
             "body": _("No valid package to select."),
         }
 
-    def no_delivery_packaging_available(self):
+    def no_package_type_available(self):
         return {
             "message_type": "warning",
             "body": _("No delivery package type available."),

@@ -58,7 +58,7 @@ class ShopfloorSchemaDetailAction(Component):
         return schema
 
     def package_detail(self):
-        schema = self.package(with_packaging=True)
+        schema = self.package(with_package_type=True)
         schema.update(
             {
                 "pickings": self._schema_list_of(self.picking()),

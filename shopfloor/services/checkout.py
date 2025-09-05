@@ -1,5 +1,5 @@
-# Copyright 2020-2021 Camptocamp SA (http://www.camptocamp.com)
-# Copyright 2020-2021 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
+# Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+# Copyright 2020 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 from werkzeug.exceptions import BadRequest
@@ -143,7 +143,7 @@ class Checkout(Component):
         packages_data = self.data.packages(
             packages.with_context(picking_id=picking.id).sorted(),
             picking=picking,
-            with_packaging=True,
+            with_package_type=True,
             with_package_move_line_count=True,
         )
         return self._response(
@@ -156,34 +156,34 @@ class Checkout(Component):
             message=message,
         )
 
-    def _response_for_select_delivery_packaging(self, picking, packaging, message=None):
+    def _response_for_select_package_type(self, picking, package_type, message=None):
         return self._response(
-            next_state="select_delivery_packaging",
+            next_state="select_package_type",
             data={
                 # We don't need to send the 'picking' as the mobile frontend
                 # already has this info after `select_document` state
                 # TODO adapt other endpoints to see if we can get rid of the
                 # 'picking' data
-                "packaging": self._data_for_delivery_packaging(packaging),
+                "package_type": self._data_for_package_type(package_type),
             },
             message=message,
         )
 
-    def _response_for_change_packaging(self, picking, package, packaging_list):
+    def _response_for_change_package_type(self, picking, package, package_types):
         if not package:
             return self._response_for_summary(
                 picking, message=self.msg_store.record_not_found()
             )
 
         return self._response(
-            next_state="change_packaging",
+            next_state="change_package_type",
             data={
                 "picking": self.data.picking(picking),
                 "package": self.data.package(
-                    package, picking=picking, with_packaging=True
+                    package, picking=picking, with_package_type=True
                 ),
-                "packaging": self.data.delivery_packaging_list(
-                    packaging_list.sorted("sequence")
+                "package_type": self.data.package_type_list(
+                    package_types.sorted("sequence")
                 ),
             },
         )
@@ -338,8 +338,8 @@ class Checkout(Component):
     def _data_for_move_lines(self, lines, **kw):
         return self.data.move_lines(lines, **kw)
 
-    def _data_for_delivery_packaging(self, packaging, **kw):
-        return self.data.delivery_packaging_list(packaging, **kw)
+    def _data_for_package_type(self, package_type, **kw):
+        return self.data.package_type_list(package_type, **kw)
 
     def _data_for_stock_picking(
         self, picking, done=False, with_lines=True, with_location=False
@@ -351,7 +351,7 @@ class Checkout(Component):
                 {
                     "move_lines": self._data_for_move_lines(
                         self._lines_prepare(picking, line_picker(picking)),
-                        with_packaging=done,
+                        with_package_type=done,
                     )
                 }
             )
@@ -479,7 +479,7 @@ class Checkout(Component):
             "packaging": self._select_lines_from_packaging,
             "lot": self._select_lines_from_lot,
             "serial": self._select_lines_from_serial,
-            "delivery_packaging": self._select_lines_from_delivery_packaging,
+            "package_type": self._select_lines_from_package_type,
             "none": self._select_lines_from_none,
         }
         search_result = self._scan_line_find(picking, barcode, handlers.keys())
@@ -702,10 +702,10 @@ class Checkout(Component):
         return self._select_lines_from_lot(picking, selection_lines, lot, **kw)
 
     # Handling of the destination package scanned
-    def _select_lines_from_delivery_packaging(
-        self, picking, selection_lines, packaging, confirm_pack_all=None, **kw
+    def _select_lines_from_package_type(
+        self, picking, selection_lines, package_type, confirm_pack_all=None, **kw
     ):
-        """Handle delivery packaging.
+        """Handle package type.
 
         A delivery pkg has been scanned:
 
@@ -720,14 +720,14 @@ class Checkout(Component):
         carrier = self._get_carrier(picking)
         if carrier:
             # Validate against carrier
-            is_valid = self._packaging_good_for_carrier(packaging, carrier)
+            is_valid = self._package_type_good_for_carrier(package_type, carrier)
         else:
             is_valid = True
         if carrier and not is_valid:
             return self._response_for_select_line(
                 picking,
-                message=self.msg_store.packaging_invalid_for_carrier(
-                    packaging, carrier
+                message=self.msg_store.package_type_invalid_for_carrier(
+                    package_type, carrier
                 ),
             )
         message = None
@@ -738,10 +738,10 @@ class Checkout(Component):
         if not has_lines_to_pack:
             if self.work.menu.no_prefill_qty:
                 message = self.msg_store.no_lines_to_process_set_quantities()
-            elif confirm_pack_all != packaging.barcode:
-                need_confirm_pack_all = packaging.barcode
+            elif confirm_pack_all != package_type.barcode:
+                need_confirm_pack_all = package_type.barcode
                 message = self.msg_store.confirm_put_all_goods_in_delivery_package(
-                    packaging
+                    package_type
                 )
             if message:
                 return self._response_for_select_line(
@@ -749,10 +749,10 @@ class Checkout(Component):
                     message=message,
                     need_confirm_pack_all=need_confirm_pack_all,
                 )
-        if confirm_pack_all == packaging.barcode:
+        if confirm_pack_all == package_type.barcode:
             self._select_lines(selection_lines)
-        return self._create_and_assign_new_packaging(
-            picking, selection_lines, packaging=packaging
+        return self._create_and_assign_new_package_type(
+            picking, selection_lines, package_type=package_type
         )
 
     def _select_line_package(self, picking, selection_lines, package):
@@ -1006,9 +1006,11 @@ class Checkout(Component):
     def _post_put_lines_in_package(self, lines_packaged):
         """Hook to override."""
 
-    def _create_and_assign_new_packaging(self, picking, selected_lines, packaging=None):
-        actions = self._actions_for("packaging")
-        package = actions.create_package_from_packaging(packaging=packaging)
+    def _create_and_assign_new_package_type(
+        self, picking, selected_lines, package_type=None
+    ):
+        actions = self._actions_for("packing")
+        package = actions.create_package_from_package_type(package_type=package_type)
         return self._pack_lines(picking, selected_lines, package)
 
     def _pack_lines(self, picking, selected_lines, package):
@@ -1076,7 +1078,7 @@ class Checkout(Component):
             "packaging": self._scan_package_action_from_packaging,
             "lot": self._scan_package_action_from_lot,
             "serial": self._scan_package_action_from_serial,
-            "delivery_packaging": self._scan_package_action_from_delivery_packaging,
+            "package_type": self._scan_package_action_from_package_type,
         }
         search_result = self._scan_package_find(picking, barcode, handlers.keys())
         handler = handlers.get(search_result.type, self._scan_package_action_from_none)
@@ -1094,7 +1096,7 @@ class Checkout(Component):
             "packaging",
             "lot",
             "serial",
-            "delivery_packaging",
+            "package_type",
         )
         return search.find(
             barcode,
@@ -1165,24 +1167,26 @@ class Checkout(Component):
             )
         return self._put_lines_in_package(picking, selected_lines, package)
 
-    def _scan_package_action_from_delivery_packaging(
-        self, picking, selected_lines, packaging, **kw
+    def _scan_package_action_from_package_type(
+        self, picking, selected_lines, package_type, **kw
     ):
         carrier = self._get_carrier(picking)
         if carrier:
             # Validate against carrier
-            is_valid = self._packaging_type_good_for_carrier(packaging, carrier)
+            is_valid = self._package_type_good_for_carrier(package_type, carrier)
         else:
             is_valid = True
         if carrier and not is_valid:
             return self._response_for_select_package(
                 picking,
                 selected_lines,
-                message=self.msg_store.packaging_invalid_for_carrier(
-                    packaging, carrier
+                message=self.msg_store.package_type_invalid_for_carrier(
+                    package_type, carrier
                 ),
             )
-        return self._create_and_assign_new_packaging(picking, selected_lines, packaging)
+        return self._create_and_assign_new_package_type(
+            picking, selected_lines, package_type
+        )
 
     def _scan_package_action_from_none(self, picking, selected_lines, record, **kw):
         return self._response_for_select_package(
@@ -1192,48 +1196,47 @@ class Checkout(Component):
     def _get_carrier(self, picking):
         return picking.ship_carrier_id or picking.carrier_id
 
-    def _packaging_type_good_for_carrier(self, packaging, carrier):
-        actions = self._actions_for("packaging")
-        return actions.packaging_type_valid_for_carrier(packaging, carrier)
+    def _package_type_good_for_carrier(self, package_type, carrier):
+        actions = self._actions_for("packing")
+        return actions.package_type_valid_for_carrier(package_type, carrier)
 
-    def _packaging_good_for_carrier(self, packaging, carrier):
-        actions = self._actions_for("packaging")
-        return actions.packaging_valid_for_carrier(packaging, carrier)
-
-    def _get_available_delivery_packaging(self, picking):
+    def _get_available_package_type(self, picking):
         model = self.env["stock.package.type"]
         carrier = picking.ship_carrier_id or picking.carrier_id
         if not carrier:
-            return model.browse()
+            return model.search(
+                [("package_carrier_type", "=", False)],
+                order="name",
+            )
         return model.search(
             [("package_carrier_type", "=", carrier.delivery_type or "none")],
             order="name",
         )
 
-    def list_delivery_packaging(self, picking_id, selected_line_ids):
-        """List available delivery packaging for given picking.
+    def list_package_type(self, picking_id, selected_line_ids):
+        """List available package type for given picking.
 
         Transitions:
-        * select_delivery_packaging: list available delivery packaging, the
+        * select_package_type: list available package type, the
         user has to choose one to create the new package
-        * select_package: when no delivery packaging is available
+        * select_package: when no package type is available
         """
         picking = self.env["stock.picking"].browse(picking_id)
         message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
         selected_lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
-        delivery_packaging = self._get_available_delivery_packaging(picking)
-        if not delivery_packaging:
+        package_type = self._get_available_package_type(picking)
+        if not package_type:
             return self._response_for_select_package(
                 picking,
                 selected_lines,
-                message=self.msg_store.no_delivery_packaging_available(),
+                message=self.msg_store.no_package_type_available(),
             )
         response = self._check_allowed_qty_picked(picking, selected_lines)
         if response:
             return response
-        return self._response_for_select_delivery_packaging(picking, delivery_packaging)
+        return self._response_for_select_package_type(picking, package_type)
 
     def new_package(self, picking_id, selected_line_ids, package_type_id=None):
         """Add all selected lines in a new package
@@ -1252,11 +1255,16 @@ class Checkout(Component):
         message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
-        packaging = None
         if package_type_id:
-            packaging = self.env["stock.package.type"].browse(package_type_id).exists()
+            package_type = (
+                self.env["stock.package.type"].browse(package_type_id).exists()
+            )
+        else:
+            package_type = None
         selected_lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
-        return self._create_and_assign_new_packaging(picking, selected_lines, packaging)
+        return self._create_and_assign_new_package_type(
+            picking, selected_lines, package_type
+        )
 
     def no_package(self, picking_id, selected_line_ids):
         """Process all selected lines without any package.
@@ -1410,17 +1418,16 @@ class Checkout(Component):
             return self._response_for_select_document(message=message)
         return self._response_for_summary(picking)
 
-    def _get_allowed_packaging(self):
-        return self.env["stock.package.type"].search([])
+    def _get_allowed_package_type(self):
+        return self.env["stock.package.type"].search(
+            [("package_carrier_type", "!=", False)]
+        )
 
-    def list_packaging(self, picking_id, package_id):
-        """List the available package types for a package
-
-        For a package, we can change the packaging. The available
-        packaging are the ones with no product.
+    def change_list_package_type(self, picking_id, package_id):
+        """List the available package types for a package in order to change it.
 
         Transitions:
-        * change_packaging
+        * change_package_type
         * summary: if the package_id no longer exists
         """
         picking = self.env["stock.picking"].browse(picking_id)
@@ -1428,14 +1435,14 @@ class Checkout(Component):
         if message:
             return self._response_for_select_document(message=message)
         package = self.env["stock.quant.package"].browse(package_id).exists()
-        packaging_list = self._get_allowed_packaging()
-        return self._response_for_change_packaging(picking, package, packaging_list)
+        package_types = self._get_available_package_type(picking)
+        return self._response_for_change_package_type(picking, package, package_types)
 
-    def set_packaging(self, picking_id, package_id, package_type_id):
+    def change_set_package_type(self, picking_id, package_id, package_type_id):
         """Set a package type on a package
 
         Transitions:
-        * change_packaging: in case of error
+        * change_package_type: in case of error
         * summary
         """
         picking = self.env["stock.picking"].browse(picking_id)
@@ -1444,17 +1451,17 @@ class Checkout(Component):
             return self._response_for_select_document(message=message)
 
         package = self.env["stock.quant.package"].browse(package_id).exists()
-        packaging = self.env["stock.package.type"].browse(package_type_id).exists()
-        if not (package and packaging):
+        package_type = self.env["stock.package.type"].browse(package_type_id).exists()
+        if not (package and package_type):
             return self._response_for_summary(
                 picking, message=self.msg_store.record_not_found()
             )
-        package.package_type_id = packaging
+        package.package_type_id = package_type
         return self._response_for_summary(
             picking,
             message={
                 "message_type": "success",
-                "body": _("Packaging changed on package {}").format(package.name),
+                "body": _("Package type changed on package {}").format(package.name),
             },
         )
 
@@ -1679,7 +1686,7 @@ class ShopfloorCheckoutValidator(Component):
             "barcode": {"required": True, "type": "string"},
         }
 
-    def list_delivery_packaging(self):
+    def list_package_type(self):
         return {
             "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
             "selected_line_ids": {
@@ -1742,13 +1749,13 @@ class ShopfloorCheckoutValidator(Component):
     def summary(self):
         return {"picking_id": {"coerce": to_int, "required": True, "type": "integer"}}
 
-    def list_packaging(self):
+    def change_list_package_type(self):
         return {
             "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
             "package_id": {"coerce": to_int, "required": True, "type": "integer"},
         }
 
-    def set_packaging(self):
+    def change_set_package_type(self):
         return {
             "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
             "package_id": {"coerce": to_int, "required": True, "type": "integer"},
@@ -1825,9 +1832,9 @@ class ShopfloorCheckoutValidatorResponse(Component):
             ),
             "change_quantity": self._schema_selected_lines,
             "select_dest_package": self._schema_select_package,
-            "select_delivery_packaging": self._schema_select_delivery_packaging,
+            "select_package_type": self._schema_select_package_type,
             "summary": self._schema_summary,
-            "change_packaging": self._schema_select_packaging,
+            "change_package_type": self._schema_change_package_type,
             "confirm_done": self._schema_confirm_done,
             "select_child_location": self._schema_select_child_location,
         }
@@ -1842,12 +1849,12 @@ class ShopfloorCheckoutValidatorResponse(Component):
             },
         }
 
-    def _schema_stock_picking(self, lines_with_packaging=False):
+    def _schema_stock_picking(self, lines_with_package_type=False):
         schema = self.schemas.picking()
         schema.update(
             {
                 "move_lines": self.schemas._schema_list_of(
-                    self.schemas.move_line(with_packaging=lines_with_packaging)
+                    self.schemas.move_line(with_package_type=lines_with_package_type)
                 )
             }
         )
@@ -1866,13 +1873,13 @@ class ShopfloorCheckoutValidatorResponse(Component):
     @property
     def _schema_summary(self):
         return dict(
-            self._schema_stock_picking(lines_with_packaging=True),
+            self._schema_stock_picking(lines_with_package_type=True),
             all_processed={"type": "boolean"},
         )
 
     @property
     def _schema_confirm_done(self):
-        return self._schema_stock_picking(lines_with_packaging=True)
+        return self._schema_stock_picking(lines_with_package_type=True)
 
     @property
     def _schema_select_child_location(self):
@@ -1900,31 +1907,29 @@ class ShopfloorCheckoutValidatorResponse(Component):
                 "type": "list",
                 "schema": {
                     "type": "dict",
-                    "schema": self.schemas.package(with_packaging=True),
+                    "schema": self.schemas.package(with_package_type=True),
                 },
             },
             "picking": {"type": "dict", "schema": self.schemas.picking()},
         }
 
     @property
-    def _schema_select_delivery_packaging(self):
+    def _schema_select_package_type(self):
         return {
-            "packaging": self.schemas._schema_list_of(
-                self.schemas.delivery_packaging()
-            ),
+            "package_type": self.schemas._schema_list_of(self.schemas.package_type()),
         }
 
     @property
-    def _schema_select_packaging(self):
+    def _schema_change_package_type(self):
         return {
             "picking": {"type": "dict", "schema": self.schemas.picking()},
             "package": {
                 "type": "dict",
-                "schema": self.schemas.package(with_packaging=True),
+                "schema": self.schemas.package(with_package_type=True),
             },
-            "packaging": {
+            "package_type": {
                 "type": "list",
-                "schema": {"type": "dict", "schema": self.schemas.delivery_packaging()},
+                "schema": {"type": "dict", "schema": self.schemas.package_type()},
             },
         }
 
@@ -1973,9 +1978,9 @@ class ShopfloorCheckoutValidatorResponse(Component):
             next_states={"select_package", "select_line", "summary"}
         )
 
-    def list_delivery_packaging(self):
+    def list_package_type(self):
         return self._response_schema(
-            next_states={"select_delivery_packaging", "select_package"}
+            next_states={"select_package_type", "select_package"}
         )
 
     def new_package(self):
@@ -2012,11 +2017,11 @@ class ShopfloorCheckoutValidatorResponse(Component):
     def summary(self):
         return self._response_schema(next_states={"summary"})
 
-    def list_packaging(self):
-        return self._response_schema(next_states={"change_packaging", "summary"})
+    def change_list_package_type(self):
+        return self._response_schema(next_states={"change_package_type", "summary"})
 
-    def set_packaging(self):
-        return self._response_schema(next_states={"change_packaging", "summary"})
+    def change_set_package_type(self):
+        return self._response_schema(next_states={"change_package_type", "summary"})
 
     def cancel_line(self):
         return self._response_schema(next_states={"summary", "select_line"})

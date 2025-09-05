@@ -66,7 +66,6 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
 
     def test_data_package(self):
         package = self.move_a.move_line_ids.package_id
-        package.product_packaging_id = self.packaging.id
         package.package_type_id = self.storage_type_pallet
         # package.invalidate_recordset()
         data = self.data_detail.package_detail(package, picking=self.picking)
@@ -83,13 +82,14 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
                 "name": package.location_id.display_name,
             },
             "name": package.name,
-            "packaging": self.data_detail.packaging(package.product_packaging_id),
             "weight": 20.0,
             "pickings": self.data_detail.pickings(pickings),
             "move_lines": self.data_detail.move_lines(lines),
             "storage_type": {
                 "id": self.storage_type_pallet.id,
                 "name": self.storage_type_pallet.name,
+                "packaging_type": "none",
+                "barcode": None,
             },
             "total_quantity": sum(package.quant_ids.mapped("quantity")),
         }
@@ -196,7 +196,6 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
                 "id": move_line.package_id.id,
                 "name": move_line.package_id.name,
                 "weight": move_line.package_id.shopfloor_weight,
-                "storage_type": None,
                 "total_quantity": sum(
                     move_line.package_id.quant_ids.mapped("quantity")
                 ),
@@ -205,7 +204,6 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
                 "id": result_package.id,
                 "name": result_package.name,
                 "weight": result_package.shopfloor_weight,
-                "storage_type": None,
                 "total_quantity": sum(
                     move_line.result_package_id.quant_ids.mapped("quantity")
                 ),
@@ -264,7 +262,6 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
                 "id": move_line.package_id.id,
                 "name": move_line.package_id.name,
                 "weight": move_line.package_id.shopfloor_weight,
-                "storage_type": None,
                 "total_quantity": sum(
                     move_line.package_id.quant_ids.mapped("quantity")
                 ),
@@ -273,7 +270,6 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
                 "id": move_line.result_package_id.id,
                 "name": move_line.result_package_id.name,
                 "weight": move_line.result_package_id.shopfloor_weight,
-                "storage_type": None,
                 "total_quantity": sum(
                     move_line.result_package_id.quant_ids.mapped("quantity")
                 ),

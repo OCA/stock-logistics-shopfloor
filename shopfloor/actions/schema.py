@@ -29,7 +29,7 @@ class ShopfloorSchemaAction(Component):
             "priority": {"type": "string", "nullable": True, "required": False},
         }
 
-    def move_line(self, with_packaging=False, with_picking=False):
+    def move_line(self, with_package_type=False, with_picking=False):
         schema = {
             "id": {"type": "integer", "required": True},
             "qty_done": {"type": "float", "required": True},
@@ -42,10 +42,10 @@ class ShopfloorSchemaAction(Component):
                 "schema": self.lot(),
             },
             "package_src": self._schema_dict_of(
-                self.package(with_packaging=with_packaging)
+                self.package(with_package_type=with_package_type)
             ),
             "package_dest": self._schema_dict_of(
-                self.package(with_packaging=with_packaging), required=False
+                self.package(with_package_type=with_package_type), required=False
             ),
             "location_src": self._schema_dict_of(self.location()),
             "location_dest": self._schema_dict_of(self.location()),
@@ -85,13 +85,12 @@ class ShopfloorSchemaAction(Component):
             ),
         }
 
-    def package(self, with_packaging=False):
+    def package(self, with_package_type=False):
         schema = {
             "id": {"required": True, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": True},
             "weight": {"required": True, "nullable": True, "type": "float"},
             "move_line_count": {"required": False, "nullable": True, "type": "integer"},
-            "storage_type": self._schema_dict_of(self._simple_record()),
             "operation_progress": {
                 "type": "dict",
                 "required": False,
@@ -102,8 +101,8 @@ class ShopfloorSchemaAction(Component):
             },
             "total_quantity": {"required": False, "type": "float"},
         }
-        if with_packaging:
-            schema["packaging"] = self._schema_dict_of(self.packaging())
+        if with_package_type:
+            schema["storage_type"] = self._schema_dict_of(self.package_type())
         return schema
 
     def lot(self):
@@ -137,7 +136,7 @@ class ShopfloorSchemaAction(Component):
             "qty": {"type": "float", "required": True},
         }
 
-    def delivery_packaging(self):
+    def package_type(self):
         return {
             "id": {"required": True, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": True},

@@ -43,7 +43,7 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
         super().setUpClassBaseData(*args, **kwargs)
         cls._load_test_models()
         cls.carrier = cls.env["delivery.carrier"].search([], limit=1)
-        delivery_packaging_type = (
+        package_type_type = (
             cls.env["stock.package.type"]
             .sudo()
             .create({"name": "TEST DEFAULT", "package_carrier_type": "test"})
@@ -52,7 +52,7 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
             {
                 "delivery_type": "test",
                 "integration_level": "rate",  # avoid sending emails
-                "test_default_packaging_id": delivery_packaging_type.id,
+                "test_default_package_type_id": package_type_type.id,
             }
         )
 
@@ -113,7 +113,7 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
         delivery_pkg = move_line.result_package_id
         self.assertNotIn(delivery_pkg, existing_packages)
         self.assertEqual(
-            delivery_pkg.package_type_id, self.carrier.test_default_packaging_id
+            delivery_pkg.package_type_id, self.carrier.test_default_package_type_id
         )
         message = self.msg_store.confirm_pack_moved()
         message["body"] += "\n" + self.msg_store.goods_packed_in(delivery_pkg)["body"]
@@ -176,7 +176,7 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
             zone_location,
             picking_type,
             move_line,
-            message=self.service.msg_store.packaging_invalid_for_carrier(
+            message=self.service.msg_store.package_type_invalid_for_carrier(
                 self.free_package.product_packaging_id, self.carrier
             ),
             qty_done=quantity_reserved,
@@ -197,7 +197,7 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
             .create(
                 {
                     "name": "TEST DEFAULT",
-                    "package_type_id": self.carrier.test_default_packaging_id.id,
+                    "package_type_id": self.carrier.test_default_package_type_id.id,
                     "product_id": self.free_product.id,
                 }
             )

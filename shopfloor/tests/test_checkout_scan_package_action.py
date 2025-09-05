@@ -232,7 +232,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
         picking.action_assign()
 
         package = self.env["stock.quant.package"].create(
-            {"package_type_id": self.delivery_packaging.id}
+            {"package_type_id": self.package_type.id}
         )
 
         # assume that product d was already put in a package,
@@ -410,7 +410,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
             self._assert_selected_response(
                 response,
                 selected_lines,
-                message=self.msg_store.packaging_invalid_for_carrier(
+                message=self.msg_store.package_type_invalid_for_carrier(
                     packaging, picking.carrier_id
                 ),
             )

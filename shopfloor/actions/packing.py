@@ -1,55 +1,53 @@
 # Copyright 2021 Camptocamp SA (http://www.camptocamp.com)
+# Copyright 2025 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo.addons.component.core import Component
 
 
-class PackagingAction(Component):
-    """Provide methods to work with packaging operations."""
+class PackingAction(Component):
+    """Provide methods to work with packing operations."""
 
-    _name = "shopfloor.packaging.action"
+    _name = "shopfloor.packing.action"
     _inherit = "shopfloor.process.action"
-    _usage = "packaging"
+    _usage = "packing"
 
-    def packaging_valid_for_carrier(self, packaging, carrier):
-        return self.packaging_type_valid_for_carrier(packaging.package_type_id, carrier)
-
-    def packaging_type_valid_for_carrier(self, packaging_type, carrier):
-        return packaging_type.package_carrier_type in (
+    def package_type_valid_for_carrier(self, package_type, carrier):
+        return package_type.package_carrier_type in (
             "none",
             carrier.delivery_type,
         )
 
     def create_delivery_package(self, carrier):
-        default_packaging = self._get_default_packaging(carrier)
-        return self.create_package_from_packaging(default_packaging)
+        default_package_type = self._get_default_package_type(carrier)
+        return self.create_package_from_package_type(default_package_type)
 
-    def _get_default_packaging(self, carrier):
+    def _get_default_package_type(self, carrier):
         # TODO: refactor `delivery_[carrier_name]` modules
-        # to have always the same field named `default_packaging_id`
+        # to have always the same field named `default_package_type_id`
         # to unify lookup of this field.
         # As alternative add a computed field.
         # AFAIS there's no reason to have 1 field per carrier type.
-        fname = carrier.delivery_type + "_default_packaging_id"
+        fname = carrier.delivery_type + "_default_package_type_id"
         if fname not in carrier._fields:
             return self.env["stock.package.type"].browse()
         return carrier[fname]
 
-    def create_package_from_packaging(self, packaging=None):
-        if packaging:
-            vals = self._package_vals_from_packaging(packaging)
+    def create_package_from_package_type(self, package_type=None):
+        if package_type:
+            vals = self._package_vals_from_package_type(package_type)
         else:
-            vals = self._package_vals_without_packaging()
+            vals = self._package_vals_without_package_type()
         return self.env["stock.quant.package"].create(vals)
 
-    def _package_vals_from_packaging(self, packaging):
+    def _package_vals_from_package_type(self, package_type):
         return {
-            "package_type_id": packaging.id,
-            "pack_length": packaging.packaging_length,
-            "width": packaging.width,
-            "height": packaging.height,
+            "package_type_id": package_type.id,
+            "pack_length": package_type.packaging_length,
+            "width": package_type.width,
+            "height": package_type.height,
         }
 
-    def _package_vals_without_packaging(self):
+    def _package_vals_without_package_type(self):
         return {}
 
     def package_has_several_products(self, package):

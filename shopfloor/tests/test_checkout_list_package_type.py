@@ -53,7 +53,7 @@ class CheckoutListDeliveryPackagingCase(CheckoutCommonCase, CheckoutSelectPackag
             .sudo()
             .create({"name": "Transport Box", "code": "TB", "sequence": 0})
         )
-        cls.delivery_packaging1 = (
+        cls.package_type1 = (
             cls.env["stock.package.type"]
             .sudo()
             .create(
@@ -64,7 +64,7 @@ class CheckoutListDeliveryPackagingCase(CheckoutCommonCase, CheckoutSelectPackag
                 }
             )
         )
-        cls.delivery_packaging2 = (
+        cls.package_type2 = (
             cls.env["stock.package.type"]
             .sudo()
             .create(
@@ -75,16 +75,14 @@ class CheckoutListDeliveryPackagingCase(CheckoutCommonCase, CheckoutSelectPackag
                 }
             )
         )
-        cls.delivery_packaging = (
-            cls.delivery_packaging1 | cls.delivery_packaging2
-        ).sorted("name")
+        cls.package_type = (cls.package_type1 | cls.package_type2).sorted("name")
 
-    def test_list_delivery_packaging_available(self):
+    def test_list_package_type_available(self):
         self._fill_stock_for_moves(self.picking.move_ids, in_package=True)
         self.picking.action_assign()
         selected_lines = self.picking.move_line_ids
         response = self.service.dispatch(
-            "list_delivery_packaging",
+            "list_package_type",
             params={
                 "picking_id": self.picking.id,
                 "selected_line_ids": selected_lines.ids,
@@ -92,21 +90,19 @@ class CheckoutListDeliveryPackagingCase(CheckoutCommonCase, CheckoutSelectPackag
         )
         self.assert_response(
             response,
-            next_state="select_delivery_packaging",
+            next_state="select_package_type",
             data={
-                "packaging": self.service.data.delivery_packaging_list(
-                    self.delivery_packaging
-                ),
+                "package_type": self.service.data.package_type_list(self.package_type),
             },
         )
 
-    def test_list_delivery_packaging_not_available(self):
-        self.delivery_packaging.package_carrier_type = False
+    def test_list_package_type_not_available(self):
+        self.package_type.package_carrier_type = False
         self._fill_stock_for_moves(self.picking.move_ids, in_package=True)
         self.picking.action_assign()
         selected_lines = self.picking.move_line_ids
         response = self.service.dispatch(
-            "list_delivery_packaging",
+            "list_package_type",
             params={
                 "picking_id": self.picking.id,
                 "selected_line_ids": selected_lines.ids,
@@ -126,5 +122,5 @@ class CheckoutListDeliveryPackagingCase(CheckoutCommonCase, CheckoutSelectPackag
                 ),
                 "package_allowed": True,
             },
-            message=self.service.msg_store.no_delivery_packaging_available(),
+            message=self.service.msg_store.no_package_type_available(),
         )

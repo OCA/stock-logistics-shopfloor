@@ -76,15 +76,15 @@ class DataAction(Component):
         ]
 
     @ensure_model("stock.quant.package")
-    def package(self, record, picking=None, with_packaging=False, **kw):
+    def package(self, record, picking=None, with_package_type=False, **kw):
         """Return data for a stock.quant.package
 
         If a picking is given, it will include the number of lines of the package
         for the picking.
         """
         parser = self._package_parser
-        if with_packaging:
-            parser += self._package_packaging_parser
+        if with_package_type:
+            parser += self._package_package_type_parser
         data = self._jsonify(record, parser, **kw)
         qty = len(record.quant_ids)
         # handle special cases
@@ -128,7 +128,6 @@ class DataAction(Component):
             "id",
             "name",
             "shopfloor_weight:weight",
-            ("package_type_id:storage_type", ["id", "name"]),
             (
                 "quant_ids:total_quantity",
                 lambda rec, fname: sum(rec.quant_ids.mapped("quantity")),
@@ -136,9 +135,9 @@ class DataAction(Component):
         ]
 
     @property
-    def _package_packaging_parser(self):
+    def _package_package_type_parser(self):
         return [
-            ("product_packaging_id:packaging", self._packaging_parser),
+            ("package_type_id:storage_type", self._package_type_parser),
         ]
 
     @ensure_model("product.packaging")
@@ -158,14 +157,14 @@ class DataAction(Component):
         ]
 
     @ensure_model("stock.package.type")
-    def delivery_packaging(self, record, **kw):
-        return self._jsonify(record, self._delivery_packaging_parser, **kw)
+    def package_type(self, record, **kw):
+        return self._jsonify(record, self._package_type_parser, **kw)
 
-    def delivery_packaging_list(self, records, **kw):
-        return self.delivery_packaging(records, multi=True)
+    def package_type_list(self, records, **kw):
+        return self.package_type(records, multi=True)
 
     @property
-    def _delivery_packaging_parser(self):
+    def _package_type_parser(self):
         return [
             "id",
             "name",
