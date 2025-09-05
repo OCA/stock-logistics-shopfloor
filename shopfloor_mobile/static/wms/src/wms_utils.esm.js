@@ -167,7 +167,7 @@ export class WMSUtils {
 
     group_by_package_type(lines) {
         const res = [];
-        const grouped = _.groupBy(lines, "package_dest.packaging.name");
+        const grouped = _.groupBy(lines, "package_dest.storage_type.name");
         _.forEach(grouped, function (products, packaging_name) {
             res.push({
                 _is_group: true,
