@@ -853,7 +853,7 @@ class Reception(Component):
         packages_data = self.data.packages(
             packages.with_context(picking_id=picking.id).sorted(),
             picking=picking,
-            with_packaging=True,
+            with_package_type=True,
         )
         return self._response(
             next_state="select_dest_package",
@@ -1754,7 +1754,7 @@ class ShopfloorReceptionValidatorResponse(Component):
                 "type": "list",
                 "schema": {
                     "type": "dict",
-                    "schema": self.schemas.package(with_packaging=True),
+                    "schema": self.schemas.package(with_package_type=True),
                 },
             },
             "picking": {"type": "dict", "schema": self.schemas.picking()},
