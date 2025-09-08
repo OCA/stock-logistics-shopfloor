@@ -12,7 +12,7 @@ class TestLocationContentTransferPutaway(LocationContentTransferCommonCase):
     @classmethod
     def setUpClassVars(cls, *args, **kwargs):
         super().setUpClassVars(*args, **kwargs)
-        cls.pallets_storage_type = cls.env.ref(
+        cls.pallets_package_type = cls.env.ref(
             "stock_storage_type.package_storage_type_pallets"
         )
         cls.main_pallets_location = cls.env.ref(
@@ -33,14 +33,14 @@ class TestLocationContentTransferPutaway(LocationContentTransferCommonCase):
             {
                 # this will parameterize the putaway to use pallet locations,
                 # and if not, it will stay on the picking type's default dest.
-                "package_type_id": cls.pallets_storage_type.id,
+                "package_type_id": cls.pallets_package_type.id,
             }
         )
         cls.package2 = cls.env["stock.quant.package"].create(
             {
                 # this will parameterize the putaway to use pallet locations,
                 # and if not, it will stay on the picking type's default dest.
-                "package_type_id": cls.pallets_storage_type.id,
+                "package_type_id": cls.pallets_package_type.id,
             }
         )
         # create a location to be sure it's empty
@@ -87,7 +87,7 @@ class TestLocationContentTransferPutaway(LocationContentTransferCommonCase):
         """
         for location in self.all_pallets_locations:
             package = self.env["stock.quant.package"].create(
-                {"package_type_id": self.pallets_storage_type.id}
+                {"package_type_id": self.pallets_package_type.id}
             )
             self._update_qty_in_location(location, self.product_a, 10, package=package)
 

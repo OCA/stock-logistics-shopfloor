@@ -137,7 +137,7 @@ class DataAction(Component):
     @property
     def _package_package_type_parser(self):
         return [
-            ("package_type_id:storage_type", self._package_type_parser),
+            ("package_type_id:package_type", self._package_type_parser),
         ]
 
     @ensure_model("product.packaging")
