@@ -453,7 +453,7 @@ const Reception = {
                             label: "Lines already in pack",
                             display_no_value: true,
                         },
-                        {path: "storage_type.name", label: "Package type"},
+                        {path: "package_type.name", label: "Package type"},
                     ],
                 },
             };
