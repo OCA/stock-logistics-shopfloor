@@ -88,7 +88,7 @@ class TestSelectDestPackage(CommonCase):
         package_data = self.data.packages(
             self.package.with_context(picking_id=picking.id),
             picking=picking,
-            with_packaging=True,
+            with_package_type=True,
         )
         self.assert_response(
             response,

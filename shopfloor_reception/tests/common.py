@@ -114,7 +114,7 @@ class CommonCase(BaseCommonCase):
         return self.data.move_line(move_line)
 
     def _package_data(self, package, picking):
-        return self.data.package(package, picking=picking, with_packaging=True)
+        return self.data.package(package, picking=picking, with_package_type=True)
 
     def _packaging_data(self, packaging):
         return self.data.packaging(packaging)
