@@ -52,13 +52,13 @@ class ActionsDataBase(ActionsDataCaseBase):
 
     def test_data_package(self):
         package = self.move_a.move_line_ids.package_id
-        package.package_type_id = self.storage_type_pallet
+        package.package_type_id = self.package_type_pallet
         data = self.data.package(package, picking=self.picking, with_package_type=True)
         self.assert_schema(self.schema.package(with_package_type=True), data)
         expected = {
             "id": package.id,
             "name": package.name,
-            "storage_type": self._expected_package_type(package.package_type_id),
+            "package_type": self._expected_package_type(package.package_type_id),
             "weight": 20.0,
             "has_lq_products": True,
         }
