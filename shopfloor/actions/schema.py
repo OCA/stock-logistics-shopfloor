@@ -102,7 +102,7 @@ class ShopfloorSchemaAction(Component):
             "total_quantity": {"required": False, "type": "float"},
         }
         if with_package_type:
-            schema["storage_type"] = self._schema_dict_of(self.package_type())
+            schema["package_type"] = self._schema_dict_of(self.package_type())
         return schema
 
     def lot(self):

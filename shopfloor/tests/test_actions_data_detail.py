@@ -66,7 +66,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
 
     def test_data_package(self):
         package = self.move_a.move_line_ids.package_id
-        package.package_type_id = self.storage_type_pallet
+        package.package_type_id = self.package_type_pallet
         # package.invalidate_recordset()
         data = self.data_detail.package_detail(package, picking=self.picking)
         self.assert_schema(self.schema_detail.package_detail(), data)
@@ -85,9 +85,9 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "weight": 20.0,
             "pickings": self.data_detail.pickings(pickings),
             "move_lines": self.data_detail.move_lines(lines),
-            "storage_type": {
-                "id": self.storage_type_pallet.id,
-                "name": self.storage_type_pallet.name,
+            "package_type": {
+                "id": self.package_type_pallet.id,
+                "name": self.package_type_pallet.name,
                 "packaging_type": "none",
                 "barcode": None,
             },

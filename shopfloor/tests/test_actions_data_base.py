@@ -16,7 +16,7 @@ class ActionsDataCaseBase(CommonCase, ActionsDataTestMixin):
         super().setUpClassVars()
         cls.wh = cls.env.ref("stock.warehouse0")
         cls.picking_type = cls.wh.out_type_id
-        cls.storage_type_pallet = cls.env.ref(
+        cls.package_type_pallet = cls.env.ref(
             "stock_storage_type.package_storage_type_pallets"
         )
 
@@ -203,7 +203,7 @@ class ActionsDataDetailCaseBase(ActionsDataCaseBase):
     @classmethod
     def setUpClassVars(cls):
         super().setUpClassVars()
-        cls.storage_type_pallet = cls.env.ref(
+        cls.package_type_pallet = cls.env.ref(
             "stock_storage_type.package_storage_type_pallets"
         )
 
