@@ -22,7 +22,8 @@ const new_template =
         :options="{main: true, key_title: 'name', title_icon: 'mdi-package-variant'}"
     />
 
-     <v-form ref="form_dimension">
+    <v-card class="pa-2" :color="utils.colors.color_for('screen_step_todo')">
+      <v-form ref="form_dimension">
         <v-container>
             <v-row>
                 <v-text-field
@@ -76,13 +77,14 @@ const new_template =
                 ></v-text-field>
             </v-row>
             <!-- extend -->
-       </v-container>
-    </v-form>
+          </v-container>
+        </v-form>
+    </v-card>
 
     <div class="button-list button-vertical-list full">
         <v-row align="center">
             <v-col class="text-center" cols="12">
-                <btn-action action="todo" @click="state.on_done">Done</btn-action>
+                <btn-action @click="state.on_done">Done</btn-action>
             </v-col>
         </v-row>
         <v-row align="center">
