@@ -14,6 +14,11 @@ const make_reception_picking = () => {
     picking.move_lines = [];
     for (let i = 0; i < 3; i++) {
         const move = demotools.makeMove();
+        if (i === 0) {
+            // Lead to set_lot on scan
+            move.lot = undefined;
+            move.product.display_name += " (lot required)";
+        }
         picking.moves.push(move);
         move_by_id[move.id] = move;
         move_by_id[move.id].picking = {id: picking.id, name: picking.name};
@@ -66,9 +71,62 @@ const DEMO_RECEPTION = {
         },
     },
     scan_line: function (data) {
-        const res = data_for_select_document;
-        return res;
+        const move = _.find(Object.values(move_by_id), (x) => {
+            return x.product.barcode === data.barcode;
+        });
+        const selected_move_line = move_line_by_move_id[move.id];
+        if (_.isUndefined(move.lot)) {
+            return {
+                next_state: "set_lot",
+                data: {
+                    set_lot: {
+                        picking: move.picking,
+                        selected_move_line: [selected_move_line],
+                    },
+                },
+            };
+        }
+        return {
+            next_state: "set_packaging_dimension",
+            data: {
+                set_packaging_dimension: {
+                    picking: move.picking,
+                    selected_move_line: selected_move_line,
+                    packaging: move.product.packaging[0],
+                },
+            },
+        };
     },
+    set_lot: function (data) {
+        const line = move_line_by_id[data.selected_line_id];
+        const lot = demotools.makeLot(
+            {},
+            {name: data.lot_name, expiration_date: data.expiration_date}
+        );
+        line.lot = lot;
+        return {
+            next_state: "set_lot",
+            data: {
+                set_lot: {
+                    picking: line.picking,
+                    selected_move_line: [line],
+                },
+            },
+        };
+    },
+    set_lot_confirm_action: function (data) {
+        const line = move_line_by_id[data.selected_line_id];
+        return {
+            next_state: "set_quantity",
+            data: {
+                set_quantity: {
+                    picking: line.picking,
+                    selected_move_line: [line],
+                },
+            },
+        };
+    },
+
     scan_document: function (data) {
         return {
             next_state: "select_move",
