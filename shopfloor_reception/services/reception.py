@@ -1372,8 +1372,12 @@ class Reception(Component):
         move._recompute_state()
         new_move.extract_and_action_done()
 
+    def _set_destination_handle_extra_params(self, picking, selected_line, **kwargs):
+        """Used by the shopfloor_reception_package_dimension module."""
+        pass
+
     def set_destination(
-        self, picking_id, selected_line_id, location_name, confirmation=False
+        self, picking_id, selected_line_id, location_name, confirmation=False, **kwargs
     ):
         """Set the destination on the move line.
 
@@ -1399,6 +1403,14 @@ class Reception(Component):
                 picking, selected_line, message=message
             )
         search = self._actions_for("search")
+
+        message = self._set_destination_handle_extra_params(
+            picking, selected_line, **kwargs
+        )
+        if message:
+            return self._response_for_set_destination(
+                picking, selected_line, message=message
+            )
 
         location = search.location_from_scan(location_name)
         if not location:
