@@ -264,16 +264,18 @@ export const reception_states = function () {
                 title: "Set destination",
                 scan_placeholder: "Scan destination location",
             },
+            _get_set_destination_data: (location) => {
+                return {
+                    picking_id: this.state.data.picking.id,
+                    selected_line_id: this.line_being_handled.id,
+                    location_name: location.text,
+                    // FIXME if it is always set to true, it is not really used ?
+                    confirmation: true,
+                };
+            },
             on_scan: (location) => {
-                this.wait_call(
-                    this.odoo.call("set_destination", {
-                        picking_id: this.state.data.picking.id,
-                        selected_line_id: this.line_being_handled.id,
-                        location_name: location.text,
-                        // FIXME if it is always set to true, it is not really used ?
-                        confirmation: true,
-                    })
-                );
+                const payload = this.state._get_set_destination_data(location);
+                this.wait_call(this.odoo.call("set_destination", payload));
             },
         },
         select_dest_package: {

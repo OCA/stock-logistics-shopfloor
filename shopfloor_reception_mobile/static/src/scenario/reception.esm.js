@@ -169,6 +169,8 @@ const Reception = {
                     :options="manual_select_options_for_package_type()"
                     :key="make_state_component_key(['reception', 'manual-select-package-type'])"
                 />
+
+
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
@@ -192,7 +194,12 @@ const Reception = {
                     :options="package_type_options(line_being_handled, true)"
                     :card_color="utils.colors.color_for('screen_step_todo')"
                     :key="make_state_component_key(['reception-product-item-detail-set-destination-pack-type', state.data.picking.id])"
-                />
+                >
+                    <template v-slot:details>
+                        <!-- Package Detail Slot -->
+                    </template>
+                </item-detail-card>
+
                 <item-detail-card
                     :record="line_being_handled"
                     :card_color="utils.colors.color_for('screen_step_todo')"
