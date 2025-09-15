@@ -1,5 +1,5 @@
-# Copyright 2020-2021 Camptocamp SA (http://www.camptocamp.com)
-# Copyright 2020-2021 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
+# Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+# Copyright 2020 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # Copyright 2023 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 import functools
@@ -166,10 +166,9 @@ class ZonePicking(Component):
         return self.work.menu.require_destination_package
 
     def _handle_complete_mix_pack(self, package):
-        packaging = self._actions_for("packaging")
+        packing = self._actions_for("packing")
         return (
-            packaging.is_complete_mix_pack(package)
-            and not self.work.menu.no_prefill_qty
+            packing.is_complete_mix_pack(package) and not self.work.menu.no_prefill_qty
         )
 
     def _response_for_start(self, message=None):
@@ -619,7 +618,7 @@ class ZonePicking(Component):
         message = None
         response = None
         search = self._actions_for("search")
-        packaging = self._actions_for("packaging")
+        packing = self._actions_for("packing")
         package = search.package_from_scan(barcode)
         if not package:
             return response, message
@@ -640,9 +639,9 @@ class ZonePicking(Component):
                     first(move_lines), qty_done=0
                 )
                 return response, message
-            if packaging.package_has_several_products(package):
+            if packing.package_has_several_products(package):
                 message = self.msg_store.several_products_in_package(package)
-            if packaging.package_has_several_lots(package):
+            if packing.package_has_several_lots(package):
                 message = self.msg_store.several_lots_in_package(package)
             if message or self.work.menu.no_prefill_qty:
                 return (
@@ -1285,7 +1284,7 @@ class ZonePicking(Component):
         picking = move_line.picking_id
         carrier = picking.ship_carrier_id or picking.carrier_id
         if carrier:
-            actions = self._actions_for("packaging")
+            actions = self._actions_for("packing")
             pkg = actions.create_delivery_package(carrier)
             move_line.write({"result_package_id": pkg.id})
             message = self.msg_store.goods_packed_in(pkg)
@@ -1306,14 +1305,12 @@ class ZonePicking(Component):
         picking = move_line.picking_id
         carrier = picking.ship_carrier_id or picking.carrier_id
         if carrier:
-            actions = self._actions_for("packaging")
-            if actions.packaging_valid_for_carrier(
-                package.product_packaging_id, carrier
-            ):
+            actions = self._actions_for("packing")
+            if actions.package_type_valid_for_carrier(package.package_type_id, carrier):
                 good_for_packing = True
             else:
-                message = self.msg_store.packaging_invalid_for_carrier(
-                    package.product_packaging_id, carrier
+                message = self.msg_store.package_type_invalid_for_carrier(
+                    package.package_type_id, carrier
                 )
         else:
             message = self.msg_store.picking_without_carrier_cannot_pack(picking)

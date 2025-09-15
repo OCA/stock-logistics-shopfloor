@@ -222,10 +222,10 @@ const DEMO_CHECKOUT_DG = {
             body: "Done",
         },
     },
-    list_packaging: {
-        next_state: "change_packaging",
+    change_list_package_type: {
+        next_state: "change_package_type",
         data: {
-            change_packaging: {
+            change_package_type: {
                 picking: select_pack_picking,
                 package: demotools.makePack(),
                 packaging: _.sampleSize(

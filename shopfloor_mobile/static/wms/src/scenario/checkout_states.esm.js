@@ -181,7 +181,7 @@ export const checkout_states = function ($instance) {
             },
             on_new_pack: () => {
                 $instance.wait_call(
-                    $instance.odoo.call("list_delivery_packaging", {
+                    $instance.odoo.call("list_package_type", {
                         picking_id: $instance.state.data.picking.id,
                         selected_line_ids: $instance.selectable_line_ids(),
                     })
@@ -208,7 +208,7 @@ export const checkout_states = function ($instance) {
                 $instance.reset_notification();
             },
         },
-        select_delivery_packaging: {
+        select_package_type: {
             display_info: {
                 title: "Select delivery packaging",
                 scan_placeholder: "Scan package type",
@@ -309,7 +309,7 @@ export const checkout_states = function ($instance) {
             },
             on_pkg_change_type: (pkg) => {
                 $instance.wait_call(
-                    $instance.odoo.call("list_packaging", {
+                    $instance.odoo.call("change_list_package_type", {
                         picking_id: $instance.state.data.picking.id,
                         package_id: pkg.id,
                     })
@@ -340,9 +340,9 @@ export const checkout_states = function ($instance) {
                 );
             },
         },
-        change_packaging: {
+        change_package_type: {
             display_info: {
-                title: "Change packaging",
+                title: "Change package type",
             },
             events: {
                 select: "on_select",
@@ -352,7 +352,7 @@ export const checkout_states = function ($instance) {
                     return;
                 }
                 $instance.wait_call(
-                    $instance.odoo.call("set_packaging", {
+                    $instance.odoo.call("change_set_package_type", {
                         picking_id: $instance.state.data.picking.id,
                         package_id: $instance.state.data.package.id,
                         package_type_id: selected.id,

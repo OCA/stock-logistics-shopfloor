@@ -19,7 +19,7 @@ class CheckoutCommonCase(CommonCase):
     def setUpClassBaseData(cls, *args, **kwargs):
         super().setUpClassBaseData(*args, **kwargs)
         cls.wh.sudo().delivery_steps = "pick_pack_ship"
-        cls.delivery_packaging = (
+        cls.package_type = (
             cls.env["stock.package.type"]
             .sudo()
             .create(
@@ -56,11 +56,11 @@ class CheckoutCommonCase(CommonCase):
 
     def _package_data(self, package, picking, **kwargs):
         return self.data.package(
-            package, picking=picking, with_packaging=True, **kwargs
+            package, picking=picking, with_package_type=True, **kwargs
         )
 
-    def _packaging_data(self, packaging):
-        return self.data.delivery_packaging(packaging)
+    def _package_type_data(self, package_type):
+        return self.data.package_type(package_type)
 
     def _data_for_select_line(self, picking, **kw):
         data = {

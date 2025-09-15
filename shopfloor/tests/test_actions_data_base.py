@@ -16,7 +16,7 @@ class ActionsDataCaseBase(CommonCase, ActionsDataTestMixin):
         super().setUpClassVars()
         cls.wh = cls.env.ref("stock.warehouse0")
         cls.picking_type = cls.wh.out_type_id
-        cls.storage_type_pallet = cls.env.ref(
+        cls.package_type_pallet = cls.env.ref(
             "stock_storage_type.package_storage_type_pallets"
         )
 
@@ -39,7 +39,7 @@ class ActionsDataCaseBase(CommonCase, ActionsDataTestMixin):
                 }
             )
         )
-        cls.delivery_packaging = (
+        cls.package_type = (
             cls.env["stock.package.type"]
             .sudo()
             .create(
@@ -160,20 +160,12 @@ class ActionsDataCaseBase(CommonCase, ActionsDataTestMixin):
         data.update(kw)
         return data
 
-    def _expected_delivery_packaging(self, record, **kw):
+    def _expected_package_type(self, record, **kw):
         data = {
             "id": record.id,
             "name": record.name,
             "packaging_type": record.package_carrier_type,
-            "barcode": record.barcode,
-        }
-        data.update(kw)
-        return data
-
-    def _expected_storage_type(self, record, **kw):
-        data = {
-            "id": record.id,
-            "name": record.name,
+            "barcode": record.barcode or None,
         }
         data.update(kw)
         return data
@@ -183,7 +175,6 @@ class ActionsDataCaseBase(CommonCase, ActionsDataTestMixin):
             "id": record.id,
             "name": record.name,
             "weight": record.shopfloor_weight,
-            "storage_type": None,
             "total_quantity": sum(record.quant_ids.mapped("quantity")),
         }
         data.update(kw)
@@ -212,7 +203,7 @@ class ActionsDataDetailCaseBase(ActionsDataCaseBase):
     @classmethod
     def setUpClassVars(cls):
         super().setUpClassVars()
-        cls.storage_type_pallet = cls.env.ref(
+        cls.package_type_pallet = cls.env.ref(
             "stock_storage_type.package_storage_type_pallets"
         )
 

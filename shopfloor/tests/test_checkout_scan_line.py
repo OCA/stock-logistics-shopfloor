@@ -9,7 +9,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
     @classmethod
     def setUpClassBaseData(cls, *args, **kwargs):
         super().setUpClassBaseData(*args, **kwargs)
-        cls.delivery_packaging = (
+        cls.package_type = (
             cls.env["stock.package.type"]
             .sudo()
             .create(
@@ -419,24 +419,22 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
             "scan_line",
             params={
                 "picking_id": picking.id,
-                "barcode": self.delivery_packaging.barcode,
+                "barcode": self.package_type.barcode,
             },
         )
         # back to same state
         self.assertEqual(response["next_state"], "select_line")
         self.assertEqual(
             response["message"],
-            self.msg_store.confirm_put_all_goods_in_delivery_package(
-                self.delivery_packaging
-            ),
+            self.msg_store.confirm_put_all_goods_in_delivery_package(self.package_type),
         )
         self.assertTrue(response["data"]["select_line"]["need_confirm_pack_all"])
         response = self.service.dispatch(
             "scan_line",
             params={
                 "picking_id": picking.id,
-                "barcode": self.delivery_packaging.barcode,
-                "confirm_pack_all": self.delivery_packaging.barcode,
+                "barcode": self.package_type.barcode,
+                "confirm_pack_all": self.package_type.barcode,
             },
         )
         # move to summary as all lines are done

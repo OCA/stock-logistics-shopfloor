@@ -32,7 +32,7 @@ class CheckoutAutoPostCase(CheckoutCommonCase):
             params={
                 "picking_id": picking.id,
                 "selected_line_ids": [selected_move_line_a.id, selected_move_line_b.id],
-                "barcode": self.delivery_packaging.barcode,
+                "barcode": self.package_type.barcode,
             },
         )
 
