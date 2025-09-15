@@ -1053,6 +1053,20 @@ msgstr "¡El nombre del Paquete debe ser único!"
 
 #. module: shopfloor
 #. odoo-python
+#: code:addons/shopfloor/actions/message.py:0
+msgid ""
+"Package type '%(package_type_name)s' is not allowed for carrier "
+"%(carrier_name)s.or carrier %(carrier_name)s."
+msgstr ""
+
+#. module: shopfloor
+#. odoo-python
+#: code:addons/shopfloor/services/checkout.py:0
+msgid "Package type changed on package {}"
+msgstr ""
+
+#. module: shopfloor
+#. odoo-python
 #: code:addons/shopfloor/services/delivery.py:0
 msgid "Package {} belongs to a picking without a valid state."
 msgstr "El Paquete {} pertenece a una entrega sin un estado válido."
@@ -1085,20 +1099,6 @@ msgstr "El Paquete {} no está vacío."
 #: model:ir.model,name:shopfloor.model_stock_quant_package
 msgid "Packages"
 msgstr "Paquetes"
-
-#. module: shopfloor
-#. odoo-python
-#: code:addons/shopfloor/actions/message.py:0
-msgid ""
-"Packaging '%(package_name)s' is not allowed for carrier %(carrier_name)s.or "
-"carrier %(carrier_name)s."
-msgstr ""
-
-#. module: shopfloor
-#. odoo-python
-#: code:addons/shopfloor/services/checkout.py:0
-msgid "Packaging changed on package {}"
-msgstr "El Empaquetado cambió en el paquete {}"
 
 #. module: shopfloor
 #. odoo-python
@@ -2160,6 +2160,9 @@ msgstr "Zona de Entreda"
 #: code:addons/shopfloor/actions/message.py:0
 msgid "{} is not a valid destination package."
 msgstr "{} no es un paquete de destino válido."
+
+#~ msgid "Packaging changed on package {}"
+#~ msgstr "El Empaquetado cambió en el paquete {}"
 
 #, python-format
 #~ msgid "Move lines processed have to share the same source location."

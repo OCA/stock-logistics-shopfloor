@@ -993,6 +993,20 @@ msgstr ""
 
 #. module: shopfloor
 #. odoo-python
+#: code:addons/shopfloor/actions/message.py:0
+msgid ""
+"Package type '%(package_type_name)s' is not allowed for carrier "
+"%(carrier_name)s.or carrier %(carrier_name)s."
+msgstr ""
+
+#. module: shopfloor
+#. odoo-python
+#: code:addons/shopfloor/services/checkout.py:0
+msgid "Package type changed on package {}"
+msgstr ""
+
+#. module: shopfloor
+#. odoo-python
 #: code:addons/shopfloor/services/delivery.py:0
 msgid "Package {} belongs to a picking without a valid state."
 msgstr ""
@@ -1024,20 +1038,6 @@ msgstr ""
 #. module: shopfloor
 #: model:ir.model,name:shopfloor.model_stock_quant_package
 msgid "Packages"
-msgstr ""
-
-#. module: shopfloor
-#. odoo-python
-#: code:addons/shopfloor/actions/message.py:0
-msgid ""
-"Packaging '%(package_name)s' is not allowed for carrier %(carrier_name)s.or "
-"carrier %(carrier_name)s."
-msgstr ""
-
-#. module: shopfloor
-#. odoo-python
-#: code:addons/shopfloor/services/checkout.py:0
-msgid "Packaging changed on package {}"
 msgstr ""
 
 #. module: shopfloor
