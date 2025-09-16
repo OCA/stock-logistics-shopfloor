@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-08-19 13:33+0000\n"
+"PO-Revision-Date: 2025-09-16 10:42+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -1113,12 +1113,14 @@ msgid ""
 "Package type '%(package_type_name)s' is not allowed for carrier "
 "%(carrier_name)s.or carrier %(carrier_name)s."
 msgstr ""
+"Tipo collo '%(package_type_name)s' non consentito per il trasportatore "
+"%(carrier_name)s. o corriere %(carrier_name)s."
 
 #. module: shopfloor
 #. odoo-python
 #: code:addons/shopfloor/services/checkout.py:0
 msgid "Package type changed on package {}"
-msgstr ""
+msgstr "Tipo collo modificato nel collo {}"
 
 #. module: shopfloor
 #. odoo-python
