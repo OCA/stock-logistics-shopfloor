@@ -59,7 +59,8 @@ class StockMove(models.Model):
             split_move.move_line_ids = to_move
             split_move._action_confirm(merge=False)
             split_move._recompute_state()
-            split_move._action_assign()
+            if split_move.state != "assigned":
+                split_move._action_assign()
             self._recompute_state()
             return split_move
         return self.browse()
