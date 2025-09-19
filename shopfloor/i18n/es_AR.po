@@ -969,10 +969,8 @@ msgstr "Paquete"
 #. module: shopfloor
 #. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
-msgid "Package %(old_package_name)s replaced by package %(new_package_name)s."
+msgid "Package %(old_pack_name)s replaced by package %(new_pack_name)s."
 msgstr ""
-"El Paquete %(old_package_name)s está reemplazado por el paquete "
-"%(new_package_name)s."
 
 #. module: shopfloor
 #. odoo-python
@@ -2160,6 +2158,12 @@ msgstr "Zona de Entreda"
 #: code:addons/shopfloor/actions/message.py:0
 msgid "{} is not a valid destination package."
 msgstr "{} no es un paquete de destino válido."
+
+#~ msgid ""
+#~ "Package %(old_package_name)s replaced by package %(new_package_name)s."
+#~ msgstr ""
+#~ "El Paquete %(old_package_name)s está reemplazado por el paquete "
+#~ "%(new_package_name)s."
 
 #~ msgid "Packaging changed on package {}"
 #~ msgstr "El Empaquetado cambió en el paquete {}"

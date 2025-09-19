@@ -1020,8 +1020,8 @@ msgstr "Collo"
 #. module: shopfloor
 #. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
-msgid "Package %(old_package_name)s replaced by package %(new_package_name)s."
-msgstr "Collo %(old_package_name)s sostituito dal collo %(new_package_name)s."
+msgid "Package %(old_pack_name)s replaced by package %(new_pack_name)s."
+msgstr ""
 
 #. module: shopfloor
 #. odoo-python
@@ -2238,6 +2238,11 @@ msgstr "Prelievo per area"
 #: code:addons/shopfloor/actions/message.py:0
 msgid "{} is not a valid destination package."
 msgstr "{} non è un collo destinazione valido."
+
+#~ msgid ""
+#~ "Package %(old_package_name)s replaced by package %(new_package_name)s."
+#~ msgstr ""
+#~ "Collo %(old_package_name)s sostituito dal collo %(new_package_name)s."
 
 #~ msgid ""
 #~ "Packaging '%(package_name)s' is not allowed for carrier %(carrier_name)s."

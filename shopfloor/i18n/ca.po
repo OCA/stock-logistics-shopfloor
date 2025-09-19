@@ -921,7 +921,7 @@ msgstr ""
 #. module: shopfloor
 #. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
-msgid "Package %(old_package_name)s replaced by package %(new_package_name)s."
+msgid "Package %(old_pack_name)s replaced by package %(new_pack_name)s."
 msgstr ""
 
 #. module: shopfloor
