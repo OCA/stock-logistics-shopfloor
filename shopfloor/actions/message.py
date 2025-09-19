@@ -615,7 +615,7 @@ class MessageAction(Component):
             "body": _(
                 "Lot %(lot_name)s not found in transfer %(picking_name)s",
                 lot_name=lot.name,
-                pcking_name=picking.name,
+                picking_name=picking.name,
             ),
         }
 
@@ -818,8 +818,10 @@ class MessageAction(Component):
     def lot_replaced_by_lot(self, old_lot, new_lot):
         return {
             "message_type": "success",
-            "body": _("Lot %(old_lot_name)s replaced by lot %(new_lot_name)s.").format(
-                old_lot.name, new_lot.name
+            "body": _(
+                "Lot %(old_lot_name)s replaced by lot %(new_lot_name)s.",
+                old_lot_name=old_lot.name,
+                new_lot_name=new_lot.name,
             ),
         }
 
@@ -827,8 +829,10 @@ class MessageAction(Component):
         return {
             "message_type": "success",
             "body": _(
-                "Package %(old_package_name)s replaced by package %(new_package_name)s."
-            ).format(old_package.name, new_package.name),
+                "Package %(old_pack_name)s replaced by package %(new_pack_name)s.",
+                old_pack_name=old_package.name,
+                new_pack_name=new_package.name,
+            ),
         }
 
     def package_already_picked_by(self, package, picking):
