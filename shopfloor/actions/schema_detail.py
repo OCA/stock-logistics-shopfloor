@@ -132,7 +132,7 @@ class ShopfloorSchemaDetailAction(Component):
                 "length": {"type": "float", "nullable": True, "required": False},
                 "width": {"type": "float", "nullable": True, "required": False},
                 "height": {"type": "float", "nullable": True, "required": False},
-                "max_weight": {"type": "float", "nullable": True, "required": False},
+                "weight": {"type": "float", "nullable": True, "required": False},
                 "length_uom": {"type": "string", "nullable": True, "required": False},
                 "weight_uom": {"type": "string", "nullable": True, "required": False},
                 "barcode": {"type": "string", "nullable": True, "required": False},
