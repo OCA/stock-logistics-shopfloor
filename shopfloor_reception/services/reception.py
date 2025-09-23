@@ -1460,10 +1460,13 @@ class Reception(Component):
             )
             message = self._check_package_type_valid(package_type)
             if not message:
-                # FIXME : this is to avoid an exception when it is required
-                selected_line.result_package_id.height = 1
                 selected_line.result_package_id.package_type_id = package_type
-                if hasattr(selected_line, "_recompute_putaways"):
+                if (
+                    self.env["ir.module.module"]
+                    ._get("stock_picking_putaway_recompute")
+                    .state
+                    == "installed"
+                ):
                     # Recompute the putaway location if the module
                     # stock_picking_putaway_recompute is installed
                     selected_line._recompute_putaways()
