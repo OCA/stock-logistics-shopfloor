@@ -21,33 +21,33 @@ class TestShopfloorReceptionChangeStorageType(CommonCase):
         # Product B with no packaging
         cls.product_b.packaging_ids = [(5, 0, 0)]
 
-    def test_go_to_set_storage_type_screen(self):
+    def test_go_to_set_package_type_screen(self):
         picking = self.picking
         self.service.dispatch("scan_document", params={"barcode": picking.name})
         selected_move_line = picking.move_line_ids.filtered(
             lambda li: li.product_id == self.product_a
         )
         response = self.service.dispatch(
-            "set_storage_type",
+            "set_package_type",
             params={
                 "picking_id": picking.id,
                 "selected_line_id": selected_move_line.id,
             },
         )
-        response["data"]["set_storage_type"]["picking"].pop("progress")
+        response["data"]["set_package_type"]["picking"].pop("progress")
         self.assert_response(
             response,
-            next_state="set_storage_type",
+            next_state="set_package_type",
             data={
                 "picking": self.data.picking(picking),
                 "selected_move_line": self.data.move_lines(selected_move_line),
-                "storage_types": self.data.package_type_list(
-                    self.service._get_storage_type()
+                "package_types": self.data.package_type_list(
+                    self.service._get_package_type()
                 ),
             },
         )
 
-    def test_change_storage_type_on_package(self):
+    def test_change_package_type_on_package(self):
         picking = self.picking
         self.service.dispatch("scan_document", params={"barcode": picking.name})
         selected_move_line = picking.move_line_ids.filtered(
@@ -64,7 +64,7 @@ class TestShopfloorReceptionChangeStorageType(CommonCase):
             },
         )
         response = self.service.dispatch(
-            "set_storage_type",
+            "set_package_type",
             params={
                 "picking_id": picking.id,
                 "selected_line_id": selected_move_line.id,

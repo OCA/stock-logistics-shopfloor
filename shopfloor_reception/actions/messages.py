@@ -14,17 +14,17 @@ class MessageAction(Component):
     def package_type_not_found(self):
         return {
             "message_type": "error",
-            "body": self.env._("The storage type could not be found"),
+            "body": self.env._("The package type could not be found"),
         }
 
     def package_type_changed(self):
         return {
             "message_type": "success",
-            "body": self.env._("The storage type was successfully changed"),
+            "body": self.env._("The package type was successfully changed"),
         }
 
-    def storage_type_not_valid(self):
+    def package_type_not_valid(self):
         return {
             "message_type": "error",
-            "body": self.env._("The storage type is not valid"),
+            "body": self.env._("The package type is not valid"),
         }

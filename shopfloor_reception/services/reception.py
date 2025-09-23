@@ -1440,8 +1440,8 @@ class Reception(Component):
         # Else return select move
         return self._response_for_select_move(picking)
 
-    def set_storage_type(self, picking_id, selected_line_id, barcode=""):
-        """Set a storage type on the result package."""
+    def set_package_type(self, picking_id, selected_line_id, barcode=""):
+        """Set a package type on the result package."""
         picking = self.env["stock.picking"].browse(picking_id)
         selected_line = self.env["stock.move.line"].browse(selected_line_id)
         message = self._check_picking_processible(picking)
@@ -1455,14 +1455,14 @@ class Reception(Component):
                 picking, selected_line, message=message
             )
         if barcode:
-            storage_type = self.env["stock.package.type"].search(
+            package_type = self.env["stock.package.type"].search(
                 [("barcode", "=", barcode)]
             )
-            message = self._check_storage_type_valid(storage_type)
+            message = self._check_package_type_valid(package_type)
             if not message:
                 # FIXME : this is to avoid an exception when it is required
                 selected_line.result_package_id.height = 1
-                selected_line.result_package_id.package_type_id = storage_type
+                selected_line.result_package_id.package_type_id = package_type
                 if hasattr(selected_line, "_recompute_putaways"):
                     # Recompute the putaway location if the module
                     # stock_picking_putaway_recompute is installed
@@ -1471,29 +1471,29 @@ class Reception(Component):
                 return self._response_for_set_destination(
                     picking, selected_line, message=message
                 )
-        return self._response_for_set_storage_type(
+        return self._response_for_set_package_type(
             picking, selected_line, message=message
         )
 
-    def _check_storage_type_valid(self, record):
+    def _check_package_type_valid(self, record):
         if not record.exists():
             return self.msg_store.package_type_not_found()
         elif record.package_carrier_type and record.package_carrier_type != "none":
-            return self.msg_store.storage_type_not_valid()
+            return self.msg_store.package_type_not_valid()
         return
 
-    def _get_storage_type(self):
+    def _get_package_type(self):
         domain = [("package_carrier_type", "=", False), ("barcode", "!=", False)]
         return self.env["stock.package.type"].sudo().search(domain)
 
-    def _response_for_set_storage_type(self, picking, line, message=None):
-        storage_types = self._get_storage_type()
+    def _response_for_set_package_type(self, picking, line, message=None):
+        package_types = self._get_package_type()
         data = {
             "selected_move_line": self._data_for_move_lines(line),
             "picking": self._data_for_stock_picking(picking, with_lines=False),
-            "storage_types": self.data.package_type_list(storage_types),
+            "package_types": self.data.package_type_list(package_types),
         }
-        return self._response(next_state="set_storage_type", data=data, message=message)
+        return self._response(next_state="set_package_type", data=data, message=message)
 
     def select_dest_package(
         self, picking_id, selected_line_id, barcode, confirmation=False
@@ -1651,7 +1651,7 @@ class ShopfloorReceptionValidator(Component):
             "confirmation": {"type": "boolean"},
         }
 
-    def set_storage_type(self):
+    def set_package_type(self):
         return {
             "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
             "selected_line_id": {
@@ -1716,7 +1716,7 @@ class ShopfloorReceptionValidatorResponse(Component):
             "set_destination": self._schema_set_destination,
             "select_dest_package": self._schema_select_dest_package,
             "confirm_new_package": self._schema_confirm_new_package,
-            "set_storage_type": self._schema_set_storage_type,
+            "set_package_type": self._schema_set_package_type,
         }
 
     def _start_next_states(self):
@@ -1753,10 +1753,10 @@ class ShopfloorReceptionValidatorResponse(Component):
         return {"set_quantity", "select_move"}
 
     def _set_destination_next_states(self):
-        return {"set_destination", "select_move", "set_storage_type"}
+        return {"set_destination", "select_move", "set_package_type"}
 
-    def _set_storage_type_next_states(self):
-        return {"set_storage_type", "set_destination"}
+    def _set_package_type_next_states(self):
+        return {"set_package_type", "set_destination"}
 
     def _select_dest_package_next_states(self):
         return {"set_lot", "select_dest_package", "confirm_new_package", "select_move"}
@@ -1889,14 +1889,14 @@ class ShopfloorReceptionValidatorResponse(Component):
         }
 
     @property
-    def _schema_set_storage_type(self):
+    def _schema_set_package_type(self):
         return {
             "selected_move_line": {
                 "type": "list",
                 "schema": {"type": "dict", "schema": self.schemas.move_line()},
             },
             "picking": {"type": "dict", "schema": self.schemas.picking()},
-            "storage_types": self.schemas._schema_list_of(
+            "package_types": self.schemas._schema_list_of(
                 self.schemas.package_type(), required=False
             ),
         }
@@ -1961,8 +1961,8 @@ class ShopfloorReceptionValidatorResponse(Component):
     def set_destination(self):
         return self._response_schema(next_states=self._set_destination_next_states())
 
-    def set_storage_type(self):
-        return self._response_schema(next_states=self._set_storage_type_next_states())
+    def set_package_type(self):
+        return self._response_schema(next_states=self._set_package_type_next_states())
 
     def select_dest_package(self):
         return self._response_schema(
