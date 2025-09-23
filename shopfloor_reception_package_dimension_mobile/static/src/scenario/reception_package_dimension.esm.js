@@ -3,8 +3,6 @@
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
  */
 
-console.log("SHOPFLOOR RECEPTION PACKAGE DIMENSION MOBILE...loaded");
-
 import {process_registry} from "/shopfloor_mobile_base/static/src/services/process_registry.esm.js";
 
 const reception_scenario = process_registry.get("reception");
@@ -18,7 +16,7 @@ const new_template =
     <div class="v-card__text details">
     <v-form ref="form_dimension">
         <v-container style="padding-top: 0; padding-bottom: 0">
-            <v-row v-if="state.data.selected_move_line[0].package_dest.package_type.height_required">
+            <v-row v-if="state.is_height_required()">
                 <v-text-field
                     label="Package Height"
                     type="number"
@@ -47,6 +45,14 @@ const ReceptionPackageDimension = process_registry.extend("reception", {
             return data;
         };
         states.set_destination._get_set_destination_data = overriden.bind(this);
+        const is_height_required = function () {
+            const pack = this.state.data.selected_move_line[0].package_dest;
+            if (pack.package_type && pack.package_type.height_required) {
+                return true;
+            }
+            return false;
+        }
+        states.set_destination.is_height_required = is_height_required.bind(this);
         return states;
     },
 });
