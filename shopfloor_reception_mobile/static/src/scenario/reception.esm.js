@@ -17,7 +17,7 @@ const Reception = {
                 <state-display-info :info="state.display_info" v-if="state.display_info"/>
             </template>
             <searchbar
-                v-if="state_in(['select_document', 'select_move', 'set_lot', 'set_quantity', 'set_destination', 'select_dest_package', 'set_storage_type'])"
+                v-if="state_in(['select_document', 'select_move', 'set_lot', 'set_quantity', 'set_destination', 'select_dest_package', 'set_package_type'])"
                 v-on:found="on_scan"
                 :input_placeholder="search_input_placeholder"
             />
@@ -163,11 +163,11 @@ const Reception = {
             </template>
 
 
-            <template v-if="state_is('set_storage_type')">
+            <template v-if="state_is('set_package_type')">
                 <manual-select
-                    :records="state.data.storage_types"
-                    :options="manual_select_options_for_storage_type()"
-                    :key="make_state_component_key(['reception', 'manual-select-storage-type'])"
+                    :records="state.data.package_types"
+                    :options="manual_select_options_for_package_type()"
+                    :key="make_state_component_key(['reception', 'manual-select-package-type'])"
                 />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
@@ -189,7 +189,7 @@ const Reception = {
                 <item-detail-card
                     v-if="line_being_handled.package_dest"
                     :record="line_being_handled"
-                    :options="storage_type_options(line_being_handled, true)"
+                    :options="package_type_options(line_being_handled, true)"
                     :card_color="utils.colors.color_for('screen_step_todo')"
                     :key="make_state_component_key(['reception-product-item-detail-set-destination-pack-type', state.data.picking.id])"
                 />
@@ -327,9 +327,9 @@ const Reception = {
                 },
             };
         },
-        manual_select_options_for_storage_type: function () {
+        manual_select_options_for_package_type: function () {
             return {
-                group_title_default: "Available storage types",
+                group_title_default: "Available package types",
                 group_color: this.utils.colors.color_for("screen_step_todo"),
                 list_item_component: "list-item",
                 list_item_options: {
@@ -450,16 +450,16 @@ const Reception = {
             };
         },
 
-        storage_type_select: function () {
+        package_type_select: function () {
             this.wait_call(
-                this.odoo.call("set_storage_type", {
+                this.odoo.call("set_package_type", {
                     picking_id: this.state.data.picking.id,
                     selected_line_id: this.line_being_handled.id,
                     barcode: "",
                 })
             );
         },
-        storage_type_options: function (line, withAction = false) {
+        package_type_options: function (line, withAction = false) {
             const options = {
                 key_title: "package_dest.package_type.name",
                 title_icon: "mdi-package-variant-closed",
@@ -467,7 +467,7 @@ const Reception = {
             };
             const optionsAction = {
                 title_action_icon: "mdi-pencil",
-                on_title_action: this.storage_type_select,
+                on_title_action: this.package_type_select,
             };
 
             if (withAction == true) {
