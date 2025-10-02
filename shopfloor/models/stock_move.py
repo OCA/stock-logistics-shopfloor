@@ -104,7 +104,6 @@ class StockMove(models.Model):
         self.package_level_id.picking_id = new_picking.id
         self.move_line_ids.picking_id = new_picking.id
         self.move_line_ids.package_level_id.picking_id = new_picking.id
-        self._action_assign()
         return new_picking
 
     def extract_and_action_done(self):
