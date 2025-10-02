@@ -1357,7 +1357,6 @@ class Reception(Component):
         new_move._action_confirm(merge=False)
         selected_line.quantity = selected_line.qty_picked
         new_move._recompute_state()
-        new_move._action_assign()
         # Set back the quantity to do on one of the lines
         line = fields.first(
             move.move_line_ids.filtered(
