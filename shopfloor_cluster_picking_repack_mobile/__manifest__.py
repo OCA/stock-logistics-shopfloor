@@ -7,7 +7,7 @@
     "summary": """
     Shopfloor mobile extension for packing operation into cluster picking
     """,
-    "author": "ACSONE SA/NV,Odoo Community Association (OCA)",
+    "author": "ACSONE SA/NV, Camptocamp, Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/stock-logistics-shopfloor",
     "category": "Stock Management",
     "depends": ["shopfloor_mobile", "shopfloor_cluster_picking_repack"],
