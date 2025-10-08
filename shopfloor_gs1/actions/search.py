@@ -19,7 +19,8 @@ class BarcodeParser(Component):
         """Convert search type to AIs.
 
         Each type can be mapped to multiple AIs.
-        For instance, you can search a product by barcode (01) or manufacturer code (240).
+        For instance, you can search a product by barcode (01)
+        or manufacturer code (240).
         """
         return MAPPING_TYPE_TO_AI.get(_type)
 
