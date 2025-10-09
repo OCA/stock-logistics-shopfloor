@@ -8,7 +8,6 @@ from odoo.addons.component.core import Component
 
 
 class SearchResult:
-
     __slots__ = ("record", "type", "code", "parse_result")
 
     def __init__(self, **kw) -> None:

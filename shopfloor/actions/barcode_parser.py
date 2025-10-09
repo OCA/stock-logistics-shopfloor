@@ -7,7 +7,6 @@ from ..actions.search import SearchAction
 
 
 class BarcodeResult:
-
     __slots__ = ("type", "value", "raw")
 
     def __init__(self, **kw) -> None:
