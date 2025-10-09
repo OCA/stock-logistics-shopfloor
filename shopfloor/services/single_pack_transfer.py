@@ -141,6 +141,10 @@ class SinglePackTransfer(Component):
         message = self.msg_store.no_pending_operation_for_pack(package)
         if not package_level and self.is_allow_move_create():
             package_level = self._create_package_level(package)
+            if package_level.state != "assigned":
+                message = self.msg_store.package_level_not_assigned(package_level)
+                savepoint.rollback()
+                return self._response_for_start(message=message)
             if not self.is_dest_location_valid(
                 package_level.move_line_ids.move_id, package_level.location_dest_id
             ):

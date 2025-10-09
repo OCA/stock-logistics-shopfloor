@@ -2,6 +2,7 @@
 # Copyright 2020 Akretion (http://www.akretion.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
+from odoo import fields
 from odoo.fields import Command
 from odoo.tests import Form
 
@@ -208,6 +209,45 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         }
 
         self.assert_response(response, next_state="scan_location", data=expected_data)
+
+    def test_start_no_operation_expired_date(self):
+        """Test /start when the pack to move is expired.
+
+        The pre-conditions:
+
+        * The option "Allow Move Creation" is turned on on the menu
+        * A Pack exists in Stock/Shelf1.
+        * No stock picking exists to move the Pack from Stock/Shelf1 to
+          Stock/Shelf2, or the state is not assigned.
+        * Packed product is configured to use expiration date
+        * Packed product is expired
+
+        Expected result:
+
+        * Return a message
+        """
+        self.menu.sudo().allow_move_create = True
+        barcode = self.pack_a.name
+        params = {"barcode": barcode}
+        self.picking.do_unreserve()
+        self.quant_a.product_id.use_expiration_date = True
+        self.quant_a.expiration_date = fields.Date.from_string("2020-01-01")
+
+        response = self.service.dispatch("start", params=params)
+
+        self.assert_response(
+            response,
+            next_state="start",
+            message={
+                "message_type": "error",
+                "body": self.env._(
+                    "Package %(package)s cannot be reserved in %(location)s%(extra)s.",
+                    package=self.pack_a.name,
+                    location=self.pack_a.location_id.name,
+                    extra=" (date has expired?)",
+                ),
+            },
+        )
 
     def test_start_barcode_not_known(self):
         """Test /start when the barcode is unknown

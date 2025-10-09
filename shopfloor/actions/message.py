@@ -3,7 +3,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 import logging
 
-from odoo import _
+from odoo import _, fields
 
 from odoo.addons.component.core import Component
 
@@ -150,6 +150,31 @@ class MessageAction(Component):
                 "operation type %(picking_type_name)s.",
                 package_name=package.name,
                 picking_type_name=picking_type.name,
+            ),
+        }
+
+    def package_level_not_assigned(self, package_level):
+        package = package_level.package_id
+        body = "Package %(package)s cannot be reserved in %(location)s%(extra)s."
+        extra = ""
+        # Check if quant has an expiration_date outdated.
+        # Starting from Odoo 17.0+, `product_expiry` is blocking the reservation if:
+        #   - product is configured with 'use_expiration_date = True'
+        #   - quant.expiration_date < move.date
+        move = fields.first(package_level.move_ids)
+        if move.product_id.use_expiration_date and any(
+            quant.expiration_date < move.date
+            for quant in package.quant_ids
+            if quant.expiration_date
+        ):
+            extra = " (date has expired?)"
+        return {
+            "message_type": "error",
+            "body": _(
+                body,
+                package=package.name,
+                location=package.location_id.name,
+                extra=extra,
             ),
         }
 
