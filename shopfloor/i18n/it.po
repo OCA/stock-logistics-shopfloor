@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-09-26 18:43+0000\n"
+"PO-Revision-Date: 2025-10-14 08:42+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -1027,7 +1027,7 @@ msgstr "Collo %(old_pack_name)s sostituito dal collo %(new_pack_name)s."
 #. odoo-python
 #: code:addons/shopfloor/tests/test_single_pack_transfer.py:0
 msgid "Package %(package)s cannot be reserved in %(location)s%(extra)s."
-msgstr ""
+msgstr "Il collo %(package)s non può essere prenotato in %(location)s%(extra)s."
 
 #. module: shopfloor
 #. odoo-python
