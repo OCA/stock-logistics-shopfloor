@@ -749,7 +749,10 @@ class Reception(Component):
     def _response_for_select_document(self, pickings=None, message=None):
         if not pickings:
             # We use the standard shopfloor
-            move_lines = self.search_move_line.search_move_lines(match_user=True)
+            # order priorized self by assignee, then date
+            move_lines = self.search_move_line.search_move_lines(
+                match_user=True, order="priority"
+            )
             pickings = move_lines.picking_id.filtered_domain(
                 self._domain_stock_picking(
                     today_only=self.filter_today_scheduled_pickings
@@ -1228,7 +1231,7 @@ class Reception(Component):
         if compare == -1:
             default_values = {
                 "lot_id": False,
-                "shopfloor_user_id": False,
+                "shopfloor_user_id": self.env.uid,
                 "expiration_date": False,
             }
             line._split_qty_to_be_done(quantity, **default_values)
