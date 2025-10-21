@@ -27,6 +27,8 @@
         #  OCA / stock-logistics-workflow
         "stock_move_line_change_lot",
         "stock_picking_progress",
+        #  OCA / stock-logistics-reservation
+        "product_expiry_assign",
         #  OCA / stock-logistics-tracking
         "stock_quant_package_dimension",
         "stock_quant_package_product_packaging",
