@@ -406,6 +406,18 @@ class MessageAction(Component):
             "body": _("Transfer {} is not available.").format(picking.name),
         }
 
+    def picking_above_max_weight(self, picking, max_weight):
+        return {
+            "message_type": "error",
+            "body": _(
+                "Transfer %(picking_name)s weight (%(picking_weight).2f kg) "
+                "exceeds the maximum limit of %(max_weight).2f kg.",
+                picking_name=picking.name,
+                picking_weight=picking.weight,
+                max_weight=max_weight,
+            ),
+        }
+
     def line_has_package_scan_package(self):
         return {
             "message_type": "warning",
