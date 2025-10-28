@@ -140,7 +140,11 @@ class TestSetDestination(CommonCase):
         )
         # Next screen is select move, because picking is not done
         self.assert_response(
-            response, next_state="select_move", data=self._data_for_select_move(picking)
+            response,
+            next_state="select_move",
+            data=self._data_for_select_move(
+                picking, last_processed_line=selected_move_line
+            ),
         )
         # The line has been moved to a different picking.
         self.assertNotEqual(picking, selected_move_line.picking_id)

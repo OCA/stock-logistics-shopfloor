@@ -149,8 +149,20 @@ class Reception(Component):
             )
         return self._response_for_select_move(picking)
 
-    def _response_for_select_move(self, picking, message=None):
+    def _response_for_select_move(
+        self, picking, message=None, last_processed_line=None
+    ):
+        if last_processed_line:
+            if not last_processed_line.result_package_id:
+                last_processed_line = None
+            else:
+                move = self._find_related_move_in_picking(picking, last_processed_line)
+                if move.product_uom_qty <= move.quantity_picked:
+                    # If the move is complete, not proposing to repeat the operation
+                    last_processed_line = None
         data = {"picking": self._data_for_stock_picking(picking, with_lines=True)}
+        if last_processed_line:
+            data["last_processed_line_id"] = last_processed_line.id
         return self._response(next_state="select_move", data=data, message=message)
 
     def _response_for_confirm_done(self, picking, message=None):
@@ -256,6 +268,31 @@ class Reception(Component):
             pickings=pickings,
             message=self.msg_store.lot_not_found_in_pickings(),
         )
+
+    def _find_or_create_line(self, move, exclude_line=None):
+        """Return the next repeat line."""
+        if not exclude_line:
+            exclude_line = self.env["stock.move.line"]
+        unassigned_lines = self.env["stock.move.line"]
+        for move_line in move.move_line_ids:
+            if move_line.result_package_id:
+                continue  # already kind of processed
+            if move_line in exclude_line:
+                continue
+            if move_line.shopfloor_user_id.id == self.env.uid:
+                return move_line
+            elif not move_line.shopfloor_user_id:
+                unassigned_lines |= move_line
+        if unassigned_lines:
+            lock = self._actions_for("lock")
+            for move_line in unassigned_lines:
+                if lock.for_update(move_line, skip_locked=True):
+                    return move_line
+        values = move._prepare_move_line_vals()
+        values["is_shopfloor_created"] = True
+        if exclude_line:
+            values["quantity"] = exclude_line.quantity
+        return self.env["stock.move.line"].create(values)
 
     def _scan_line__find_or_create_line(self, picking, move, qty_done=1):
         """Find or create a line  on a move for the user to work on.
@@ -983,6 +1020,50 @@ class Reception(Component):
             return handler(picking, search_result.record)
         return self._scan_line__fallback(picking, barcode)
 
+    def _find_related_move_in_picking(self, picking, line):
+        move = line.move_id
+        if move.picking_id != picking:
+            move = fields.first(
+                picking.move_ids.filtered(lambda m: m.product_id == line.product_id)
+            )
+        return move
+
+    def scan_line_repeat(self, picking_id, last_processed_line_id):
+        """Repeat the previous line operation on the same move.
+
+        Allows to not manually repeat the last operation scan
+        (lot id, expiration date and quantity picked).
+        By creating a new move line for the user with the same data
+        than the previous line.
+
+        input:
+            picking_id: The current picking
+            last_processed_line_id: The last processed line
+
+        transitions:
+        - select_move: If the last operation can not be repeated
+        - set_quantity: If the last operation is being repeated
+
+        """
+        picking = self.env["stock.picking"].browse(picking_id)
+        message = self._check_picking_processible(picking)
+        if message:
+            return self._response_for_select_move(picking, message=message)
+        last_processed_line = (
+            self.env["stock.move.line"].browse(last_processed_line_id).exists()
+        )
+        if not last_processed_line:
+            message = self.msg_store.record_not_found()
+            return self._response_for_select_move(picking, message=message)
+        # Create a new line to work with
+        current_move = self._find_related_move_in_picking(picking, last_processed_line)
+        line = self._find_or_create_line(current_move, exclude_line=last_processed_line)
+        line.lot_id = last_processed_line.lot_id
+        line.expiration_date = last_processed_line.expiration_date
+        line.qty_picked = last_processed_line.qty_picked
+        self._assign_user_to_line(line)
+        return self._response_for_set_quantity(picking, line)
+
     def manual_select_move(self, move_id):
         move = self.env["stock.move"].browse(move_id)
         picking = move.picking_id
@@ -1414,7 +1495,9 @@ class Reception(Component):
             message = self.msg_store.transfer_done_success(picking)
             return self._response_for_select_document(message=message)
         # Else return select move
-        return self._response_for_select_move(picking)
+        return self._response_for_select_move(
+            picking, last_processed_line=selected_line
+        )
 
     def select_dest_package(
         self, picking_id, selected_line_id, barcode, confirmation=False
@@ -1485,6 +1568,12 @@ class ShopfloorReceptionValidator(Component):
         return {
             "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
             "barcode": {"required": True, "type": "string"},
+        }
+
+    def scan_line_repeat(self):
+        return {
+            "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "last_processed_line_id": {"required": True, "type": "integer"},
         }
 
     def manual_select_move(self):
@@ -1650,7 +1739,7 @@ class ShopfloorReceptionValidatorResponse(Component):
         }
 
     def _scan_line_next_states(self):
-        return {"select_move", "set_lot", "set_quantity"}
+        return {"select_move", "set_lot", "set_quantity", "set_destination"}
 
     def _set_lot_next_states(self):
         return {"select_move", "set_lot", "set_quantity"}
@@ -1705,7 +1794,12 @@ class ShopfloorReceptionValidatorResponse(Component):
         return {
             "picking": self.schemas._schema_dict_of(
                 self._schema_stock_picking_with_lines(), required=True
-            )
+            ),
+            "last_processed_line_id": {
+                "type": "integer",
+                "nullable": True,
+                "required": False,
+            },
         }
 
     @property

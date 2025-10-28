@@ -90,11 +90,15 @@ class CommonCase(BaseCommonCase):
             res.append(self._data_for_move(move))
         return res
 
-    def _data_for_select_move(self, picking, with_progress=True):
+    def _data_for_select_move(
+        self, picking, with_progress=True, last_processed_line=None
+    ):
         picking_data = self._data_for_picking_with_moves(picking, with_progress)
         data = {
             "picking": picking_data,
         }
+        if last_processed_line:
+            data["last_processed_line_id"] = last_processed_line.id
         return data
 
     def setUp(self):
