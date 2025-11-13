@@ -986,6 +986,12 @@ class Reception(Component):
     def manual_select_move(self, move_id):
         move = self.env["stock.move"].browse(move_id)
         picking = move.picking_id
+        message = self._check_move_available(move)
+        if message:
+            return self._response_for_select_move(
+                picking,
+                message=message,
+            )
         return self._scan_line__find_or_create_line(picking, move)
 
     def done_action(self, picking_id, confirmation=False):
