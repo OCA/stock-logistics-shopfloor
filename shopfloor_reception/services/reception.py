@@ -1299,16 +1299,15 @@ class Reception(Component):
         self._prefill_package_type(selected_line, package)
         return self._response_for_set_destination(picking, selected_line)
 
+    def _recompute_putaway_on_line(self, line, allow_unsafe=True):
+        """Hook for the module `shopfloor_reception_putaway_recompute`."""
+        pass
+
     def _prefill_package_type(self, line, package):
         """Prefill the package type on the package before the move is done."""
         package._assign_packaging(line.product_id, line.qty_picked)
         if not package.location_id:
-            if hasattr(line, "_recompute_putaways"):
-                # Recompute the putaway location if the module
-                # stock_picking_putaway_recompute is installed
-                line.with_context(
-                    allow_unsafe_putaway_recompute=True
-                )._recompute_putaways()
+            self._recompute_putaway_on_line(line)
 
     def process_without_pack(self, picking_id, selected_line_id, quantity):
         picking = self.env["stock.picking"].browse(picking_id)
@@ -1488,16 +1487,7 @@ class Reception(Component):
             message = self._check_package_type_valid(package_type)
             if not message:
                 selected_line.result_package_id.package_type_id = package_type
-                if (
-                    self.env["ir.module.module"]
-                    ._get("stock_picking_putaway_recompute")
-                    .state
-                    == "installed"
-                ):
-                    # FIXME should be handeled by a glue module ?!
-                    # Recompute the putaway location if the module
-                    # stock_picking_putaway_recompute is installed
-                    selected_line._recompute_putaways()
+                self._recompute_putaway_on_line(selected_line)
                 message = self.msg_store.package_type_changed()
                 return self._response_for_set_destination(
                     picking, selected_line, message=message
