@@ -1090,8 +1090,22 @@ class Reception(Component):
             selected_line._onchange_serial_number()
         elif expiration_date:
             selected_line.write({"expiration_date": expiration_date})
-            selected_line.lot_id.write({"expiration_date": expiration_date})
+            lot = selected_line.lot_id
+            vals = self._write_lot_expiration_values(lot, expiration_date)
+            lot.write(vals)
         return self._response_for_set_lot(picking, selected_line)
+
+    def _write_lot_expiration_values(self, lot, expiration_date):
+        # Align product_expiry dates with expiration_date
+        tmp_lot = lot.new(
+            values={"product_id": lot.product_id.id, "expiration_date": expiration_date}
+        )
+        return {
+            "expiration_date": tmp_lot.expiration_date,
+            "use_date": tmp_lot.use_date,
+            "removal_date": tmp_lot.removal_date,
+            "alert_date": tmp_lot.alert_date,
+        }
 
     def _create_lot_values(self, product, lot_name):
         return {

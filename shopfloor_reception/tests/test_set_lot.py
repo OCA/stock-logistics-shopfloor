@@ -120,6 +120,7 @@ class TestSetLot(CommonCase):
         )
 
     def test_set_expiry_date(self):
+        self.product_a.use_expiration_date = True
         # First, set the lot
         picking = self._create_picking()
         lot = self._create_lot()
@@ -146,6 +147,9 @@ class TestSetLot(CommonCase):
             },
         )
         self.assertEqual(str(lot.expiration_date), expiration_date)
+        self.assertEqual(str(lot.use_date), expiration_date)
+        self.assertEqual(str(lot.removal_date), expiration_date)
+        self.assertEqual(str(lot.alert_date), expiration_date)
         self.assertEqual(str(selected_move_line.expiration_date), expiration_date)
         data = self.data.picking(picking)
         self.assert_response(
@@ -156,3 +160,40 @@ class TestSetLot(CommonCase):
                 "selected_move_line": self.data.move_lines(selected_move_line),
             },
         )
+
+    def test_set_expiry_date_new_lot(self):
+        self.product_a.use_expiration_date = True
+        picking = self._create_picking()
+        selected_move_line = picking.move_line_ids.filtered(
+            lambda li: li.product_id == self.product_a
+        )
+        selected_move_line.shopfloor_user_id = self.env.uid
+        self.service.dispatch(
+            "set_lot",
+            params={
+                "picking_id": picking.id,
+                "selected_line_id": selected_move_line.id,
+                "lot_name": "LOTTERY",
+            },
+        )
+        new_lot = self.env["stock.lot"].search([("name", "=", "LOTTERY")])
+        self.assertTrue(new_lot)
+        # If use_expiration_date is set, Odoo will compute dates for all those fields.
+        self.assertTrue(new_lot.expiration_date)
+        self.assertTrue(new_lot.use_date)
+        self.assertTrue(new_lot.removal_date)
+        self.assertTrue(new_lot.alert_date)
+        # Set the expiration date to another value
+        expiration_date = "2022-08-24 12:00:00"
+        self.service.dispatch(
+            "set_lot",
+            params={
+                "picking_id": picking.id,
+                "selected_line_id": selected_move_line.id,
+                "expiration_date": expiration_date,
+            },
+        )
+        self.assertEqual(str(new_lot.expiration_date), expiration_date)
+        self.assertEqual(str(new_lot.use_date), expiration_date)
+        self.assertEqual(str(new_lot.removal_date), expiration_date)
+        self.assertEqual(str(new_lot.alert_date), expiration_date)
