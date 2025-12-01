@@ -17,7 +17,7 @@ const Reception = {
                 <state-display-info :info="state.display_info" v-if="state.display_info"/>
             </template>
             <searchbar
-                v-if="state_in(['select_document', 'select_move', 'set_lot', 'set_quantity', 'set_destination', 'select_dest_package'])"
+                v-if="state_in(['select_document', 'select_move', 'set_lot', 'set_quantity', 'set_destination', 'select_dest_package', 'set_package_type'])"
                 v-on:found="on_scan"
                 :input_placeholder="search_input_placeholder"
             />
@@ -161,12 +161,37 @@ const Reception = {
                     </div>
                 </div>
             </template>
+
+
+            <template v-if="state_is('set_package_type')">
+                <manual-select
+                    :records="state.data.package_types"
+                    :options="manual_select_options_for_package_type()"
+                    :key="make_state_component_key(['reception', 'manual-select-package-type'])"
+                />
+                <div class="button-list button-vertical-list full">
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <btn-back/>
+                        </v-col>
+                    </v-row>
+                </div>
+            </template>
+
+
             <template v-if="state_is('set_destination')">
                 <item-detail-card
                     :record="line_being_handled"
                     :options="picking_detail_options_for_set_destination()"
                     :card_color="utils.colors.color_for('screen_step_done')"
                     :key="make_state_component_key(['reception-product-item-detail-set-destination-pack', state.data.picking.id])"
+                />
+                <item-detail-card
+                    v-if="line_being_handled.package_dest"
+                    :record="line_being_handled"
+                    :options="package_type_options(line_being_handled, true)"
+                    :card_color="utils.colors.color_for('screen_step_todo')"
+                    :key="make_state_component_key(['reception-product-item-detail-set-destination-pack-type', state.data.picking.id])"
                 />
                 <item-detail-card
                     :record="line_being_handled"
@@ -302,6 +327,16 @@ const Reception = {
                 },
             };
         },
+        manual_select_options_for_package_type: function () {
+            return {
+                group_title_default: "Available package types",
+                group_color: this.utils.colors.color_for("screen_step_todo"),
+                list_item_component: "list-item",
+                list_item_options: {
+                    key_title: "name",
+                },
+            };
+        },
         picking_detail_options_for_set_lot: function () {
             return {
                 key_title: "product.display_name",
@@ -414,6 +449,33 @@ const Reception = {
                 ],
             };
         },
+
+        package_type_select: function () {
+            this.wait_call(
+                this.odoo.call("set_package_type", {
+                    picking_id: this.state.data.picking.id,
+                    selected_line_id: this.line_being_handled.id,
+                    barcode: "",
+                })
+            );
+        },
+        package_type_options: function (line, withAction = false) {
+            const options = {
+                key_title: "package_dest.package_type.name",
+                title_icon: "mdi-package-variant-closed",
+                title_default: "/",
+            };
+            const optionsAction = {
+                title_action_icon: "mdi-pencil",
+                on_title_action: this.package_type_select,
+            };
+
+            if (withAction == true) {
+                return Object.assign(options, optionsAction);
+            }
+            return options;
+        },
+
         select_dest_package_display_name_values: function (rec) {
             var values = [];
             if (rec.origin) {

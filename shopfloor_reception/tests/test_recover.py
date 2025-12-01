@@ -95,7 +95,9 @@ class TestRecover(CommonCase):
         self.assertEqual(selected_move_line.qty_picked, 5)
         self.assertEqual(selected_move_line.quantity, 5)
         picking_data = self.data.picking(picking)
-        move_line_data = self.data.move_lines(selected_move_line)
+        move_line_data = self.data.move_lines(
+            selected_move_line, with_package_type=True
+        )
         self.assert_response(
             response,
             next_state="set_destination",
