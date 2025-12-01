@@ -30,9 +30,8 @@ msgstr ""
 #. module: shopfloor_reception
 #. odoo-python
 #: code:addons/shopfloor_reception/models/shopfloor_menu.py:0
-#, python-format
-msgid "Filter Today Pickings is not allowed for menu {}."
-msgstr "Il filtro Prelievi odierni non è consentito per il menu {}."
+msgid "Filter Today Pickings is not allowed for menu  %s."
+msgstr ""
 
 #. module: shopfloor_reception
 #: model:ir.model.fields,field_description:shopfloor_reception.field_shopfloor_menu__filter_today_scheduled_pickings
@@ -55,6 +54,28 @@ msgstr "Menu visualizzato nell'applicazione di scansione"
 #: model:stock.picking.type,name:shopfloor_reception.picking_type_reception_demo
 msgid "Reception"
 msgstr "Ricezione"
+
+#. module: shopfloor_reception
+#. odoo-python
+#: code:addons/shopfloor_reception/actions/messages.py:0
+msgid "The package type could not be found"
+msgstr ""
+
+#. module: shopfloor_reception
+#. odoo-python
+#: code:addons/shopfloor_reception/actions/messages.py:0
+msgid "The package type is not valid"
+msgstr ""
+
+#. module: shopfloor_reception
+#. odoo-python
+#: code:addons/shopfloor_reception/actions/messages.py:0
+msgid "The package type was successfully changed"
+msgstr ""
+
+#, python-format
+#~ msgid "Filter Today Pickings is not allowed for menu {}."
+#~ msgstr "Il filtro Prelievi odierni non è consentito per il menu {}."
 
 #~ msgid "Is Shopfloor Created"
 #~ msgstr "Il reparto è crato"
