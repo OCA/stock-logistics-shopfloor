@@ -80,6 +80,12 @@ const Checkout = {
                 <v-alert type="info" tile v-if="state.data.packing_info" class="packing-info">
                     <p v-text="state.data.packing_info" />
                 </v-alert>
+                <v-alert type="info" tile
+                    v-if="(state.data.picking.note && state.data.picking.note !== '<p></p>')"
+                    class="packing-info"
+                    >
+                    <p class="split-text-lines" v-html="state.data.picking.note" />
+                </v-alert>
                 <item-detail-card
                     v-if="state.data.picking.carrier"
                     :key="make_state_component_key(['picking-carrier', state.data.picking.id])"
