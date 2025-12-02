@@ -77,6 +77,16 @@ msgid "Group by commercial entity"
 msgstr "Agrupar por entidad comercial"
 
 #. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,help:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_split_picking_exceeding_limit
+msgid ""
+"If checked, the pickings exceeding the maximum number of lines, volume or "
+"weight of available devices will be split into multiple pickings to respect "
+"the limits. If unchecked, the pickings exceeding the limits will not be "
+"added to the batch. The limits are defined by the limits of the last "
+"available devices."
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
 #: model:ir.model.fields,help:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_group_by_commercial_partner
 msgid ""
 "If enabled, transfers will be grouped by commercial entity.This could mix "
@@ -115,6 +125,11 @@ msgid ""
 "        that will be used to sort the lines. You can also call\n"
 "        the super method to get the default behavior.\n"
 "        "
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_split_picking_exceeding_limit
+msgid "Split pickings exceeding limits"
 msgstr ""
 
 #. module: shopfloor_batch_automatic_creation
