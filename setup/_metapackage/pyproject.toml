@@ -1,6 +1,6 @@
 [project]
 name = "odoo-addons-oca-stock-logistics-shopfloor"
-version = "18.0.20251202.0"
+version = "18.0.20251202.1"
 dependencies = [
     "odoo-addon-shopfloor==18.0.*",
     "odoo-addon-shopfloor_batch_automatic_creation==18.0.*",
@@ -15,6 +15,7 @@ dependencies = [
     "odoo-addon-shopfloor_reception_mobile==18.0.*",
     "odoo-addon-shopfloor_reception_packaging_dimension==18.0.*",
     "odoo-addon-shopfloor_reception_vendor_packaging==18.0.*",
+    "odoo-addon-shopfloor_single_product_transfer==18.0.*",
     "odoo-addon-shopfloor_vendor_packaging==18.0.*",
 ]
 classifiers=[

@@ -38,6 +38,7 @@ addon | version | maintainers | summary
 [shopfloor_reception_mobile](shopfloor_reception_mobile/) | 18.0.1.1.0 | <a href='https://github.com/JuMiSanAr'><img src='https://github.com/JuMiSanAr.png' width='32' height='32' style='border-radius:50%;' alt='JuMiSanAr'/></a> <a href='https://github.com/simahawk'><img src='https://github.com/simahawk.png' width='32' height='32' style='border-radius:50%;' alt='simahawk'/></a> | Scenario for receiving products
 [shopfloor_reception_packaging_dimension](shopfloor_reception_packaging_dimension/) | 18.0.1.3.0 | <a href='https://github.com/TDu'><img src='https://github.com/TDu.png' width='32' height='32' style='border-radius:50%;' alt='TDu'/></a> | Collect Packaging Dimension from the Reception scenario
 [shopfloor_reception_vendor_packaging](shopfloor_reception_vendor_packaging/) | 18.0.1.0.0 |  | Manage shopfloor reception behavior for vendor packaging
+[shopfloor_single_product_transfer](shopfloor_single_product_transfer/) | 18.0.1.0.0 | <a href='https://github.com/mmequignon'><img src='https://github.com/mmequignon.png' width='32' height='32' style='border-radius:50%;' alt='mmequignon'/></a> | Move an item from one location to another.
 [shopfloor_vendor_packaging](shopfloor_vendor_packaging/) | 18.0.1.0.0 |  | Manage shopfloor behavior for vendor packaging
 
 [//]: # (end addons)
