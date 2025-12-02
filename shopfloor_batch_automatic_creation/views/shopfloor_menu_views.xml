@@ -20,6 +20,10 @@
                         name="batch_maximum_number_of_preparation_lines"
                         invisible="not batch_create"
                     />
+                    <field
+                        name="batch_split_picking_exceeding_limit"
+                        invisible="not batch_create"
+                    />
 
                     <label
                         for="stock_device_type_ids"
