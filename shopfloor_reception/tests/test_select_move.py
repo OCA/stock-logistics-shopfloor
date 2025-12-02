@@ -317,3 +317,27 @@ class TestSelectLine(CommonCase):
                 "selected_move_line": self.data.move_lines(selected_move_line),
             },
         )
+
+    def test_manual_select_move_already_done(self):
+        picking = self._create_picking(lines=[(self.product_b, 10)])
+        selected_move = picking.move_ids.filtered(
+            lambda m: m.product_id == self.product_b
+        )
+        move_line = selected_move.move_line_ids
+        package = self.env["stock.quant.package"].create({"name": "PackateOne"})
+        move_line.result_package_id = package
+        move_line.picked = True
+        move_line._action_done()
+
+        response = self.service.dispatch(
+            "manual_select_move",
+            params={"move_id": selected_move.id},
+        )
+        self.assertEqual(response["next_state"], "select_move")
+        message = "Move already processed."
+        self.assert_response(
+            response,
+            next_state="select_move",
+            data=self._data_for_select_move(picking),
+            message={"message_type": "warning", "body": message},
+        )
