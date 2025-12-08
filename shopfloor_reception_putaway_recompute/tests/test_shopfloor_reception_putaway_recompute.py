@@ -79,7 +79,6 @@ class TestShopfloorReceptionPutawayRecompute(CommonCase):
                 }
             )
         )
-        self.sub_location_1.storage_category_id = self.storage_category
         self.sub_location_2.storage_category_id = self.storage_category
         self.env["stock.storage.location.sequence"].sudo().create(
             {
