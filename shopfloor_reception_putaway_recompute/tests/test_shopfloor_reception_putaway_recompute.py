@@ -57,9 +57,37 @@ class TestShopfloorReceptionPutawayRecompute(CommonCase):
 
     def test_change_package_type_on_package(self):
         """Check hook is called on set_package_type endpoint."""
+        self.rule.unlink()
         self.package_type = self.env.ref("stock.package_type_01")
         self.package_type.sudo().barcode = "CAGE"
-        self.rule.location_out_id = self.sub_location_2
+        self.storage_category = (
+            self.env["stock.storage.category"]
+            .sudo()
+            .create(
+                {
+                    "name": "Cage category",
+                    "capacity_ids": [
+                        (
+                            0,
+                            0,
+                            {
+                                "package_type_id": self.package_type.id,
+                                "quantity": 1,
+                            },
+                        )
+                    ],
+                }
+            )
+        )
+        self.sub_location_1.storage_category_id = self.storage_category
+        self.sub_location_2.storage_category_id = self.storage_category
+        self.env["stock.storage.location.sequence"].sudo().create(
+            {
+                "package_type_id": self.package_type.id,
+                "location_id": self.sub_location_2.id,
+                "sequence": 1,
+            }
+        )
         self.service.dispatch("scan_document", params={"barcode": self.picking.name})
         self.move_line.qty_picked = self.move_line.quantity_product_uom
         response = self.service.dispatch(
