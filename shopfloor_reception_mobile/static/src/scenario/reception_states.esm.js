@@ -103,6 +103,14 @@ export const reception_states = function () {
                 //     })
                 // );
             },
+            on_repeat_last: () => {
+                this.wait_call(
+                    this.odoo.call("scan_line_repeat", {
+                        picking_id: this.state.data.picking.id,
+                        last_processed_line_id: this.state.data.last_processed_line_id,
+                    })
+                );
+            },
         },
         confirm_done: {
             display_info: {
