@@ -477,7 +477,7 @@ const Reception = {
                 on_title_action: this.package_type_select,
             };
 
-            if (withAction == true) {
+            if (withAction === true) {
                 return Object.assign(options, optionsAction);
             }
             return options;
