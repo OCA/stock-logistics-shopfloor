@@ -1349,7 +1349,8 @@ class Reception(Component):
         if compare == -1:
             default_values = {
                 "lot_id": False,
-                "shopfloor_user_id": self.env.uid,
+                # The leftover to be picked later should not be assigned to any users
+                "shopfloor_user_id": False,
                 "expiration_date": False,
             }
             line._split_qty_to_be_done(quantity, **default_values)
