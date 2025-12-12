@@ -34,10 +34,36 @@ class ZonePickingZeroCheckCase(ZonePickingCommonCase):
             "is_zero",
             params={"move_line_id": move_line.id, "zero": True},
         )
-        move_lines = self.service._find_location_move_lines()
+        move_lines = self.service._find_location_move_lines(
+            move_line.location_id, picking_type
+        )
         self.assert_response_select_line(
             response,
             zone_location,
             picking_type,
             move_lines,
         )
+
+    def test_is_zero_is_not_empty(self):
+        """call /is_zero not confirming it's empty"""
+        zone_location = self.zone_location
+        picking_type = self.picking1.picking_type_id
+        move_line = self.picking1.move_line_ids[0]
+        response = self.service.dispatch(
+            "is_zero",
+            params={"move_line_id": move_line.id, "zero": False},
+        )
+        move_lines = self.service._find_location_move_lines(
+            move_line.location_id, picking_type
+        )
+        self.assert_response_select_line(
+            response,
+            zone_location,
+            picking_type,
+            move_lines,
+        )
+        inventory = self.service._actions_for("inventory")
+        result = inventory._inventory_exists(
+            move_line.location_id, move_line.product_id
+        )
+        self.assertTrue(result)

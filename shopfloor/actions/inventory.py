@@ -73,8 +73,9 @@ class InventoryAction(Component):
                 {
                     "location_id": location.id,
                     "product_id": product.id,
-                    "lot_id": lot.id,
+                    "lot_id": lot.id if lot else False,
                     "inventory_quantity": 1,
+                    "inventory_quantity_set": True,
                     "inventory_date": fields.Date.today(),
                     "package_id": package.id if package else False,
                 }

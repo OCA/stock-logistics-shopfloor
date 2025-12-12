@@ -1330,7 +1330,21 @@ class ZonePicking(Component):
         move_line = self.env["stock.move.line"].browse(move_line_id)
         if not move_line.exists():
             return self._response_for_start(message=self.msg_store.record_not_found())
-        return self.list_move_lines()
+        zone_location = move_line.location_id
+        if not zone_location.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        picking_type = move_line.move_id.picking_id.picking_type_id
+        if not picking_type.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        if not zero:
+            inventory = self._actions_for("inventory")
+            inventory.create_draft_check_empty(
+                move_line.location_id,
+                move_line.product_id,
+                ref=picking_type.name,
+            )
+        move_lines = self._find_location_move_lines(zone_location, picking_type)
+        return self._response_for_select_line(move_lines)
 
     def _domain_stock_issue_unlink_lines(self, move_line):
         # Since we have not enough stock, delete the move lines, which will
