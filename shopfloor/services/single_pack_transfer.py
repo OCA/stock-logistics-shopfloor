@@ -118,7 +118,7 @@ class SinglePackTransfer(Component):
                     ("state", "in", ("assigned", "partially_available")),
                 ]
             )
-            if any(line.qty_done > 0 for line in other_move_lines) or (
+            if any(line.qty_picked > 0 for line in other_move_lines) or (
                 other_move_lines and not self.work.menu.allow_unreserve_other_moves
             ):
                 picking = fields.first(other_move_lines).picking_id
@@ -286,18 +286,17 @@ class SinglePackTransfer(Component):
         moves = package_level.move_ids | package_level.move_line_ids.move_id
         if "done" in moves.mapped("state"):
             return self._response_for_start(message=self.msg_store.already_done())
-
+        picking = package_level.picking_id
+        assigned_picking = picking.state == "assigned"
         package_level.is_done = False
-        if (
-            self.is_allow_move_create()
-            and package_level.picking_id.create_uid == self.env.user
-        ):
+        if self.is_allow_move_create() and picking.create_uid == self.env.user:
             # Cancel the transfer when it has been created by the shopfloor user
-            moves.picking_id.action_cancel()
-        else:
-            # Not owned only unassign the user
-            stock = self._actions_for("stock")
-            stock.unmark_move_line_as_picked(moves.move_line_ids)
+            picking.action_cancel()
+        elif assigned_picking:
+            # Should we ensure same pieces are reserved than those previously
+            #  reserved before move lines are deleted by package_level.is_done = False
+            #  above?
+            picking.action_assign()
 
         return self._response_for_start(
             message=self.msg_store.confirm_canceled_scan_next_pack()
