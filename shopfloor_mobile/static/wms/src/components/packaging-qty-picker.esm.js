@@ -219,7 +219,7 @@ export var PackagingQtyPicker = Vue.component("packaging-qty-picker", {
     },
     computed: {
         qty_color_class: function () {
-            if (this.qty == this.qtyTodo) {
+            if (this.qty === this.qtyTodo) {
                 if (this.readonly) return "";
                 return "qty-color-green";
             }
