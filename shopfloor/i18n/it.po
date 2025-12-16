@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-10-14 08:42+0000\n"
+"PO-Revision-Date: 2025-12-16 12:43+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -807,7 +807,7 @@ msgstr "Mvimento già elaborato."
 #. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 msgid "Move validation failed. %s"
-msgstr ""
+msgstr "Validazione movimento fallita. %s"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__multiple_move_single_pack_is_possible
