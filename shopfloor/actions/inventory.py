@@ -74,7 +74,9 @@ class InventoryAction(Component):
                     "location_id": location.id,
                     "product_id": product.id,
                     "lot_id": lot.id if lot else False,
-                    "inventory_quantity": 1,
+                    # Set a user to prevent the zero quant cleanup
+                    "user_id": self.env.user.id,
+                    "inventory_quantity": 0,
                     "inventory_quantity_set": True,
                     "inventory_date": fields.Date.today(),
                     "package_id": package.id if package else False,
