@@ -181,6 +181,7 @@ class Reception(Component):
             next_state="confirm_new_package", data=data, message=message
         )
 
+    # TODO: is this method used somewhere?
     def _select_document_from_move_lines(self, move_lines, msg_func):
         pickings = move_lines.move_id.picking_id
         if len(pickings) == 1:
