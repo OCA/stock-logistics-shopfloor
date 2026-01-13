@@ -538,7 +538,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
             "stock_storage_type.stock_location_pallets_reserve_bin_2"
         )
         pallets_location = self.env.ref("stock_storage_type.stock_location_pallets")
-        pallets_location.barcode = "PALLETS"
+        pallets_location.sudo().barcode = "PALLETS"
         pack_a = self.env["stock.quant.package"].create(
             {"location_id": reserve_location.id}
         )
