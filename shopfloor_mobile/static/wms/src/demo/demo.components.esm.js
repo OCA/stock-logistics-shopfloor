@@ -4,9 +4,9 @@
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
 
+import {demotools} from "/shopfloor_mobile_base/static/src/demo/demo.core.esm.js";
 import {ScenarioBaseMixin} from "/shopfloor_mobile_base/static/src/scenario/mixins.esm.js";
 import {process_registry} from "/shopfloor_mobile_base/static/src/services/process_registry.esm.js";
-import {demotools} from "/shopfloor_mobile_base/static/src/demo/demo.core.esm.js";
 
 const DemoComponents = {
     mixins: [ScenarioBaseMixin],
