@@ -57,14 +57,6 @@ class Reception(Component):
             picking, selected_line, packaging, message=msg
         )
 
-    def _set_packaging_dimension_data_for_packaging(self, packaging):
-        # Add flag `is_being_measured` to indicate
-        # if the packaging is being measured on the app
-        return dict(
-            super()._set_packaging_dimension_data_for_packaging(packaging),
-            is_being_measured=bool(packaging.measuring_device_id),
-        )
-
     def _response_for_use_measuring_device(
         self, picking, line, packaging, message=None
     ):
@@ -145,11 +137,6 @@ class ShopfloorReceptionValidatorResponse(Component):
         return self._response_schema(
             next_states=self._set_packaging_dimension__measuring_device_next_states()
         )
-
-    def _schema_packaging(self):
-        schema = super()._schema_packaging()
-        schema["schema"]["is_being_measured"] = {"type": "boolean", "default": False}
-        return schema
 
     def _set_packaging_dimension_next_states(self):
         res = super()._set_packaging_dimension_next_states()
