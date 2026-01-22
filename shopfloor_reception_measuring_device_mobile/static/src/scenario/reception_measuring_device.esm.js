@@ -9,14 +9,14 @@ const reception_scenario = process_registry.get("reception");
 const _get_states = reception_scenario.component.methods._get_states;
 // Get the original template of the reception scenario
 const template = reception_scenario.component.template;
-// Add in template: the button to access the measuring device screen
+// Add a button in the `set_packaging_dimension` screen to access the new screen `use_measuring_device`
 const button_placeholder = "<!-- measuring-device-placeholder -->";
 const new_template_temp = template.replace(
     button_placeholder,
     `
         <v-row>
             <v-col class="text-center" cols="12">
-                <btn-action @click="state.use_measuring_device">USE MEASURING DEVICE</btn-action>
+                <btn-action @click="state.on_use_measuring_device">Use Measuring Device</btn-action>
             </v-col>
         </v-row>
     `
@@ -40,7 +40,7 @@ const new_template =
      <div class="button-list button-vertical-list full">
          <v-row align="center">
              <v-col class="text-center" cols="12">
-                 <btn-action @click="state.on_ok">OK</btn-action>
+                 <btn-action @click="state.on_confirm_measurement">OK</btn-action>
              </v-col>
          </v-row>
      </div>
@@ -57,7 +57,8 @@ const ReceptionMeasuringDevice = process_registry.extend("reception", {
     template: new_template,
     "methods._get_states": function () {
         const states = _get_states.bind(this)();
-        states.set_packaging_dimension.use_measuring_device = () => {
+        // Add the handler for the Use Measuring Device button in the `set_packaging_dimension` screen
+        states.set_packaging_dimension.on_use_measuring_device = () => {
             const values = {
                 picking_id: this.state.data.picking.id,
                 selected_line_id: this.state.data.selected_move_line.id,
@@ -70,11 +71,12 @@ const ReceptionMeasuringDevice = process_registry.extend("reception", {
                 )
             );
         };
+        // Add the new state `use_measuring_device`
         states.use_measuring_device = {
             display_info: {
                 title: "Using measuring device",
             },
-            on_ok: () => {
+            on_confirm_measurement: () => {
                 this.wait_call(
                     this.odoo.call(
                         "set_packaging_dimension__measuring_device_release",
