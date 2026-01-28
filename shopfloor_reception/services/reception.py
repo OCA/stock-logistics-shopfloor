@@ -1174,7 +1174,7 @@ class Reception(Component):
                 picking,
                 message=message,
             )
-        return self._scan_line__find_or_create_line(picking, move)
+        return self._scan_line__find_or_create_line(picking, move, qty_done=0)
 
     def done_action(self, picking_id, confirmation=False):
         """Mark a picking as done
