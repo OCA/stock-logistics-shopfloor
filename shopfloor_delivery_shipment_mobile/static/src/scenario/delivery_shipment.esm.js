@@ -250,6 +250,7 @@ const DeliveryShipment = {
             return this.utils.colors.color_for(color);
         },
         package_level_process(package_levels) {
+            package_levels = package_levels || [];
             const package_level_count = package_levels.length;
             const done_package_level_count = package_levels.reduce((acc, next) => {
                 return next.is_done ? acc + 1 : acc;
