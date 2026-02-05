@@ -601,6 +601,7 @@ class Reception(Component):
                     or (lot.name == li.lot_name and lot.product_id == li.product_id)
                 )
                 and not li.shopfloor_unloaded
+                and li.shopfloor_user_id.id in (False, self.env.uid)
             )
         )
         if not lines:
@@ -622,7 +623,9 @@ class Reception(Component):
     def _scan_line__fallback(self, picking, barcode):
         # We might have lines with no lot, but with a lot_name.
         lines = picking.move_line_ids.filtered(
-            lambda li: li.lot_name == barcode and not li.shopfloor_unloaded
+            lambda li: li.lot_name == barcode
+            and not li.shopfloor_unloaded
+            and li.shopfloor_user_id.id in (False, self.env.uid)
         )
         if not lines:
             return self._response_for_select_move(
