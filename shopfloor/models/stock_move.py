@@ -116,9 +116,9 @@ class StockMove(models.Model):
         """
         # Process assigned moves
         moves = self.filtered(lambda m: m.state == "assigned")
-        if not moves:
-            return False
         new_backorders = self.env["stock.picking"]
+        if not moves:
+            return new_backorders
         for picking in moves.picking_id:
             existing_backorders = picking.backorder_ids
             moves_todo = picking.move_ids & moves
