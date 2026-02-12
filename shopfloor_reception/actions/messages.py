@@ -28,3 +28,22 @@ class MessageAction(Component):
             "message_type": "error",
             "body": self.env._("The package type is not valid"),
         }
+
+    def lot_already_exists_different_expiration_date(self, lot, expiration_date):
+        formatted_lot_expiration_date = self.work.env[
+            "ir.qweb.field.date"
+        ].value_to_html(lot.expiration_date, {})
+        formatted_provided_expiration_date = self.work.env[
+            "ir.qweb.field.date"
+        ].value_to_html(expiration_date, {})
+        return {
+            "message_type": "warning",
+            "body": self.env._(
+                "A lot already exists with a different expiration date.\n\n"
+                "Lot '%(lot_name)s' expiration date: %(current)s "
+                "!= provided expiration date: %(provided)s",
+                lot_name=lot.name,
+                current=formatted_lot_expiration_date,
+                provided=formatted_provided_expiration_date,
+            ),
+        }
