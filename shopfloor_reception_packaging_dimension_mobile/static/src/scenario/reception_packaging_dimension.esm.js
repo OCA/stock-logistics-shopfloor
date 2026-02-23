@@ -46,7 +46,7 @@ const new_template =
                     type="number"
                     :suffix="state.data.packaging.length_uom_name"
                     placeholder="Packaging Length"
-                    v-model="state.data.packaging.length_input"
+                    v-model="state.data.packaging.packaging_length_input"
                 ></v-text-field>
             </v-row>
             <v-row>
@@ -108,7 +108,7 @@ const ReceptionPackageDimension = process_registry.extend("reception", {
     template: new_template,
     "methods.get_packaging_measurements_inputs": function () {
         return [
-            "length_input",
+            "packaging_length_input",
             "width_input",
             "height_input",
             "weight_input",
@@ -138,11 +138,11 @@ const ReceptionPackageDimension = process_registry.extend("reception", {
                     klass: _is_field_changed("qty") ? "accent" : "",
                 },
                 {
-                    path: "length",
+                    path: "packaging_length",
                     label: "Length",
-                    klass: _is_field_changed("length") ? "accent" : "",
+                    klass: _is_field_changed("packaging_length") ? "accent" : "",
                     renderer: function (rec) {
-                        const value = _.result(rec, "length", "");
+                        const value = _.result(rec, "packaging_length", "");
                         const uom = _.result(rec, "length_uom_name", "");
                         return value + " " + uom;
                     },
