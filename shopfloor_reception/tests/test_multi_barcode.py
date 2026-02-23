@@ -24,6 +24,7 @@ class TestStructuredBarcode(CommonCase):
         """
         picking = self._create_picking()
         lot = self._create_lot()
+        lot.expiration_date = None
         selected_move_line = picking.move_line_ids.filtered(
             lambda li: li.product_id == self.product_a
         )
