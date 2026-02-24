@@ -47,3 +47,13 @@ class MessageAction(Component):
                 provided=formatted_provided_expiration_date,
             ),
         }
+
+    def lot_creation_disabled(self, picking_type):
+        return {
+            "message_type": "error",
+            "body": self.env._(
+                "The operation type '%(picking_type)s' does not allow to"
+                " create new lots.",
+                picking_type=picking_type.display_name,
+            ),
+        }
