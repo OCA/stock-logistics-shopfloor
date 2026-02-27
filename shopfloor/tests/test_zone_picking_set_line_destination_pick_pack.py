@@ -13,42 +13,25 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
 
     """
 
-    @classmethod
-    def setUpClass(cls):
-        try:
-            super().setUpClass()
-        except BaseException:
-            # ensure that the registry is restored in case of error in setUpClass
-            # since tearDownClass is not called in this case and our _load_test_models
-            # loads fake models
-            if hasattr(cls, "loader"):
-                cls.loader.restore_registry()
-            raise
+    def setUp(self):
+        super().setUp()
+        self.loader = FakeModelLoader(self.env, self.__module__)
+        self.loader.backup_registry()
 
-    @classmethod
-    def _load_test_models(cls):
-        cls.loader = FakeModelLoader(cls.env, cls.__module__)
-        cls.loader.backup_registry()
         from .models import DeliveryCarrierTest, StockPackageType
 
-        cls.loader.update_registry((DeliveryCarrierTest, StockPackageType))
+        self.loader.update_registry((DeliveryCarrierTest, StockPackageType))
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.loader.restore_registry()
-        super().tearDownClass()
+        self.service.work.current_picking_type = self.picking1.picking_type_id
+        self.menu.sudo().pick_pack_same_time = True
 
-    @classmethod
-    def setUpClassBaseData(cls, *args, **kwargs):
-        super().setUpClassBaseData(*args, **kwargs)
-        cls._load_test_models()
-        cls.carrier = cls.env["delivery.carrier"].search([], limit=1)
+        self.carrier = self.env["delivery.carrier"].search([], limit=1)
         package_type_type = (
-            cls.env["stock.package.type"]
+            self.env["stock.package.type"]
             .sudo()
             .create({"name": "TEST DEFAULT", "package_carrier_type": "test"})
         )
-        cls.carrier.sudo().write(
+        self.carrier.sudo().write(
             {
                 "delivery_type": "test",
                 "integration_level": "rate",  # avoid sending emails
@@ -56,10 +39,9 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
             }
         )
 
-    def setUp(self):
-        super().setUp()
-        self.service.work.current_picking_type = self.picking1.picking_type_id
-        self.menu.sudo().pick_pack_same_time = True
+    def tearDown(self):
+        self.loader.restore_registry()
+        super().tearDown()
 
     def test_set_destination_location_no_carrier(self):
         """Scan location but carrier not set on picking"""
