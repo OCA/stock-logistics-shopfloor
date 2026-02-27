@@ -272,14 +272,13 @@ class StockAction(Component):
 
     def _set_destination_on_lines(self, lines, location_dest):
         # when writing the destination on the package level, it writes
-        # on the moves and move lines
+        # on the move lines
         lines_with_package_level = lines.package_level_id.move_line_ids
         lines_without_package_level = lines - lines_with_package_level
         if lines_with_package_level:
             lines_with_package_level.package_level_id.location_dest_id = location_dest
         if lines_without_package_level:
             lines_without_package_level.location_dest_id = location_dest
-            lines_without_package_level.move_id.location_dest_id = location_dest
 
     def unload_package(self, lines):
         lines.result_package_id = False
