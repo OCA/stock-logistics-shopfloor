@@ -16,6 +16,10 @@ class ZonePickingUnloadSetDestinationSync(ZonePickingCommonCase, SyncMixin):
         cls.move1 = cls.picking1.move_ids
         cls.move2, cls.move3 = cls.picking2.move_ids
         cls.move4 = cls.picking3.move_ids
+        moves = cls.move1 | cls.move2 | cls.move3 | cls.move4
+        moves.group_id = cls.env["procurement.group"].create(
+            {"name": "Test shopfloor sync"}
+        )
 
         # create the destination moves in the packing zone move[1-4] will go to
         # the same pack picking, so their destination location must be sync'ed
@@ -52,6 +56,7 @@ class ZonePickingUnloadSetDestinationSync(ZonePickingCommonCase, SyncMixin):
         )
 
     def test_unload_set_destination_sync(self):
+        self.assertEqual(self.pack_move1.picking_id, self.pack_move2.picking_id)
         self.service.work.current_picking_type = self.picking1.picking_type_id
         # set the destination package
         self.service._set_destination_package(

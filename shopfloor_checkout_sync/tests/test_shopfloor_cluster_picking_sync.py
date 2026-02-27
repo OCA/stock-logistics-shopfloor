@@ -15,7 +15,11 @@ class TestShopfloorCheckoutSync(ClusterPickingUnloadingCommonCase, SyncMixin):
 
         # moves may be in different pickings, but they all deliver the same
         # pack
-        cls.move1, cls.move2, cls.move3 = cls.batch.mapped("picking_ids.move_ids")
+        moves = cls.batch.picking_ids.move_ids
+        moves.group_id = cls.env["procurement.group"].create(
+            {"name": "Test shopfloor sync"}
+        )
+        cls.move1, cls.move2, cls.move3 = moves
         # create the destination moves in the packing zone
         cls.pack_move1 = cls._add_pack_move_after_pick_move(
             cls.move1, cls.wh.pack_type_id
@@ -32,6 +36,7 @@ class TestShopfloorCheckoutSync(ClusterPickingUnloadingCommonCase, SyncMixin):
 
     def test_unload_scan_destination_sync_checkout(self):
         """When a destination is set, it applies the sync"""
+        self.assertEqual(self.pack_move1.picking_id, self.pack_move2.picking_id)
         self._set_dest_package_and_done(self.move1.move_line_ids, self.bin1)
         self.service.dispatch(
             "unload_scan_destination",
