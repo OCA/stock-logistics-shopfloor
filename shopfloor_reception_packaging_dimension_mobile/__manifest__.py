@@ -8,8 +8,8 @@
     "development_status": "Alpha",
     "category": "Inventory",
     "website": "https://github.com/OCA/stock-logistics-shopfloor",
-    "author": "Camptocamp, Odoo Community Association (OCA)",
-    "maintainers": ["TDu"],
+    "author": "Camptocamp, BCIM, Odoo Community Association (OCA)",
+    "maintainers": ["TDu", "jbaudoux", "mmequignon"],
     "license": "AGPL-3",
     "depends": [
         "shopfloor_reception_mobile",
