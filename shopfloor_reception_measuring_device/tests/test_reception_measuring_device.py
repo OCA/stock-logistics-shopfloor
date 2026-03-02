@@ -16,12 +16,28 @@ class TestSetPackDimension(CommonCase):
         cls.wh = cls.env.ref("stock.warehouse0")
         cls.setUpClassPackaging()
         cls.setUpComponentRegistry()
-        cls.setUpClassMeasuringDevice()
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.loader.restore_registry()
-        return super().tearDownClass()
+    def setUp(self):
+        super().setUp()
+        self.loader = FakeModelLoader(self.env, self.__module__)
+        self.loader.backup_registry()
+
+        from .device_model import MeasuringModel
+
+        self.loader.update_registry((MeasuringModel,))
+        self.device_model = self.env["measuring.device"].sudo()
+        self.device = self.device_model.create(
+            {
+                "name": "Test Device",
+                "device_type": "testdevice",
+                "state": "ready",
+                "warehouse_id": self.wh.id,
+            }
+        )
+
+    def tearDown(self):
+        self.loader.restore_registry()
+        return super().tearDown()
 
     @classmethod
     def setup_picking(cls):
@@ -47,23 +63,6 @@ class TestSetPackDimension(CommonCase):
                     "qty": 6,
                 }
             )
-        )
-
-    @classmethod
-    def setUpClassMeasuringDevice(cls):
-        cls.loader = FakeModelLoader(cls.env, cls.__module__)
-        cls.loader.backup_registry()
-        from .device_model import MeasuringModel
-
-        cls.loader.update_registry((MeasuringModel,))
-        cls.device_model = cls.env["measuring.device"].sudo()
-        cls.device = cls.device_model.create(
-            {
-                "name": "Test Device",
-                "device_type": "testdevice",
-                "state": "ready",
-                "warehouse_id": cls.wh.id,
-            }
         )
 
     def _assert_response_set_dimension(

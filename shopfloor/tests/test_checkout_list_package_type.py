@@ -8,53 +8,33 @@ from .test_checkout_select_package_base import CheckoutSelectPackageMixin
 
 # pylint: disable=missing-return
 class CheckoutListDeliveryPackagingCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
-    @classmethod
-    def setUpClass(cls):
-        try:
-            super().setUpClass()
-        except BaseException:
-            # ensure that the registry is restored in case of error in setUpClass
-            # since tearDownClass is not called in this case and our _load_test_models
-            # loads fake models
-            if hasattr(cls, "loader"):
-                cls.loader.restore_registry()
-            raise
+    def setUp(self):
+        super().setUp()
+        self.loader = FakeModelLoader(self.env, self.__module__)
+        self.loader.backup_registry()
 
-    @classmethod
-    def _load_test_models(cls):
-        cls.loader = FakeModelLoader(cls.env, cls.__module__)
-        cls.loader.backup_registry()
         from .models import DeliveryCarrierTest, StockPackageType
 
-        cls.loader.update_registry((DeliveryCarrierTest, StockPackageType))
+        self.loader.update_registry((DeliveryCarrierTest, StockPackageType))
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.loader.restore_registry()
-        super().tearDownClass()
-
-    @classmethod
-    def setUpClassBaseData(cls, *args, **kwargs):
-        super().setUpClassBaseData(*args, **kwargs)
-        cls._load_test_models()
-        cls.carrier = cls.env["delivery.carrier"].search([], limit=1)
-        cls.carrier.sudo().delivery_type = "test"
-        cls.picking = cls._create_picking(
+        self.carrier = self.env["delivery.carrier"].search([], limit=1)
+        self.carrier.sudo().delivery_type = "test"
+        self.picking = self._create_picking(
             lines=[
-                (cls.product_a, 10),
-                (cls.product_b, 10),
-                (cls.product_c, 10),
-                (cls.product_d, 10),
+                (self.product_a, 10),
+                (self.product_b, 10),
+                (self.product_c, 10),
+                (self.product_d, 10),
             ]
         )
-        cls.picking.carrier_id = cls.carrier
-        cls.packaging_type = (
-            cls.env["product.packaging.level"]
+        self.picking.carrier_id = self.carrier
+        self.packaging_type = (
+            self.env["product.packaging.level"]
             .sudo()
             .create({"name": "Transport Box", "code": "TB", "sequence": 0})
         )
-        cls.package_type1 = (
-            cls.env["stock.package.type"]
+        self.package_type1 = (
+            self.env["stock.package.type"]
             .sudo()
             .create(
                 {
@@ -64,8 +44,8 @@ class CheckoutListDeliveryPackagingCase(CheckoutCommonCase, CheckoutSelectPackag
                 }
             )
         )
-        cls.package_type2 = (
-            cls.env["stock.package.type"]
+        self.package_type2 = (
+            self.env["stock.package.type"]
             .sudo()
             .create(
                 {
@@ -75,7 +55,11 @@ class CheckoutListDeliveryPackagingCase(CheckoutCommonCase, CheckoutSelectPackag
                 }
             )
         )
-        cls.package_type = (cls.package_type1 | cls.package_type2).sorted("name")
+        self.package_type = (self.package_type1 | self.package_type2).sorted("name")
+
+    def tearDown(self):
+        self.loader.restore_registry()
+        super().tearDown()
 
     def test_list_package_type_available(self):
         self._fill_stock_for_moves(self.picking.move_ids, in_package=True)
