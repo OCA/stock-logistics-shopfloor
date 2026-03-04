@@ -1,4 +1,5 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+# Copyright 2025 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import _, fields
 from odoo.tools.float_utils import float_compare, float_round
@@ -265,3 +266,24 @@ class StockAction(Component):
         if float_compare(qty_picked, qty_todo, precision_rounding=rounding) > 0:
             return False
         return True
+
+    def _lock_lines(self, lines):
+        self._actions_for("lock").for_update(lines)
+
+    def _set_destination_on_lines(self, lines, location_dest):
+        # when writing the destination on the package level, it writes
+        # on the move lines
+        lines_with_package_level = lines.package_level_id.move_line_ids
+        lines_without_package_level = lines - lines_with_package_level
+        if lines_with_package_level:
+            lines_with_package_level.package_level_id.location_dest_id = location_dest
+        if lines_without_package_level:
+            lines_without_package_level.location_dest_id = location_dest
+
+    def unload_package(self, lines):
+        lines.result_package_id = False
+
+    def set_destination_on_lines(self, lines, location_dest, lock_lines=True):
+        if lock_lines:
+            self._lock_lines(lines)
+        self._set_destination_on_lines(lines, location_dest)
