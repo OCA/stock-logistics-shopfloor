@@ -4,7 +4,7 @@
 {
     "name": "Shopfloor Delivery Shipment Mobile",
     "summary": "Frontend for delivery shipment scenario for shopfloor",
-    "version": "18.0.1.0.1",
+    "version": "18.0.1.1.0",
     "development_status": "Alpha",
     "category": "Inventory",
     "website": "https://github.com/OCA/stock-logistics-shopfloor",

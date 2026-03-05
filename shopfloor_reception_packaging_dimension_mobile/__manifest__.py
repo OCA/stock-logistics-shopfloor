@@ -4,7 +4,7 @@
 {
     "name": "Shopfloor Reception Packaging Dimension Mobile",
     "summary": "Frontend for the packaging dimension on reception scenario",
-    "version": "18.0.1.0.1",
+    "version": "18.0.1.1.0",
     "development_status": "Alpha",
     "category": "Inventory",
     "website": "https://github.com/OCA/stock-logistics-shopfloor",

@@ -3,7 +3,7 @@
 {
     "name": "Shopfloor reception mobile",
     "summary": "Scenario for receiving products",
-    "version": "18.0.1.3.0",
+    "version": "18.0.1.4.0",
     "development_status": "Beta",
     "depends": ["shopfloor_mobile_base", "shopfloor_reception"],
     "author": "Camptocamp, BCIM, Odoo Community Association (OCA)",
