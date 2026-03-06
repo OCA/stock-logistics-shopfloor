@@ -58,6 +58,7 @@
         "data/shopfloor_scenario_data.xml",
         "security/groups.xml",
         "views/shopfloor_menu.xml",
+        "views/stock_package_type.xml",
         "views/stock_picking_type.xml",
         "views/stock_location.xml",
         "views/stock_move_line.xml",
