@@ -475,3 +475,83 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
         returned_lines = res["data"]["summary"]["picking"]["move_lines"]
         expected_line_ids = [line["id"] for line in returned_lines]
         self.assertEqual(expected_line_ids, picking.move_line_ids.ids)
+
+    def test_scan_package_action_scan_invalid_package_type_carrier(self):
+        picking = self._create_picking(lines=[(self.product_a, 10)])
+        picking.carrier_id = picking.carrier_id.search([], limit=1)
+        another_carrier = picking.carrier_id.search([("id", "!=", picking.carrier_id.id)], limit=1)
+        pack1_moves = picking.move_ids
+        # put in 2 packs, for this test, we'll work on pack1
+        self._fill_stock_for_moves(pack1_moves, in_package=True)
+        picking.action_assign()
+        selected_lines = pack1_moves.move_line_ids
+        selected_lines.qty_picked = selected_lines.quantity
+        packaging = (
+            self.env["stock.package.type"]
+            .sudo()
+            .create(
+                {
+                    "name": "Package",
+                    "barcode": "PACKAGE",
+                }
+            )
+        )
+        mock1 = mock.patch.object(
+            type(packaging),
+            "package_carrier_type",
+            new_callable=mock.PropertyMock,
+        )
+        mock2 = mock.patch.object(
+            type(picking.carrier_id),
+            "delivery_type",
+            new_callable=mock.PropertyMock,
+        )
+        mock3 = mock.patch.object(
+            type(packaging),
+            "package_carrier_id",
+            new_callable=mock.PropertyMock,
+        )
+        with mock1 as mocked_package_carrier_type, mock2 as mocked_delivery_type, mock3 as mocked_package_carrier_id:
+            # Picking carrier id not matching the packaging carried id -> bad
+            mocked_package_carrier_type.return_value = "Postlogistics"
+            mocked_delivery_type.return_value = "Postlogistics"
+            mocked_package_carrier_id.return_value = another_carrier
+            response = self.service.dispatch(
+                "scan_package_action",
+                params={
+                    "picking_id": picking.id,
+                    "selected_line_ids": selected_lines.ids,
+                    "barcode": packaging.barcode,
+                },
+            )
+            self._assert_selected_response(
+                response,
+                selected_lines,
+                message=self.msg_store.package_type_carrier_mismatch(
+                    packaging, picking.carrier_id
+                ),
+            )
+            # Picking carrier id matches with packaging carrier id -> good
+            mocked_package_carrier_id.return_value = picking.carrier_id
+            response = self.service.dispatch(
+                "scan_package_action",
+                params={
+                    "picking_id": picking.id,
+                    "selected_line_ids": selected_lines.ids,
+                    "barcode": packaging.barcode,
+                },
+            )
+            self.assertEqual(
+                response["message"],
+                self.msg_store.goods_packed_in(selected_lines.result_package_id),
+            )
+            # Picking carrier id is not set on the packaging -> good
+            mocked_package_carrier_id.return_value = False
+            response = self.service.dispatch(
+                "scan_package_action",
+                params={
+                    "picking_id": picking.id,
+                    "selected_line_ids": selected_lines.ids,
+                    "barcode": packaging.barcode,
+                },
+            )

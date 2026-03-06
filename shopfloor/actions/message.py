@@ -968,6 +968,19 @@ class MessageAction(Component):
             ),
         }
 
+    def package_type_carrier_mismatch(self, package, carrier):
+        return {
+            "message_type": "error",
+            "body": _(
+                "Package '%(package_name)s' dedicated carrier "
+                "'%(package_carrier_name)s' doesn''t match with "
+                "%(carrier_name)s",
+                package_name=package.name if package else _("No value"),
+                package_carrier_name=package.carrier_id.name if package and package.carrier_id else _("No value"),
+                carrier_name=carrier.name,
+            ),
+        }
+
     def dest_package_not_valid(self, package):
         return {
             "message_type": "error",

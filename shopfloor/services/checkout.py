@@ -1175,18 +1175,20 @@ class Checkout(Component):
         self, picking, selected_lines, package_type, **kw
     ):
         carrier = self._get_carrier(picking)
+        message = None
+        is_valid = True
         if carrier:
-            # Validate against carrier
-            is_valid = self._package_type_good_for_carrier(package_type, carrier)
-        else:
-            is_valid = True
-        if carrier and not is_valid:
+            if not self._package_type_good_for_carrier(package_type, carrier):
+                is_valid = False
+                message = self.msg_store.package_type_invalid_for_carrier(package_type, carrier)
+            elif not self._package_carrier_matches_picking_carrier(package_type, carrier):
+                is_valid = False
+                message = self.msg_store.package_type_carrier_mismatch(package_type, carrier)
+        if not is_valid:
             return self._response_for_select_package(
                 picking,
                 selected_lines,
-                message=self.msg_store.package_type_invalid_for_carrier(
-                    package_type, carrier
-                ),
+                message=message,
             )
         return self._create_and_assign_new_package_type(
             picking, selected_lines, package_type
@@ -1199,6 +1201,10 @@ class Checkout(Component):
 
     def _get_carrier(self, picking):
         return picking.ship_carrier_id or picking.carrier_id
+
+    def _package_carrier_matches_picking_carrier(self, package_type, carrier):
+        actions = self._actions_for("packing")
+        return actions.package_carrier_matches_picking_carrier(package_type, carrier)
 
     def _package_type_good_for_carrier(self, package_type, carrier):
         actions = self._actions_for("packing")

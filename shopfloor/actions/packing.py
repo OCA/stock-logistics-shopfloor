@@ -17,6 +17,12 @@ class PackingAction(Component):
             carrier.delivery_type,
         )
 
+    def package_carrier_matches_picking_carrier(self, package_type, carrier):
+        return (
+            not package_type.package_carrier_id
+            or package_type.package_carrier_id == carrier
+        )
+
     def create_delivery_package(self, carrier):
         default_package_type = self._get_default_package_type(carrier)
         return self.create_package_from_package_type(default_package_type)
