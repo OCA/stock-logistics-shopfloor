@@ -67,3 +67,17 @@ class ZonePickingZeroCheckCase(ZonePickingCommonCase):
             move_line.location_id, move_line.product_id
         )
         self.assertTrue(result)
+
+    def test_is_zero_lot(self):
+        move_line_1 = self.picking2.move_line_ids[0]
+
+        self.service.dispatch(
+            "is_zero",
+            params={"move_line_id": move_line_1.id, "zero": False},
+        )
+        inventory = self.service._actions_for("inventory")
+        quant = inventory._get_existing_quant(
+            move_line_1.location_id, move_line_1.product_id, lot=move_line_1.lot_id
+        )
+        self.assertTrue(quant)
+        quant._apply_inventory()

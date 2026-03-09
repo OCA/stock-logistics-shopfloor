@@ -22,9 +22,9 @@ class InventoryAction(Component):
         # see comment in models/stock_inventory.py
         return self.env["stock.quant"].with_context(_sf_inventory=True)
 
-    def create_draft_check_empty(self, location, product, ref=None):
+    def create_draft_check_empty(self, location, product, ref=None, lot=None):
         """Create a draft inventory for a product with a zero quantity"""
-        return self._create_draft_inventory(location, product)
+        return self._create_draft_inventory(location, product, lot=lot)
 
     def _inventory_exists(self, location, product, package=None, lot=None):
         """Return if an inventory for location and product exist"""
@@ -64,17 +64,23 @@ class InventoryAction(Component):
                         # Set a user to prevent the zero quant cleanup
                         "user_id": self.env.user.id,
                         "inventory_quantity": 0,
+                        "inventory_quantity_set": True,
                         "inventory_date": fields.Date.today(),
                     }
                 )
             return quants
         else:
+            # FIXME: we should probably not get there as every move line
+            #  must match a quant as even if we do not have any quantity
+            #  in stock, we must have a negative reserved quantity
             return self.inventory_model.sudo().create(
                 {
+                    # Set a user to prevent the zero quant cleanup
+                    "user_id": self.env.user.id,
                     "location_id": location.id,
                     "product_id": product.id,
                     "lot_id": lot.id if lot else False,
-                    "inventory_quantity": 1,
+                    "inventory_quantity": 0,
                     "inventory_quantity_set": True,
                     "inventory_date": fields.Date.today(),
                     "package_id": package.id if package else False,

@@ -215,6 +215,7 @@ class ZonePickingCommonCase(CommonCase):
             picking1.move_ids, in_package=True, location=cls.zone_sublocation1
         )
         # 2 products with lots available in zone_sublocation2
+        (cls.product_b | cls.product_c).tracking = "lot"
         cls.picking2 = picking2 = cls._create_picking(
             lines=[(cls.product_b, 10), (cls.product_c, 10)]
         )

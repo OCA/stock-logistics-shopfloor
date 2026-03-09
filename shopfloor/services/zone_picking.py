@@ -1342,6 +1342,7 @@ class ZonePicking(Component):
                 move_line.location_id,
                 move_line.product_id,
                 ref=picking_type.name,
+                lot=move_line.lot_id,
             )
         move_lines = self._find_location_move_lines(zone_location, picking_type)
         return self._response_for_select_line(move_lines)

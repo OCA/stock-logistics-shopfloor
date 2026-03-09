@@ -990,6 +990,7 @@ class ClusterPicking(Component):
                 move_line.location_id,
                 move_line.product_id,
                 ref=move_line.picking_id.name,
+                lot=move_line.lot_id,
             )
 
         return self._pick_next_line(
