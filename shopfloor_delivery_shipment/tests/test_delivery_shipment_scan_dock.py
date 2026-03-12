@@ -1,4 +1,5 @@
 # Copyright 2021 Camptocamp SA
+# Copyright 2026 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 from .test_delivery_shipment_base import DeliveryShipmentCommonCase
 
@@ -106,3 +107,21 @@ class DeliveryShipmentScanDockCase(DeliveryShipmentCommonCase):
         self.assert_response_scan_document(
             response, self.shipment, lines_to_load=lines_to_load
         )
+
+    def test_scan_dock_same_barcode_different_warehouses(self):
+        self.shipment.dock_id = self.dock2.id
+        self.shipment.action_confirm()
+        self.shipment.action_in_progress()
+        wh2 = self.wh.sudo().create({"name": "WH2", "code": "wh2"})
+        barcode = "test-dock"
+        self.dock.sudo().write(
+            {
+                "barcode": barcode,
+                "warehouse_id": wh2.id,
+            }
+        )
+        self.dock2.sudo().barcode = barcode
+        response = self.service.dispatch(
+            "scan_dock", params={"barcode": self.dock.barcode}
+        )
+        self.assert_response_scan_document(response, self.shipment)

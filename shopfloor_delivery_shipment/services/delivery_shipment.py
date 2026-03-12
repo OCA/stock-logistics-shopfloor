@@ -1,4 +1,5 @@
 # Copyright 2021 Camptocamp SA
+# Copyright 2026 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 import collections
 
@@ -62,7 +63,7 @@ class DeliveryShipment(Component):
             # End point called with the back button
             return self._response_for_scan_dock()
         search = self._actions_for("search")
-        dock = search.dock_from_scan(barcode)
+        dock = search.dock_from_scan(barcode, self.picking_types.warehouse_id)
         if dock:
             shipment_advice = self._find_shipment_advice_from_dock(dock)
             if not shipment_advice:
