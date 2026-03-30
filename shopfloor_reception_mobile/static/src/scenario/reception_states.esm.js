@@ -181,7 +181,6 @@ export const reception_states = function () {
             events: {
                 qty_edit: "on_qty_edit",
                 go_back: "on_back",
-                cancel: "on_cancel",
             },
             on_qty_edit: (qty) => {
                 this.scan_destination_qty = parseInt(qty, 10);
