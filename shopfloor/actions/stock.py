@@ -179,7 +179,9 @@ class StockAction(Component):
                 # still assigned
                 if split:
                     unmarked_lines = picking.move_line_ids & move_lines
-                    unmarked_lines._extract_in_split_order(default={"user_id": False})
+                    unmarked_lines._extract_in_split_order(
+                        default={"user_id": False, "printed": False}
+                    )
                 else:
                     picking.user_id = still_assigned_users[0]
 
