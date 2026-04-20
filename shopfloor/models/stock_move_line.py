@@ -7,6 +7,8 @@ from odoo import _, exceptions, fields, models
 from odoo.exceptions import UserError
 from odoo.tools.float_utils import float_compare, float_is_zero
 
+from ..exceptions import CannotProcessMoreThanPlanned
+
 _logger = logging.getLogger(__name__)
 
 
@@ -45,8 +47,11 @@ class StockMoveLine(models.Model):
         )
         qty_lesser = compare == -1
         qty_greater = compare == 1
-        assert not qty_greater, "Quantity done cannot exceed quantity to do"
-        if qty_lesser:
+        if qty_greater:
+            raise CannotProcessMoreThanPlanned(
+                "Quantity done cannot exceed quantity to do"
+            )
+        elif qty_lesser:
             remaining = self.quantity - self.qty_picked
             new_line = self.copy(
                 {"quantity": remaining, "qty_picked": 0, "picked": False}
