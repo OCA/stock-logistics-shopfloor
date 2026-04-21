@@ -58,6 +58,7 @@ class TestSetQuantityAction(CommonCase):
                 "selected_move_line": self.data.move_lines(
                     self.selected_move_line, with_package_type=True
                 ),
+                "confirmation": None,
             },
         )
         self.assertTrue(self.selected_move_line.result_package_id)
@@ -80,6 +81,7 @@ class TestSetQuantityAction(CommonCase):
                 "selected_move_line": self.data.move_lines(
                     self.selected_move_line, with_package_type=True
                 ),
+                "confirmation": None,
             },
         )
         self.assertFalse(self.selected_move_line.result_package_id)

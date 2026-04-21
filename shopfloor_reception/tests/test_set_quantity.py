@@ -315,6 +315,7 @@ class TestSetQuantity(CommonCase):
                 "selected_move_line": self.data.move_lines(
                     selected_move_line, with_package_type=True
                 ),
+                "confirmation": None,
             },
         )
 
@@ -439,6 +440,7 @@ class TestSetQuantity(CommonCase):
                 "selected_move_line": self.data.move_lines(
                     selected_move_line, with_package_type=True
                 ),
+                "confirmation": None,
             },
         )
 
@@ -699,6 +701,7 @@ class TestSetQuantity(CommonCase):
                 "selected_move_line": self.data.move_lines(
                     selected_move_line, with_package_type=True
                 ),
+                "confirmation": None,
             },
         )
         # there should be 3 lines now
@@ -776,6 +779,7 @@ class TestSetQuantity(CommonCase):
                 "selected_move_line": self.data.move_lines(
                     move_line_user_1, with_package_type=True
                 ),
+                "confirmation": None,
             },
         )
 
@@ -882,6 +886,7 @@ class TestSetQuantity(CommonCase):
                 "selected_move_line": self.data.move_lines(
                     move_line_user_2, with_package_type=True
                 ),
+                "confirmation": None,
             },
         )
         self.assertEqual(move_product_a.quantity_picked, 1.0)
