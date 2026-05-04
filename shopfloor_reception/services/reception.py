@@ -1237,7 +1237,7 @@ class Reception(Component):
             # Remove user_id on backorder, if any
             backorders_after.user_id = False
 
-    def scan_lot_name(self, picking_id, selected_line_id, lot_name):
+    def scan_lot(self, picking_id, selected_line_id, barcode):
         picking = self.env["stock.picking"].browse(picking_id)
         selected_line = self.env["stock.move.line"].browse(selected_line_id)
         message = self._check_picking_processible(picking)
@@ -1253,12 +1253,13 @@ class Reception(Component):
 
         search = self._actions_for("search")
         search_result = search.find(
-            barcode=lot_name,
+            barcode=barcode,
             types=["lot", "expiration_date"],
             handler_kw={"lot": {"products": selected_line.product_id}},
         )
 
         # Look for more info in the barcode
+        lot_name = barcode
         for result in search_result.parse_result:
             if result.type == "lot":
                 lot_name = result.value
@@ -1905,7 +1906,7 @@ class ShopfloorReceptionValidator(Component):
             },
         }
 
-    def scan_lot_name(self):
+    def scan_lot(self):
         return {
             "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
             "selected_line_id": {
@@ -1913,7 +1914,7 @@ class ShopfloorReceptionValidator(Component):
                 "type": "integer",
                 "required": True,
             },
-            "lot_name": {"type": "string", "required": True},
+            "barcode": {"type": "string", "required": True},
         }
 
     def set_quantity(self):
@@ -2069,7 +2070,7 @@ class ShopfloorReceptionValidatorResponse(Component):
     def _set_lot_confirm_action_next_states(self):
         return {"set_lot", "set_quantity"}
 
-    def _scan_lot_name_next_states(self):
+    def _scan_lot_next_states(self):
         return {"set_lot"}
 
     def _set_quantity_next_states(self):
@@ -2260,8 +2261,8 @@ class ShopfloorReceptionValidatorResponse(Component):
             next_states=self._set_lot_confirm_action_next_states()
         )
 
-    def scan_lot_name(self):
-        return self._response_schema(next_states=self._scan_lot_name_next_states())
+    def scan_lot(self):
+        return self._response_schema(next_states=self._scan_lot_next_states())
 
     def set_quantity(self):
         return self._response_schema(next_states=self._set_quantity_next_states())
