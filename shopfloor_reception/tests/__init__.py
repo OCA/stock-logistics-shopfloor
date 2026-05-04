@@ -16,4 +16,4 @@ from . import test_return_reception_done
 from . import test_recover
 from . import test_change_package_type
 from . import test_multi_barcode
-from . import test_scan_lot_name
+from . import test_scan_lot
