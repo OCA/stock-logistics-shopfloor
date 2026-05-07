@@ -455,6 +455,7 @@ const Reception = {
             };
         },
         picking_detail_options_for_select_move: function () {
+            const self = this;
             return {
                 show_title: true,
                 showActions: false,
@@ -482,8 +483,15 @@ const Reception = {
                             path: "quantity_done",
                             label: "Qty done",
                             display_no_value: true,
-                            renderer: function (rec, field) {
-                                return rec.quantity_done + " / " + rec.quantity;
+                            render_component: "packaging-qty-picker-display",
+                            render_props: (record) => {
+                                return self.utils.wms.move_line_qty_picker_props(
+                                    record,
+                                    {
+                                        qtyInit: record.quantity_done,
+                                        qtyDone: record.quantity,
+                                    }
+                                );
                             },
                         },
                     ],
