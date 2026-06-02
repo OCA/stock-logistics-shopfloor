@@ -12,6 +12,16 @@
                 />
             </field>
             <group name="options" position="inside">
+                <group
+                    name="quantity_exceeding_demand"
+                    invisible="not allow_quantity_exceeding_demand_is_possible"
+                >
+                    <field
+                        name="allow_quantity_exceeding_demand_is_possible"
+                        invisible="1"
+                    />
+                    <field name="allow_quantity_exceeding_demand" />
+                </group>
                 <group name="move_create" invisible="not move_create_is_possible">
                     <field name="allow_move_create" />
                 </group>
