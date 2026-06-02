@@ -13,9 +13,6 @@
                 >
                     <field name="filter_today_scheduled_pickings" />
                 </group>
-                <group name="over_reception">
-                    <field name="allow_over_reception" />
-                </group>
             </xpath>
         </field>
     </record>
