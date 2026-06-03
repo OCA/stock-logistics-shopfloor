@@ -96,7 +96,8 @@ class SearchAction(Component):
         # TODO: decide the best default order in case we don't pass `types`
         parse_results = self.parser.parse(barcode, types)
         for parse_result in parse_results:
-            for btype in _types:
+            btypes = _types if parse_result.type == "unknown" else [parse_result.type]
+            for btype in btypes:
                 record = self._find_record_by_type(
                     parse_result.value, btype, handler_kw
                 )
