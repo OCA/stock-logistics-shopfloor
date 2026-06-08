@@ -1,6 +1,8 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
+from odoo import exceptions
+
 from .test_cluster_picking_base import ClusterPickingCommonCase
 
 # pylint: disable=missing-return
@@ -212,6 +214,20 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
                 "body": "Bin {} doesn't exist".format("⌿"),
             },
         )
+
+    def test_scan_destination_pack_quantity_none(self):
+        """Scan destination package do not allow quantity set to None."""
+        line = self.one_line_picking.move_line_ids
+        with self.assertRaises(exceptions.UserError):
+            self.service.dispatch(
+                "scan_destination_pack",
+                params={
+                    "picking_batch_id": self.batch.id,
+                    "move_line_id": line.id,
+                    "barcode": self.bin1.name,
+                    "quantity": None,
+                },
+            )
 
     def test_scan_destination_pack_quantity_more(self):
         """Pick more units than expected"""
