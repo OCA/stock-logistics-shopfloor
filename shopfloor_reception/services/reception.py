@@ -125,8 +125,8 @@ class Reception(Component):
             ("move_id.picking_id.state", "=", "assigned"),
             ("move_id.picking_id.user_id", "=", False),
             "|",
-            ("lot_id.name", "=", lot),
-            ("lot_name", "=", lot),
+            ("lot_id", "=", lot.id),
+            ("lot_name", "=", lot.name),
         ]
 
     def _domain_stock_picking(self, today_only=False):
