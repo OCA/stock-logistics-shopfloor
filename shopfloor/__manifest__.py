@@ -22,7 +22,6 @@
         "base_rest",
         "base_sparse_field",
         #  OCA / stock-logistics-warehouse
-        "stock_location_is_sublocation",
         "stock_picking_completion_info",
         #  OCA / stock-logistics-workflow
         "stock_move_line_change_lot",
