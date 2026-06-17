@@ -162,7 +162,7 @@ const Reception = {
                                 <btn-back/>
                             </v-col>
                             <v-col class="text-center" cols="12">
-                                <cancel-button/>
+                                <cancel-button v-on:cancel="state.on_cancel"/>
                             </v-col>
                         </v-row>
                     </div>
