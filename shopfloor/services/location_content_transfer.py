@@ -370,7 +370,12 @@ class LocationContentTransfer(Component):
                 return self._response_for_start(
                     message=self.msg_store.location_empty(location)
                 )
-            new_moves = self._create_moves_from_location(location)
+            new_moves = self._create_moves_from_location(location).with_context(
+                # Skip reservation constraint added by product_expiry
+                # regarding expired quants. In location content transfer we
+                # want to move all goods, whatever their expiration dates are.
+                without_expiration=True
+            )
             if not new_moves:
                 savepoint.rollback()
                 return self._response_for_start(
