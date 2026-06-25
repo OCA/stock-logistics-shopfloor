@@ -56,15 +56,20 @@ class StockMove(models.Model):
                 == 0
             ):
                 return self.browse()
-            split_move_vals = self._split(qty_to_split)
-            split_move = self.create(split_move_vals)
-            split_move.move_line_ids = to_move
-            split_move._action_confirm(merge=False)
-            split_move._recompute_state()
-            if split_move.state != "assigned":
-                split_move._action_assign()
+            new_move_vals_list = self._split(qty_to_split)
+            confirm_dict = dict(
+                state=self.state,
+                reservation_date=self.reservation_date,
+            )
+            [d.update(confirm_dict) for d in new_move_vals_list]
+            # Only create the move, do not call _action_confirm as
+            # since Odoo 15.0, it calls _action_assign() or we only
+            # want to split
+            new_move = self.env["stock.move"].create(new_move_vals_list)
+            new_move.move_line_ids = to_move
+            new_move._recompute_state()
             self._recompute_state()
-            return split_move
+            return new_move
         return self.browse()
 
     def split_unavailable_qty(self):
