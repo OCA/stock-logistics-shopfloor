@@ -1,1 +1,2 @@
 odoo_test_helper
+odoo-addon-shopfloor-single-product-transfer @ git+https://github.com/OCA/stock-logistics-shopfloor.git@refs/pull/117/head#subdirectory=shopfloor_single_product_transfer
