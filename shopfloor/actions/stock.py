@@ -161,7 +161,6 @@ class StockAction(Component):
                 "picked": False,
                 "qty_picked": 0,
                 "result_package_id": False,
-                "lot_id": False,
             }
         )
         pickings = move_lines.picking_id
