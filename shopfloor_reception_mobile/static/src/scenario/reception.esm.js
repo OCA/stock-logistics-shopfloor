@@ -21,14 +21,6 @@ const Reception = {
                 v-on:found="on_scan"
                 :input_placeholder="search_input_placeholder"
             />
-            <template v-if="state_is('select_move')">
-                <item-detail-card
-                    :record="state.data.picking"
-                    :options="operation_options()"
-                    :card_color="utils.colors.color_for('screen_step_done')"
-                    :key="make_state_component_key(['reception-picking-item-detail', state.data.picking.id])"
-                />
-            </template>
             <template v-if="state_is('select_document')">
                 <manual-select
                     class="with-progress-bar"
@@ -73,6 +65,12 @@ const Reception = {
                         </v-col>
                     </v-row>
                 </div>
+                <item-detail-card
+                    :record="state.data.picking"
+                    :options="operation_options()"
+                    :card_color="utils.colors.color_for('screen_step_done')"
+                    :key="make_state_component_key(['reception-picking-item-detail', state.data.picking.id])"
+                />
                 <manual-select
                     :card_color="utils.colors.color_for('screen_step_done')"
                     :records="ordered_moves"
