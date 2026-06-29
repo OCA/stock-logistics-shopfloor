@@ -381,23 +381,18 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
                 }
             )
         )
-        # Delivery type and package_carrier_type values
-        # depend on specific implementations that we don't have as dependency.
-        # What is important here is to simulate their value when mismatching.
-        mock1 = mock.patch.object(
-            type(packaging),
-            "package_carrier_type",
-            new_callable=mock.PropertyMock,
-        )
-        mock2 = mock.patch.object(
-            type(picking.carrier_id),
-            "delivery_type",
-            new_callable=mock.PropertyMock,
-        )
-        with mock1 as mocked_package_carrier_type, mock2 as mocked_delivery_type:
-            # Not matching at all -> bad
-            mocked_package_carrier_type.return_value = "DHL"
-            mocked_delivery_type.return_value = "UPS"
+        packing_action = type(self.service._actions_for("packing"))
+        with mock.patch.object(
+            packing_action,
+            "_get_package_type_domain",
+            side_effect=[
+                # first call: domain excludes packaging -> bad
+                [("id", "!=", packaging.id)],
+                # second call: domain includes packaging -> good
+                [("id", "=", packaging.id)],
+            ],
+        ):
+            # not in wizard domain -> bad
             response = self.service.dispatch(
                 "scan_package_action",
                 params={
@@ -414,8 +409,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
                     packaging, picking.carrier_id
                 ),
             )
-            # No carrier type set on the packaging -> good
-            mocked_package_carrier_type.return_value = "none"
+            # in wizard domain -> good
             response = self.service.dispatch(
                 "scan_package_action",
                 params={
@@ -475,3 +469,72 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
         returned_lines = res["data"]["summary"]["picking"]["move_lines"]
         expected_line_ids = [line["id"] for line in returned_lines]
         self.assertEqual(expected_line_ids, picking.move_line_ids.ids)
+
+    def test_scan_package_action_scan_invalid_package_type_carrier(self):
+        picking = self._create_picking(lines=[(self.product_a, 10)])
+        picking.carrier_id = picking.carrier_id.search([], limit=1)
+        pack1_moves = picking.move_ids
+        # put in 2 packs, for this test, we'll work on pack1
+        self._fill_stock_for_moves(pack1_moves, in_package=True)
+        picking.action_assign()
+        selected_lines = pack1_moves.move_line_ids
+        selected_lines.qty_picked = selected_lines.quantity
+        packaging = (
+            self.env["stock.package.type"]
+            .sudo()
+            .create(
+                {
+                    "name": "Package",
+                    "barcode": "PACKAGE",
+                }
+            )
+        )
+        other_packaging = (
+            self.env["stock.package.type"]
+            .sudo()
+            .create(
+                {
+                    "name": "Other Package",
+                    "barcode": "PACKAGE-OTHER",
+                }
+            )
+        )
+        packing_action = type(self.service._actions_for("packing"))
+        with mock.patch.object(
+            packing_action,
+            "_get_package_type_domain",
+            side_effect=[
+                [("id", "=", other_packaging.id)],
+                [("id", "=", packaging.id)],
+                [("id", "=", packaging.id)],
+            ],
+        ):
+            # package type not in wizard domain -> bad
+            response = self.service.dispatch(
+                "scan_package_action",
+                params={
+                    "picking_id": picking.id,
+                    "selected_line_ids": selected_lines.ids,
+                    "barcode": packaging.barcode,
+                },
+            )
+            self._assert_selected_response(
+                response,
+                selected_lines,
+                message=self.msg_store.package_type_invalid_for_carrier(
+                    packaging, picking.carrier_id
+                ),
+            )
+            # package type in wizard domain -> good
+            response = self.service.dispatch(
+                "scan_package_action",
+                params={
+                    "picking_id": picking.id,
+                    "selected_line_ids": selected_lines.ids,
+                    "barcode": packaging.barcode,
+                },
+            )
+            self.assertEqual(
+                response["message"],
+                self.msg_store.goods_packed_in(selected_lines.result_package_id),
+            )
