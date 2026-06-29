@@ -1341,6 +1341,7 @@ class Reception(Component):
         if selected_line.exists():
             if not selected_line.is_shopfloor_created:
                 stock = self._actions_for("stock")
+                selected_line.lot_id = False
                 stock.unmark_move_line_as_picked(selected_line)
             else:
                 selected_line.unlink()
