@@ -31,10 +31,18 @@ Vue.component("detail-product", {
         },
         supplier_detail_fields() {
             return [
-                {path: "name", klass: "loud"},
-                {path: "product_code", label: "Code"},
-                {path: "product_name", label: "Name"},
+                {path: "partner", klass: "loud"},
+                {path: "product_code", label: "Vendor Code"},
+                {path: "product_name", label: "Vendor Name"},
             ];
+        },
+        unique_suppliers(suppliers) {
+            if (!suppliers) {
+                return [];
+            }
+            return _.uniqBy(suppliers, (supp) =>
+                [supp.partner, supp.product_name, supp.product_code].join("|")
+            );
         },
         /* eslint-disable no-unused-vars */
         render_packaging(record, field) {
@@ -105,7 +113,7 @@ Vue.component("detail-product", {
     <div class="suppliers mb-4" v-if="_.result(record, 'suppliers', []).length">
         <separator-title>Suppliers</separator-title>
         <item-detail-card
-            v-for="supp in record.suppliers"
+            v-for="supp in unique_suppliers(record.suppliers)"
             :key="'supp' + supp.id"
             :record="supp"
             :options="{no_title: true, fields: supplier_detail_fields()}"
