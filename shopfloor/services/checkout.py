@@ -9,6 +9,7 @@ from odoo import _, fields
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
 
+from ..actions.search import InvalidProduct
 from ..utils import to_float
 
 
@@ -486,7 +487,15 @@ class Checkout(Component):
             "package_type": self._select_lines_from_package_type,
             "none": self._select_lines_from_none,
         }
-        search_result = self._scan_line_find(picking, barcode, handlers.keys())
+        try:
+            search_result = self._scan_line_find(picking, barcode, handlers.keys())
+            scanned_record = search_result.record
+            scanned_type = search_result.type
+        except InvalidProduct as e:
+            # Leave downstream functions deal with more precise error message
+            scanned_record = e.recordset
+            scanned_type = e.type_
+
         # setting scanned record as kwarg in order to make better logs.
         # The reason for this is that from a product we might select various records
         # and lose track of what was initially scanned. This forces us to display
@@ -494,11 +503,11 @@ class Checkout(Component):
         kwargs = {
             "confirm_pack_all": confirm_pack_all,
             "confirm_lot": confirm_lot,
-            "scanned_record": search_result.record,
+            "scanned_record": scanned_record,
             "barcode": barcode,
         }
-        handler = handlers.get(search_result.type, self._select_lines_from_none)
-        return handler(picking, selection_lines, search_result.record, **kwargs)
+        handler = handlers.get(scanned_type, self._select_lines_from_none)
+        return handler(picking, selection_lines, scanned_record, **kwargs)
 
     def _scan_line_find(self, picking, barcode, search_types):
         search = self._actions_for("search")
@@ -1080,7 +1089,14 @@ class Checkout(Component):
             "serial": self._scan_package_action_from_serial,
             "package_type": self._scan_package_action_from_package_type,
         }
-        search_result = self._scan_package_find(picking, barcode, handlers.keys())
+        try:
+            search_result = self._scan_package_find(picking, barcode, handlers.keys())
+        except InvalidProduct as e:
+            return self._response_for_select_package(
+                picking,
+                selected_lines,
+                message=self.msg_store.wrong_record(e.recordset),
+            )
         handler = handlers.get(search_result.type, self._scan_package_action_from_none)
         kwargs = {
             "barcode": barcode,
