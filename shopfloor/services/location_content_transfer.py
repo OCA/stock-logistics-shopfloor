@@ -8,7 +8,7 @@ from odoo.fields import first
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
 
-from ..actions.search import InvalidProduct
+from ..actions.search import SearchInvalidProduct
 from ..exceptions import ConcurentWorkOnTransfer
 from ..utils import to_float
 
@@ -627,7 +627,7 @@ class LocationContentTransfer(Component):
                 barcode,
                 types=handlers.keys(),
             )
-        except InvalidProduct as e:
+        except SearchInvalidProduct as e:
             return self._response_for_start_single(
                 self._find_transfer_move_lines(location).picking_id,
                 message=self.msg_store.wrong_record(e.recordset),
