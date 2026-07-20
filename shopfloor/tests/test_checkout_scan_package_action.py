@@ -18,9 +18,22 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
         from .models import DeliveryCarrierTest, StockPackageType
 
         self.loader.update_registry((DeliveryCarrierTest, StockPackageType))
-
-        self.carrier = self.env["delivery.carrier"].search([], limit=1)
-        self.carrier.sudo().delivery_type = "test"
+        carrier_product = (
+            self.env["product.product"]
+            .sudo()
+            .create({"name": "Test carrier product", "type": "service"})
+        )
+        self.test_carrier = (
+            self.env["delivery.carrier"]
+            .sudo()
+            .create(
+                {
+                    "name": "Test carrier",
+                    "delivery_type": "test",
+                    "product_id": carrier_product.id,
+                }
+            )
+        )
 
     def tearDown(self):
         self.loader.restore_registry()
@@ -490,7 +503,8 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
 
     def test_scan_package_action_scan_invalid_package_type_carrier(self):
         picking = self._create_picking(lines=[(self.product_a, 10)])
-        picking.carrier_id = self.carrier
+        picking.carrier_id = self.test_carrier
+        picking.picking_type_id.sudo().filter_package_type_on_put_in_pack = True
         pack1_moves = picking.move_ids
         # put in 2 packs, for this test, we'll work on pack1
         self._fill_stock_for_moves(pack1_moves, in_package=True)
