@@ -1,6 +1,8 @@
 # Copyright 2026 Camptocamp SA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
 
+import json
+
 from odoo.tests import Form
 
 from odoo.addons.shopfloor.tests.test_single_pack_transfer_base import (
@@ -49,6 +51,26 @@ class TestSinglePackTransferJumptoMenu(SinglePackTransferCommonBase):
             lines=[(cls.product_a, 1), (cls.product_b, 1)]
         )
         cls.menu2 = cls.env.ref("shopfloor.shopfloor_menu_demo_zone_picking")
+        # The single pack transfer scenario has no zone picking data set up,
+        # so configure one zone with stock for the zone picking menu (menu2)
+        # to have a non-empty "zones" list when jumping to it.
+        cls.zone_picking_sublocation = (
+            cls.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "name": "Zone Picking Sublocation",
+                    "location_id": cls.stock_location.id,
+                    "barcode": "ZONE_PICKING_SUB",
+                }
+            )
+        )
+        cls._update_qty_in_location(cls.zone_picking_sublocation, cls.product_a, 10)
+        cls.zone_picking_picking = cls._create_picking(
+            picking_type=cls.menu2.picking_type_ids,
+            lines=[(cls.product_a, 10)],
+        )
+        cls.zone_picking_picking.action_assign()
 
     @classmethod
     def _create_initial_move(cls, lines):
@@ -95,9 +117,30 @@ class TestSinglePackTransferJumptoMenu(SinglePackTransferCommonBase):
                 "location_barcode": self.shelf2.barcode,
             },
         )
+        # The zone picking menu's initial state (reachable through the
+        # jump) is "scan_location": _get_data_for_jump_to_menu remaps the
+        # "start" state to "scan_location". Build the expected zones data
+        # manually (one zone with one assigned move line).
+        picking_type = self.menu2.picking_type_ids[0]
+        zone_data = dict(
+            self.data.location(self.zone_picking_sublocation),
+            operation_types=[
+                dict(
+                    self.data.picking_type(picking_type),
+                    lines_count=1,
+                    picking_count=1,
+                    priority_lines_count=0,
+                    priority_picking_count=0,
+                )
+            ],
+            lines_count=1,
+            picking_count=1,
+            priority_lines_count=0,
+            priority_picking_count=0,
+        )
         expected_data = {
             "menu_id": self.menu2.id,
-            "next_state": "start",
-            "states_data": '{"start": {"zones": []}}',
+            "next_state": "scan_location",
+            "states_data": json.dumps({"scan_location": {"zones": [zone_data]}}),
         }
         self.assert_response_jump_to_menu(response, expected_data)
