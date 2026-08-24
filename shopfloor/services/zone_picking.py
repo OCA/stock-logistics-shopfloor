@@ -304,7 +304,11 @@ class ZonePicking(Component):
         )
 
     def _get_data_for_jump_to_menu(self):
-        return self._response_for_start()
+        response = self._response_for_start()
+        # The initial_state_key on the front end scenario is `scan_location`
+        response["data"]["scan_location"] = response["data"].pop("start")
+        response["next_state"] = "scan_location"
+        return response
 
     def _data_for_select_picking_type(self, zone_location, picking_types):
         data = {
