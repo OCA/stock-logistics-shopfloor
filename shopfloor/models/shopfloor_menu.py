@@ -392,6 +392,21 @@ class ShopfloorMenu(models.Model):
                     _("Creation of moves is not allowed for menu {}.").format(menu.name)
                 )
 
+    @api.constrains(
+        "scenario_id", "picking_type_ids", "unload_package_at_destination"
+    )
+    def _check_unload_package_at_destination(self):
+        for menu in self:
+            if (
+                menu.unload_package_at_destination
+                and not menu.unload_package_at_destination_is_possible
+            ):
+                raise exceptions.ValidationError(
+                    _("Unload package at destination is not allowed for menu {}.").format(
+                        menu.name
+                    )
+                )
+
     @api.depends("scenario_id")
     def _compute_unreserve_other_moves_is_possible(self):
         for menu in self:
