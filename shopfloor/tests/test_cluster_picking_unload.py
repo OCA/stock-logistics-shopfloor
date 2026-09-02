@@ -250,6 +250,7 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
             ],
         )
         self.new_picking = self.two_lines_picking.backorder_ids
+        self.assertTrue(self.new_picking.printed)
         self.assertRecordValues(
             self.move_lines,
             [
