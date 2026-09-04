@@ -161,9 +161,14 @@ class StockAction(Component):
                 "picked": False,
                 "qty_picked": 0,
                 "result_package_id": False,
-                "lot_id": False,
             }
         )
+        # Clear the lot per product so we never write ``lot_id`` on a batch of
+        # move lines spanning different products (the stock module forbids it).
+        for lines in move_lines.grouped("product_id").values():
+            lot_lines = lines.filtered("lot_id")
+            if lot_lines:
+                lot_lines.write({"lot_id": False})
         pickings = move_lines.picking_id
         for picking in pickings:
             still_assigned_users = picking.move_line_ids.shopfloor_user_id
