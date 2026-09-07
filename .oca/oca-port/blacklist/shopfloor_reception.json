@@ -1,0 +1,6 @@
+{
+  "pull_requests": {
+    "OCA/wms#1120": "Not relevant, backport from 18.0 to 16.0",
+    "OCA/wms#1122": "Not relevant, backport from 18.0 to 16.0"
+  }
+}
