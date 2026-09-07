@@ -142,7 +142,6 @@ class SearchAction(Component):
         """Find Odoo record matching given `barcode`."""
         if not barcode or isinstance(barcode, str) and not barcode.strip():
             return self._make_search_result(type="none")
-        return self.generic_find(barcode, types=types)
         # TODO: decide the best default order in case we don't pass `types`
         types = types or self._barcode_type_handler.keys()
 
