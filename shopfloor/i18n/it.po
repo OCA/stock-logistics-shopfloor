@@ -1750,17 +1750,6 @@ msgstr ""
 
 #. module: shopfloor
 #. odoo-python
-#: code:addons/shopfloor/models/stock_picking.py:0
-msgid ""
-"The backorder <a href=\"#\" data-oe-model=\"stock.picking\" data-oe-id=\"%"
-"(new_picking_id)d\">%(new_picking_name)s</a> has been created."
-msgstr ""
-"È stato creato l'ordine residuo <a href=\"#\" data-oe-"
-"model=\"stock.picking\" data-oe-id=\"%(new_picking_id)d\">%"
-"(new_picking_name)s</a>."
-
-#. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 msgid "The content of {} cannot be transferred with this scenario."
 msgstr "Il contenuto di {} non può essere trasferito con questo scenario."
@@ -2281,6 +2270,14 @@ msgstr "Prelievo per area"
 #: code:addons/shopfloor/actions/message.py:0
 msgid "{} is not a valid destination package."
 msgstr "{} non è un collo destinazione valido."
+
+#~ msgid ""
+#~ "The backorder <a href=\"#\" data-oe-model=\"stock.picking\" data-oe-id=\"%"
+#~ "(new_picking_id)d\">%(new_picking_name)s</a> has been created."
+#~ msgstr ""
+#~ "È stato creato l'ordine residuo <a href=\"#\" data-oe-"
+#~ "model=\"stock.picking\" data-oe-id=\"%(new_picking_id)d\">%"
+#~ "(new_picking_name)s</a>."
 
 #~ msgid "Content transfer to {} completed"
 #~ msgstr "Tasferimento contenuto a {} completato"

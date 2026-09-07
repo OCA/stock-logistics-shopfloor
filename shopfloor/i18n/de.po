@@ -1605,14 +1605,6 @@ msgstr ""
 
 #. module: shopfloor
 #. odoo-python
-#: code:addons/shopfloor/models/stock_picking.py:0
-msgid ""
-"The backorder <a href=\"#\" data-oe-model=\"stock.picking\" data-oe-id=\"%"
-"(new_picking_id)d\">%(new_picking_name)s</a> has been created."
-msgstr ""
-
-#. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 msgid "The content of {} cannot be transferred with this scenario."
 msgstr ""
