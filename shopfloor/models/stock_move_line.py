@@ -36,19 +36,6 @@ class StockMoveLine(models.Model):
     is_shopfloor_created = fields.Boolean()
 
     @property
-    def is_fully_picked(self):
-        """:return: True if the quantity picked >= quantity reserved."""
-        self.ensure_one()
-        return (
-            float_compare(
-                self.qty_picked,
-                self.quantity,
-                precision_rounding=self.product_uom_id.rounding,
-            )
-            >= 0
-        )
-
-    @property
     def has_quantity_reserved(self):
         self.ensure_one()
         return not float_is_zero(
@@ -150,14 +137,17 @@ class StockMoveLine(models.Model):
             return (new_line, "lesser")
         return (new_line, "full")
 
-    def _split_partial_quantity_to_be_picked(self, quantity_done, split_default_vals):
+    def _split_partial_quantity_to_be_picked(
+        self, quantity_done, split_default_vals=None
+    ):
         """Create a new move line with the remaining quantity to process."""
         # split the move line which will be processed later (maybe the user
         # has to pick some goods from another place because the location
         # contained less items than expected)
         remaining = self.quantity - quantity_done
         vals = {"quantity": remaining, "picked": False, "qty_picked": 0}
-        vals.update(split_default_vals)
+        if split_default_vals:
+            vals.update(split_default_vals)
         new_line = self.copy(vals)
         # if we didn't bypass reservation update, the quant reservation
         # would be reduced as much as the deduced quantity, which is wrong
