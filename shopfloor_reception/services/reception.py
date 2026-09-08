@@ -1332,12 +1332,11 @@ class Reception(Component):
             )
 
         if not lot:
-            error_response = self._set_lot_confirm_action__handle_new_lot(
+            lot, error_response = self._set_lot_confirm_action__handle_new_lot(
                 picking, selected_line, lot_name, expiration_date
             )
             if error_response:
                 return error_response
-            lot = self.env.context["lot"]
         else:
             error_response = self._set_lot_confirm_action__handle_existing_lot(
                 picking, selected_line, lot, expiration_date
@@ -1354,12 +1353,17 @@ class Reception(Component):
         self, picking, line, lot_name, expiration_date
     ):
         if not picking.picking_type_id.use_create_lots:
-            return self._response_for_set_lot(
-                picking,
-                line,
-                message=self.msg_store.lot_creation_disabled(picking.picking_type_id),
-                lot_name=lot_name,
-                lot_expiration_date=expiration_date,
+            return (
+                None,
+                self._response_for_set_lot(
+                    picking,
+                    line,
+                    message=self.msg_store.lot_creation_disabled(
+                        picking.picking_type_id
+                    ),
+                    lot_name=lot_name,
+                    lot_expiration_date=expiration_date,
+                ),
             )
         lot_vals = self._create_lot_values(line.product_id, lot_name)
         if expiration_date:
@@ -1367,9 +1371,7 @@ class Reception(Component):
                 tzinfo=None
             )
         lot = self.env["stock.lot"].create(lot_vals)
-        # Inject lot into context to propagate it through the call stack
-        # without extra queries
-        self.env.context = {**self.env.context} | {"lot": lot}
+        return lot, None
 
     def _set_lot_confirm_action__handle_existing_lot(
         self, picking, line, lot, expiration_date
