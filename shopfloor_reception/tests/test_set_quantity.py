@@ -874,7 +874,11 @@ class TestSetQuantity(CommonCase):
         # When posted, the move line quantity will be set to qty_picked
         self.assertEqual(move_line_user_2.qty_picked, 1.0)
         self.assert_response(
-            response, next_state="select_move", data=self._data_for_select_move(picking)
+            response,
+            next_state="select_move",
+            data=self._data_for_select_move(
+                picking, last_processed_line=move_line_user_2
+            ),
         )
         # Now, user1 can start working on this again
         service_user_1.dispatch(
