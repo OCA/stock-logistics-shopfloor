@@ -60,16 +60,11 @@ class PackingAction(Component):
             "product",
             "packaging",
             "lot",
-            "serial",
             "package_type",
         )
-        return search.find(
+        return search.for_products(picking.move_ids.product_id).find(
             barcode,
             types=search_types,
-            handler_kw=dict(
-                lot=dict(products=picking.move_ids.product_id),
-                serial=dict(products=picking.move_ids.product_id),
-            ),
         )
 
     def _check_scan_package_find(self, picking, search_result):
