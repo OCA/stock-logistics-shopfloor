@@ -122,7 +122,7 @@ class SearchAction(Component):
             "location": self._find_location,
             "lot": self._find_lot,
             "packaging": self._find_packaging,
-            "delivery_packaging": self._find_delivery_packaging,
+            "package_type": self._find_package_type,
             "origin_move": self._find_origin_move,
         }
 
@@ -190,8 +190,8 @@ class SearchAction(Component):
         res = self.find(barcode, types=["packaging"])
         return res.record if res else self.env["product.packaging"].browse()
 
-    def delivery_packaging_from_scan(self, barcode):
-        res = self.find(barcode, types=["delivery_packaging"])
+    def package_type_from_scan(self, barcode):
+        res = self.find(barcode, types=["package_type"])
         return res.record if res else self.env["stock.package.type"].browse()
 
     def origin_move_from_scan(self, barcode):
@@ -326,7 +326,7 @@ class SearchAction(Component):
             return valid_packagings
         return packagings
 
-    def _find_delivery_packaging(self, parse_results, btype="delivery_packaging"):
+    def _find_package_type(self, parse_results, btype="package_type"):
         model = self.env["stock.package.type"]
         barcode = self._get_parse_results_value(parse_results, btype)
         if not barcode:
