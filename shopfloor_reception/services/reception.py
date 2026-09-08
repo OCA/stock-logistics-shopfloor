@@ -384,7 +384,7 @@ class Reception(Component):
     def _select_line__filter_lines_by_packaging__return(self, lines, packaging):
         return_line = fields.first(
             lines.filtered(
-                lambda li: not l.package_id.product_packaging_id
+                lambda li: not li.package_id.product_packaging_id
                 and not li.shopfloor_unloaded
                 and li.shopfloor_user_id.id in (False, self.env.uid)
             )
@@ -500,8 +500,8 @@ class Reception(Component):
         origin_move_domain = [
             ("picking_id.picking_type_code", "=", "outgoing"),
         ]
-        origin_moves = search.origin_move_from_scan(
-            picking.origin, extra_domain=origin_move_domain
+        origin_moves = search.with_domain(origin_move_domain).origin_move_from_scan(
+            picking.origin
         )
         origin_moves_for_product = origin_moves.filtered(
             lambda m: m.product_id == product
@@ -554,8 +554,8 @@ class Reception(Component):
         origin_move_domain = [
             ("picking_id.picking_type_code", "=", "outgoing"),
         ]
-        origin_moves = search.origin_move_from_scan(
-            picking.origin, extra_domain=origin_move_domain
+        origin_moves = search.with_domain(origin_move_domain).origin_move_from_scan(
+            picking.origin
         )
         origin_moves_for_packaging = origin_moves.filtered(
             lambda m: packaging in m.product_id.packaging_ids
@@ -1035,12 +1035,6 @@ class Reception(Component):
             "origin_move": self._scan_document__by_origin_move,
         }
 
-    def _scan_document__get_find_kw(self):
-        return {
-            "picking": {"use_origin": True},
-            "delivered_picking": {"use_origin": True},
-        }
-
     def scan_document(self, barcode):
         """Scan a picking, a product or a packaging.
 
@@ -1061,12 +1055,9 @@ class Reception(Component):
                         single correspondance. Not tracked product
         """
         handlers_by_type = self._scan_document__get_handlers_by_type()
-        search = self._actions_for("search")
-        find_kw = self._scan_document__get_find_kw()
+        search = self._actions_for("search").with_origin()
         for handler_type, handler in handlers_by_type.items():
-            record = search._find_record_by_type(
-                barcode, handler_type, handler_kw=find_kw
-            )
+            record = search._find_record_by_type(barcode, handler_type)
             if not record:
                 continue
             res = handler(record, barcode)
@@ -1324,11 +1315,10 @@ class Reception(Component):
         self, picking, selected_line, barcode, confirmation=None
     ):
         handlers_by_type = self._set_quantity__get_handlers_by_type()
-        search = self._actions_for("search")
+        search = self._actions_for("search").for_products(selected_line.product_id)
         search_result = search.find(
             barcode,
             handlers_by_type.keys(),
-            handler_kw=dict(lot=dict(products=selected_line.product_id)),
         )
         handler = handlers_by_type.get(search_result.type)
         if handler:
