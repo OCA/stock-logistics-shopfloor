@@ -878,11 +878,9 @@ class ShopfloorSingleProductTransfer(Component):
             "lot": self._scan_product__scan_lot,
         }
         search = self._actions_for("search")
-        search_result = search.find(
-            barcode,
-            types=handlers_by_type.keys(),
-            handler_kw={"lot": {"products": products}},
-        )
+        search_result = search.find(barcode, types=("product", "packaging"))
+        if search_result.type == "none":
+            search_result = search.for_products(products).find(barcode, types=("lot",))
         handler = handlers_by_type.get(search_result.type)
         if handler:
             return handler(
