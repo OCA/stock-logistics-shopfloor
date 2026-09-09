@@ -245,7 +245,7 @@ class TestSetLotConfirm(CommonCase):
         picking.picking_type_id.sudo().use_create_lots = False
 
         selected_move_line = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         selected_move_line.shopfloor_user_id = self.env.uid
 
