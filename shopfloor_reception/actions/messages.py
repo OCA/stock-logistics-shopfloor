@@ -60,3 +60,11 @@ class MessageAction(Component):
                 qty=qty,
             ),
         }
+
+    def lot_product_mismatch(self):
+        return {
+            "message_type": "error",
+            "body": self.env._(
+                "The scanned lot does not match the selected product",
+            ),
+        }
