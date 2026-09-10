@@ -113,11 +113,15 @@ class SearchAction(Component):
         model = self.env["stock.location"]
         if not barcode:
             return model.browse()
+        # Location barcode is unique per company
+        domain = model._check_company_domain(self.env.company)
         # First search location by barcode
-        res = model.search([("barcode", "=", barcode)], limit=limit)
+        res = model.search(domain + [("barcode", "=", barcode)], limit=limit)
         # And only if we have not found through barcode search on the location name
         if len(res) < limit:
-            res |= model.search([("name", "=", barcode)], limit=(limit - len(res)))
+            res |= model.search(
+                domain + [("name", "=", barcode)], limit=(limit - len(res))
+            )
         return res
 
     def package_from_scan(self, barcode):
@@ -152,14 +156,12 @@ class SearchAction(Component):
         model = self.env["product.product"]
         if not barcode:
             return model.browse()
-        return model.search(
-            [
-                "|",
-                ("barcode", "=", barcode),
-                ("default_code", "=", barcode),
-            ],
-            limit=1,
-        )
+        domain = model._check_company_domain(self.env.company) + [
+            "|",
+            ("barcode", "=", barcode),
+            ("default_code", "=", barcode),
+        ]
+        return model.search(domain, limit=1)
 
     def lot_from_scan(self, barcode, products=None, limit=1):
         model = self.env["stock.lot"]
