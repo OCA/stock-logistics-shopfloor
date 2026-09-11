@@ -7,8 +7,6 @@ from odoo import exceptions, fields, models
 from odoo.exceptions import UserError
 from odoo.tools.float_utils import float_compare, float_is_zero
 
-from ..exceptions import CannotProcessMoreThanPlanned
-
 _logger = logging.getLogger(__name__)
 
 
@@ -48,29 +46,9 @@ class StockMoveLine(models.Model):
         :return: the new move line if created else empty recordset
         """
         self.ensure_one()
-        rounding = self.product_uom_id.rounding
-        if float_is_zero(self.qty_picked, precision_rounding=rounding):
+        if not self.picked or not self.has_quantity_reserved:
             return self.browse()
-        compare = float_compare(
-            self.qty_picked, self.quantity, precision_rounding=rounding
-        )
-        qty_lesser = compare == -1
-        qty_greater = compare == 1
-        if qty_greater:
-            raise CannotProcessMoreThanPlanned(
-                "Quantity done cannot exceed quantity to do"
-            )
-        elif qty_lesser:
-            remaining = self.quantity - self.qty_picked
-            new_line = self.copy(
-                {"quantity": remaining, "qty_picked": 0, "picked": False}
-            )
-            # if we didn't bypass reservation update, the quant reservation
-            # would be reduced as much as the deduced quantity, which is wrong
-            # as we only moved the quantity to a new move line
-            self.quantity = self.qty_picked
-            return new_line
-        return self.browse()
+        return self._split_partial_quantity_to_be_picked(self.qty_picked)
 
     def _extract_in_split_order(self, default=None):
         """Have pickings fully reserved with only those move lines.
@@ -137,14 +115,17 @@ class StockMoveLine(models.Model):
             return (new_line, "lesser")
         return (new_line, "full")
 
-    def _split_partial_quantity_to_be_picked(
-        self, quantity_done, split_default_vals=None
-    ):
-        """Create a new move line with the remaining quantity to process."""
+    def _split_partial_quantity_to_be_picked(self, quantity_done, split_default_vals=None):
+        """Create a new move line with the remaining quantity to process
+
+        :return: the new move line if created else empty recordset
+        """
         # split the move line which will be processed later (maybe the user
         # has to pick some goods from another place because the location
         # contained less items than expected)
-        remaining = self.quantity - quantity_done
+        remaining = max(0, self.quantity - quantity_done)
+        if not remaining:
+            return self.browse()
         vals = {"quantity": remaining, "picked": False, "qty_picked": 0}
         if split_default_vals:
             vals.update(split_default_vals)

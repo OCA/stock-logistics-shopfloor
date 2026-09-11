@@ -997,7 +997,7 @@ class Checkout(Component):
     def _put_lines_in_allowed_package(self, picking, lines_to_pack, package):
         for line in lines_to_pack:
             if line.qty_picked < line.quantity:
-                line._split_partial_quantity_to_be_picked(line.qty_picked, {})
+                line._split_partial_quantity_to_be_picked(line.qty_picked)
         lines_to_pack.write(
             {"result_package_id": package.id, "shopfloor_checkout_done": True}
         )
