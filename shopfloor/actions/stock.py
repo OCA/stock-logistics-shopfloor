@@ -3,7 +3,7 @@
 # Copyright 2025 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import fields
-from odoo.tools.float_utils import float_compare, float_round
+from odoo.tools.float_utils import float_round
 
 from odoo.addons.component.core import Component
 
@@ -299,15 +299,6 @@ class StockAction(Component):
         # when no putaway is found, the move line destination stays the
         # default's of the picking type
         return any(line.location_dest_id in base_locations for line in move_lines)
-
-    def move_line_check_qty_picked(self, move_line):
-        rounding = move_line.product_id.uom_id.rounding
-        qty_picked = move_line.qty_picked
-        qty_todo = move_line.quantity
-        # If qty picked is >= qty todo, then there's nothing more to pick
-        if float_compare(qty_picked, qty_todo, precision_rounding=rounding) > 0:
-            return False
-        return True
 
     def _lock_lines(self, lines):
         self._actions_for("lock").for_update(lines)
