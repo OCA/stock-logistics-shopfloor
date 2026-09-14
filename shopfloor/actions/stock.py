@@ -280,10 +280,6 @@ class StockAction(Component):
         # default's of the picking type
         return any(line.location_dest_id in base_locations for line in move_lines)
 
-    def move_line_increment_qty_picked(self, move_line, packaging=False):
-        qty = packaging and packaging.qty or 1
-        move_line.qty_picked += qty
-
     def move_line_check_qty_picked(self, move_line):
         rounding = move_line.product_id.uom_id.rounding
         qty_picked = move_line.qty_picked
@@ -313,3 +309,7 @@ class StockAction(Component):
         if lock_lines:
             self._lock_lines(lines)
         self._set_destination_on_lines(lines, location_dest)
+
+    def set_package_on_lines(self, lines, package):
+        self._lock_lines(lines)
+        lines.result_package_id = package

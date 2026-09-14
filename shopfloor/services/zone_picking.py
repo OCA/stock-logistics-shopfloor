@@ -752,7 +752,7 @@ class ZonePicking(Component):
             )
         elif move_lines:
             move_line = first(move_lines)
-            qty_done = self._get_prefill_qty(move_line, qty=(packaging.qty or 1.0))
+            qty_done = self.get_qty_picked(move_line, packaging)
             response = self._response_for_set_line_destination(
                 move_line, qty_done=qty_done
             )
@@ -806,7 +806,7 @@ class ZonePicking(Component):
                 response = self.list_move_lines()
             else:
                 move_line = first(move_lines)
-                qty_done = self._get_prefill_qty(move_line, qty=1.0)
+                qty_done = self.get_qty_picked(move_line)
                 response = self._response_for_set_line_destination(
                     move_line, qty_done=qty_done
                 )
