@@ -2,6 +2,7 @@
 # Copyright 2022 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 import logging
+import warnings
 
 from odoo import exceptions, fields, models
 from odoo.exceptions import UserError
@@ -91,6 +92,7 @@ class StockMoveLine(models.Model):
                     default=default, backorder=True
                 )
 
+    # MIGRATION NOTE: deprecated method to delete
     def _split_qty_to_be_done(self, qty_done, split_partial=True, **split_default_vals):
         """Check qty to be done for current move line. Split it if needed.
 
@@ -98,6 +100,12 @@ class StockMoveLine(models.Model):
         :param split_partial: split if qty is less than expected
             otherwise rely on a backorder.
         """
+        warnings.warn(
+            "`_split_qty_to_be_done` is deprecated "
+            "and replaced by `_split_partial_quantity_to_be_picked`",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         if self.quantity < 0:
             raise UserError(self.env._("The demand cannot be negative"))
         # store a new line if we have split our line (not enough qty)
@@ -117,7 +125,9 @@ class StockMoveLine(models.Model):
             return (new_line, "lesser")
         return (new_line, "full")
 
-    def _split_partial_quantity_to_be_picked(self, quantity_done, split_default_vals=None):
+    def _split_partial_quantity_to_be_picked(
+        self, quantity_done, split_default_vals=None
+    ):
         """Create a new move line with the remaining quantity to process
 
         :return: the new move line if created else empty recordset
