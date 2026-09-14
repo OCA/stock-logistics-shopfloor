@@ -12,6 +12,7 @@ from odoo.tools import float_compare
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
 from odoo.addons.component.exception import NoComponentError
+from odoo.addons.shopfloor.actions.search import SearchInvalidProduct
 from odoo.addons.shopfloor.utils import to_float
 
 _logger = logging.getLogger("shopfloor.services.single_product_transfer")
@@ -878,11 +879,19 @@ class ShopfloorSingleProductTransfer(Component):
             "lot": self._scan_product__scan_lot,
         }
         search = self._actions_for("search")
-        search_result = search.find(
-            barcode,
-            types=handlers_by_type.keys(),
-            handler_kw={"lot": {"products": products}},
-        )
+        search_result = search.find(barcode, types=["product", "packaging"])
+        if not search_result:
+            try:
+                search_result = search.for_products(products).find(
+                    barcode, types=["lot"]
+                )
+            except SearchInvalidProduct:
+                # A barcode containing both a product and a lot (e.g. GS1)
+                # must match the products stocked in the scanned location
+                message = self.msg_store.barcode_not_found()
+                return self._response_for_select_product(
+                    location=location, package=package, message=message
+                )
         handler = handlers_by_type.get(search_result.type)
         if handler:
             return handler(

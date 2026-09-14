@@ -163,12 +163,6 @@ class StockAction(Component):
                 "result_package_id": False,
             }
         )
-        # Clear the lot per product so we never write ``lot_id`` on a batch of
-        # move lines spanning different products (the stock module forbids it).
-        for lines in move_lines.grouped("product_id").values():
-            lot_lines = lines.filtered("lot_id")
-            if lot_lines:
-                lot_lines.write({"lot_id": False})
         pickings = move_lines.picking_id
         for picking in pickings:
             still_assigned_users = picking.move_line_ids.shopfloor_user_id
@@ -296,3 +290,7 @@ class StockAction(Component):
         if lock_lines:
             self._lock_lines(lines)
         self._set_destination_on_lines(lines, location_dest)
+
+    def set_package_on_lines(self, lines, package):
+        self._lock_lines(lines)
+        lines.result_package_id = package
