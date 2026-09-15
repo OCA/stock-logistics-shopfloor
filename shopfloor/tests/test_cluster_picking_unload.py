@@ -148,7 +148,7 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
         # since the whole batch is complete, we expect the batch and all
         # pickings to be 'done'
         self.assertRecordValues(
-            move_lines.mapped("picking_id"), [{"state": "done"}, {"state": "done"}]
+            move_lines.picking_id, [{"state": "done"}, {"state": "done"}]
         )
         self.assertRecordValues(
             move_lines,
@@ -325,12 +325,83 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
             popup=self.ANY,
         )
 
-    def test_set_destination_all_picking_partial(self):
+    def test_set_destination_all_picking_partial_after_done(self):
+        """Set destination on lines partially processed for one transfer.
+
+        Process a partially available move line.
+        Check a backorder order is created.
+        """
+        self.one_line_picking.do_unreserve()
+        location = self.one_line_picking.location_id
+        move = self.one_line_picking.move_ids
+        product = move.product_id
+        qty = move.product_uom_qty
+        # note: there are 2 move lines => qty * 2
+        self._update_qty_in_location(location, product, qty * 2 - 2)
+        self.one_line_picking.action_assign()
+        self.assertEqual(move.state, "partially_available")
+        # Process all lines
+        move_lines = self.batch.picking_ids.move_line_ids
+        self._set_dest_package_and_done(move_lines, self.bin1)
+        # Finalize
+        move_lines.write({"location_dest_id": self.packing_location.id})
+
+        response = self.service.dispatch(
+            "set_destination_all",
+            params={
+                "picking_batch_id": self.batch.id,
+                "barcode": self.packing_location.barcode,
+            },
+        )
+        self.assert_response(
+            response,
+            next_state="start",
+            message=self.service.msg_store.batch_transfer_complete(),
+            popup=self.ANY,
+        )
+        # since the whole batch is complete, we expect the batch and all
+        # pickings to be 'done'
+        self.assertRecordValues(
+            move_lines.picking_id, [{"state": "done"}, {"state": "done"}]
+        )
+        self.assertRecordValues(
+            move_lines.sorted("qty_picked"),
+            [
+                {
+                    "shopfloor_unloaded": True,
+                    "qty_picked": 8,
+                    "state": "done",
+                    "location_dest_id": self.packing_location.id,
+                },
+                {
+                    "shopfloor_unloaded": True,
+                    "qty_picked": 10,
+                    "state": "done",
+                    "location_dest_id": self.packing_location.id,
+                },
+                {
+                    "shopfloor_unloaded": True,
+                    "qty_picked": 10,
+                    "state": "done",
+                    "location_dest_id": self.packing_location.id,
+                },
+            ],
+        )
+        # There was a backorder order, the initial one line picking contains what
+        # was done
+        self.assertRecordValues(
+            self.one_line_picking, [{"state": "done", "batch_id": self.batch.id}]
+        )
+        backorder = self.one_line_picking.backorder_ids
+        self.assertTrue(backorder)
+        self.assertFalse(backorder.move_line_ids)
+
+    def test_set_destination_all_picking_partial_before_done(self):
         """Set destination on lines partially processed for one transfer.
 
         Process a partially available move line.
         Increase the stock after picking causing a line partially processed.
-        Check a backorder is created.
+        Check a split order is created.
         """
         self.one_line_picking.do_unreserve()
         location = self.one_line_picking.location_id
@@ -362,11 +433,12 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
             response,
             next_state="start",
             message=self.service.msg_store.batch_transfer_complete(),
+            popup=self.ANY,
         )
         # since the whole batch is complete, we expect the batch and all
         # pickings to be 'done'
         self.assertRecordValues(
-            move_lines.mapped("picking_id"), [{"state": "done"}, {"state": "done"}]
+            move_lines.picking_id, [{"state": "done"}, {"state": "done"}]
         )
         self.assertRecordValues(
             move_lines.sorted("qty_picked"),
@@ -401,7 +473,7 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
                 {
                     "shopfloor_unloaded": False,
                     "shopfloor_user_id": False,
-                    "reserved_uom_qty": 2,
+                    "quantity": 2,
                     "qty_picked": 0,
                     "state": "assigned",
                     "location_dest_id": self.packing_location.id,
