@@ -247,6 +247,13 @@ class StockAction(Component):
             picking = picking.with_context(cancel_backorder=not_to_backorder)
             if self._check_backorder(picking, moves_todo):
                 existing_backorders = picking.backorder_ids
+                # If a backorder is created, odoo will remove the picking from
+                # the batch. Why?!? To prevent this, mark all pickings from the
+                # batch as to detach.
+                if batch := picking.batch_id:
+                    picking = picking.with_context(
+                        pickings_to_detach=batch.picking_ids.ids
+                    )
                 picking._action_done()
                 new_backorders = picking.backorder_ids - existing_backorders
                 if new_backorders:
