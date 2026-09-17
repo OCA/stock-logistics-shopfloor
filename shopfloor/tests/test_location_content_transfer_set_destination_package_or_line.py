@@ -549,6 +549,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         # set the backorder policy to 'never'
 
         picking = self._create_picking(lines=[(self.product_a, 10)])
+        picking.is_shopfloor_created = True
         picking.picking_type_id.sudo().create_backorder = "never"
         self._update_qty_in_location(picking.location_id, self.product_a, 20)
         # Reserve quantities
