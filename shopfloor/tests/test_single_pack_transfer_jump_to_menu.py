@@ -144,3 +144,84 @@ class TestSinglePackTransferJumptoMenu(SinglePackTransferCommonBase):
             "states_data": json.dumps({"scan_location": {"zones": [zone_data]}}),
         }
         self.assert_response_jump_to_menu(response, expected_data)
+
+    def test_jump_to_zone_picking_menu(self):
+        picking1 = self._create_picking(
+            picking_type=self.menu2.picking_type_ids,
+            lines=[(self.product_a, 10)],
+        )
+        self._fill_stock_for_moves(
+            picking1.move_ids, in_package=True, location=self.shelf2
+        )
+        picking1.action_assign()
+
+        self.menu.sudo().jump_to_single_pack_transfer_validate_menu_id = self.menu2
+        package_level = self._simulate_started(self.pack_a)
+        response = self.service.dispatch(
+            "validate",
+            params={
+                "package_level_id": package_level.id,
+                "location_barcode": self.shelf2.barcode,
+            },
+        )
+        jump_data = response["data"]["jump_to_menu"]
+        self.assertEqual(jump_data["next_state"], "select_line")
+        states_data = json.loads(jump_data["states_data"])
+        self.assertIn("scan_location", states_data)
+        self.assertIn("select_picking_type", states_data)
+        self.assertIn("select_line", states_data)
+        move_lines = states_data["select_line"]["move_lines"]
+        self.assertTrue(move_lines)
+        self.assertEqual(move_lines[0]["product"]["id"], self.product_a.id)
+
+    def test_jump_to_zone_picking_menu_location_not_in_zone(self):
+        dest_location = (
+            self.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "name": "Non Zone Destination",
+                    "location_id": self.input_location.id,
+                    "barcode": "NON_ZONE_DEST",
+                }
+            )
+        )
+        picking = self._create_picking(
+            picking_type=self.picking_type,
+            lines=[(self.product_a, 1)],
+            location_dest_id=dest_location,
+        )
+        self._fill_stock_for_moves(
+            picking.move_ids, in_package=True, location=self.shelf1
+        )
+        picking.action_assign()
+        package_level = picking.move_line_ids.package_level_id
+        package_level.is_done = True
+
+        self.menu.sudo().jump_to_single_pack_transfer_validate_menu_id = self.menu2
+        response = self.service.dispatch(
+            "validate",
+            params={
+                "package_level_id": package_level.id,
+                "location_barcode": dest_location.barcode,
+            },
+        )
+        jump_data = response["data"]["jump_to_menu"]
+        self.assertEqual(jump_data["next_state"], "scan_location")
+        states_data = json.loads(jump_data["states_data"])
+        self.assertEqual(set(states_data), {"scan_location"})
+
+    def test_jump_to_zone_picking_menu_zone_without_ready_lines(self):
+        self.menu.sudo().jump_to_single_pack_transfer_validate_menu_id = self.menu2
+        package_level = self._simulate_started(self.pack_a)
+        response = self.service.dispatch(
+            "validate",
+            params={
+                "package_level_id": package_level.id,
+                "location_barcode": self.shelf2.barcode,
+            },
+        )
+        jump_data = response["data"]["jump_to_menu"]
+        self.assertEqual(jump_data["next_state"], "scan_location")
+        states_data = json.loads(jump_data["states_data"])
+        self.assertEqual(set(states_data), {"scan_location"})
