@@ -303,12 +303,50 @@ class ZonePicking(Component):
             next_state="unload_set_destination", data=data, message=message
         )
 
-    def _get_data_for_jump_to_menu(self):
+    def _get_data_for_jump_to_menu(self, location=None):
+        """Get all the data to pass to the front end.
+
+        Returns 2 values
+        * the next state the user will be landing on in the frontend
+        * the data for each previous state, the next state included
+
+        """
+        data = {}
         response = self._response_for_start()
-        # The initial_state_key on the front end scenario is `scan_location`
-        response["data"]["scan_location"] = response["data"].pop("start")
-        response["next_state"] = "scan_location"
-        return response
+        # Step 1 - initial_state_key on front end is `scan_location` not `start`
+        data["scan_location"] = response["data"].pop("start")
+        next_state = "scan_location"
+        if not location:
+            return next_state, data
+        # Find the zone related to the location of the user (location parents)
+        zones = self.work.menu.picking_type_ids.mapped(
+            "default_location_src_id.child_ids"
+        )
+        zone_ids = set(zones.ids)
+        ancestor_ids = set(map(int, filter(None, location.parent_path.split("/"))))
+        zone_location_id = zone_ids & ancestor_ids
+        if not zone_location_id:
+            return next_state, data
+        # Step 2 - select the zone location
+        zone_location = self.env["stock.location"].browse(next(iter(zone_location_id)))
+        response = self.scan_location(zone_location.barcode or zone_location.name)
+        self.work.current_zone_location = zone_location
+        if response["next_state"] != "select_picking_type":
+            return next_state, data
+        # Step 3 - select a picking type with lines to process
+        next_state = "select_picking_type"
+        data.update(response["data"])
+        for picking_type in response["data"]["select_picking_type"]["picking_types"]:
+            if picking_type["lines_count"] > 0:
+                self.work.current_picking_type = self.env["stock.picking.type"].browse(
+                    picking_type["id"]
+                )
+                response = self.list_move_lines()
+                if response["next_state"] == "select_line":
+                    next_state = "select_line"
+                    data.update(response["data"])
+                    break
+        return next_state, data
 
     def _data_for_select_picking_type(self, zone_location, picking_types):
         data = {
