@@ -418,7 +418,8 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
         # Increase quantity available
         self._update_qty_in_location(location, product, qty * 2)
         self.one_line_picking.action_assign()
-        self.assertEqual(move.state, "assigned")
+        # Since odoo v17, picked moves are not assigned anymore
+        self.assertEqual(move.state, "partially_available")
         # Finalize
         move_lines.write({"location_dest_id": self.packing_location.id})
 
