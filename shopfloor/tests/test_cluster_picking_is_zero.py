@@ -43,9 +43,17 @@ class ClusterPickingIsZeroCase(ClusterPickingCommonCase):
         # system see the location is empty and reach "zero_check"
         cls._set_dest_package_and_done(cls.line, cls.bin1)
 
+    def source_qty(self, product, location):
+        return sum(
+            self.env["stock.quant"]._gather(product, location).mapped("quantity")
+        )
+
     def test_is_zero_is_empty(self):
         """call /is_zero confirming it's empty"""
-        response = self.service.dispatch(
+        # Source location holds the quantity to move
+        available = self.source_qty(self.line.product_id, self.line.location_id)
+        self.assertEqual(available, 10)
+        self.service.dispatch(
             "is_zero",
             params={
                 "picking_batch_id": self.batch.id,
@@ -53,18 +61,23 @@ class ClusterPickingIsZeroCase(ClusterPickingCommonCase):
                 "zero": True,
             },
         )
-        self.assert_response(
-            response,
-            next_state="start_line",
-            data=self._line_data(self.next_line),
-            message={
-                "message_type": "success",
-                "body": (
-                    f"{self.line.qty_picked} {self.line.product_id.display_name} "
-                    f"put in {self.bin1.name}"
-                ),
+        # the remaining line is picked, then the batch is unloaded and validated
+        self._set_dest_package_and_done(self.next_line, self.bin1)
+        self.service.dispatch(
+            "prepare_unload",
+            params={"picking_batch_id": self.batch.id},
+        )
+        self.service.dispatch(
+            "set_destination_all",
+            params={
+                "picking_batch_id": self.batch.id,
+                "barcode": self.packing_location.barcode,
             },
         )
+        self.assertEqual(self.picking.state, "done")
+        # Check the source location is empty (no negative quants)
+        available = self.source_qty(self.line.product_id, self.line.location_id)
+        self.assertEqual(available, 0)
 
     def test_is_zero_is_not_empty(self):
         """call /is_zero not confirming it's empty"""

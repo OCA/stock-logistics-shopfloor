@@ -122,10 +122,14 @@ class InventoryAction(Component):
                 location, product, package=package, lot=lot
             )
         else:
+            # If the system asked the user to confirm a location is empty
+            # but the line being processed that triggered it is not yet Done.
+            # The inventory must match the quantity of the system.
+            for quant in quants:
+                quant.inventory_quantity = quant.quantity
             quants.write(
                 {
                     "user_id": self.env.user.id,
-                    "inventory_quantity": 0,
                     "inventory_quantity_set": True,
                     "inventory_date": fields.Date.today(),
                 }
