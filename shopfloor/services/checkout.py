@@ -833,28 +833,17 @@ class Checkout(Component):
             message = self.msg_store.record_not_found()
         for move_line in move_lines:
             qty_picked = quantity_func(move_line)
-            if qty_picked < 0:
-                message = {
-                    "body": _("Negative quantity not allowed."),
-                    "message_type": "error",
-                }
-            else:
-                new_line = self.env["stock.move.line"]
-                if qty_picked > 0:
-                    new_line, qty_check = move_line._split_qty_to_be_done(
-                        qty_picked,
-                        split_partial=False,
-                        result_package_id=False,
-                    )
+            # The move line qty is increased before the check so that the user
+            # can figure out how much extra qty. There is a check later in the
+            # process to prevent to validate such extra.
+            if qty_picked >= 0:
                 move_line.qty_picked = qty_picked
-                if new_line:
-                    selected_line_ids.append(new_line.id)
-                if qty_picked > move_line.quantity:
-                    return self._response_for_select_package(
-                        picking,
-                        self.env["stock.move.line"].browse(selected_line_ids).exists(),
-                        message=self.msg_store.line_scanned_qty_picked_higher_than_allowed(),
-                    )
+            if message := self._check_move_line_qty_picked(move_line, qty_picked):
+                return self._response_for_select_package(
+                    picking,
+                    self.env["stock.move.line"].browse(selected_line_ids).exists(),
+                    message=message,
+                )
         return self._response_for_select_package(
             picking,
             self.env["stock.move.line"].browse(selected_line_ids).exists(),
@@ -997,7 +986,7 @@ class Checkout(Component):
     def _put_lines_in_allowed_package(self, picking, lines_to_pack, package):
         for line in lines_to_pack:
             if line.qty_picked < line.quantity:
-                line._split_partial_quantity_to_be_picked(line.qty_picked, {})
+                line._split_partial_quantity_to_be_picked(line.qty_picked)
         lines_to_pack.write(
             {"result_package_id": package.id, "shopfloor_checkout_done": True}
         )
