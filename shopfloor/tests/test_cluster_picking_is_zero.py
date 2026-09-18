@@ -106,3 +106,58 @@ class ClusterPickingIsZeroCase(ClusterPickingCommonCase):
                 "body": f"{self.line.qty_picked} {self.line.product_id.display_name} put in {self.bin1.name}",  # noqa
             },
         )
+
+
+class ClusterPickingIsZeroLotCase(ClusterPickingCommonCase):
+    """Zero check on a location holding the product in a lot"""
+
+    @classmethod
+    def setUpClassBaseData(cls, *args, **kwargs):
+        super().setUpClassBaseData(*args, **kwargs)
+        cls.batch = cls._create_picking_batch(
+            [[cls.BatchProduct(product=cls.product_a, quantity=10)]]
+        )
+        cls.picking = cls.batch.picking_ids
+        cls._simulate_batch_selected(cls.batch, in_lot=True)
+        cls.line = cls.picking.move_line_ids[0]
+        cls.line.location_id = cls.shelf1
+        cls.bin1 = cls.env["stock.quant.package"].create({})
+        cls._update_qty_in_location(
+            cls.line.location_id,
+            cls.line.product_id,
+            cls.line.quantity,
+            lot=cls.line.lot_id,
+        )
+        cls._set_dest_package_and_done(cls.line, cls.bin1)
+
+    def source_qty(self):
+        return sum(
+            self.env["stock.quant"]
+            ._gather(self.line.product_id, self.line.location_id)
+            .mapped("quantity")
+        )
+
+    def test_is_zero_is_empty_with_lot(self):
+        self.assertTrue(self.line.lot_id)
+        self.assertEqual(self.source_qty(), 10)
+        self.service.dispatch(
+            "is_zero",
+            params={
+                "picking_batch_id": self.batch.id,
+                "move_line_id": self.line.id,
+                "zero": True,
+            },
+        )
+        self.service.dispatch(
+            "prepare_unload", params={"picking_batch_id": self.batch.id}
+        )
+        self.service.dispatch(
+            "set_destination_all",
+            params={
+                "picking_batch_id": self.batch.id,
+                "barcode": self.packing_location.barcode,
+            },
+        )
+        self.assertEqual(self.picking.state, "done")
+        # The lot quant must be emptied by the move, not by the zero check
+        self.assertEqual(self.source_qty(), 0)
