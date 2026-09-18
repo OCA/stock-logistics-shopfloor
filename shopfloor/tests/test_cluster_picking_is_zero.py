@@ -1,9 +1,23 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
+from unittest import mock
+
+from ..actions.inventory import InventoryAction
 from .test_cluster_picking_base import ClusterPickingCommonCase
 
 # pylint: disable=missing-return
+
+
+def spy_confirm_empty():
+    """Patch InventoryAction.confirm_empty to record its calls while still
+    running it; use as a context manager, the mock is returned"""
+    return mock.patch.object(
+        InventoryAction,
+        "confirm_empty",
+        autospec=True,
+        side_effect=InventoryAction.confirm_empty,
+    )
 
 
 class ClusterPickingIsZeroCase(ClusterPickingCommonCase):
@@ -53,14 +67,16 @@ class ClusterPickingIsZeroCase(ClusterPickingCommonCase):
         # Source location holds the quantity to move
         available = self.source_qty(self.line.product_id, self.line.location_id)
         self.assertEqual(available, 10)
-        self.service.dispatch(
-            "is_zero",
-            params={
-                "picking_batch_id": self.batch.id,
-                "move_line_id": self.line.id,
-                "zero": True,
-            },
-        )
+        with spy_confirm_empty() as confirm_empty:
+            self.service.dispatch(
+                "is_zero",
+                params={
+                    "picking_batch_id": self.batch.id,
+                    "move_line_id": self.line.id,
+                    "zero": True,
+                },
+            )
+        confirm_empty.assert_called_once()
         # the remaining line is picked, then the batch is unloaded and validated
         self._set_dest_package_and_done(self.next_line, self.bin1)
         self.service.dispatch(
@@ -140,14 +156,17 @@ class ClusterPickingIsZeroLotCase(ClusterPickingCommonCase):
     def test_is_zero_is_empty_with_lot(self):
         self.assertTrue(self.line.lot_id)
         self.assertEqual(self.source_qty(), 10)
-        self.service.dispatch(
-            "is_zero",
-            params={
-                "picking_batch_id": self.batch.id,
-                "move_line_id": self.line.id,
-                "zero": True,
-            },
-        )
+        with spy_confirm_empty() as confirm_empty:
+            self.service.dispatch(
+                "is_zero",
+                params={
+                    "picking_batch_id": self.batch.id,
+                    "move_line_id": self.line.id,
+                    "zero": True,
+                },
+            )
+        confirm_empty.assert_called_once()
+        self.assertEqual(confirm_empty.call_args.kwargs["lot"], self.line.lot_id)
         self.service.dispatch(
             "prepare_unload", params={"picking_batch_id": self.batch.id}
         )
