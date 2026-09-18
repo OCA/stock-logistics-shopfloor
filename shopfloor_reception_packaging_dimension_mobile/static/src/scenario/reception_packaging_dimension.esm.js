@@ -93,6 +93,11 @@ const new_template =
 
             </v-col>
         </v-row>
+        <v-row align="center">
+            <v-col class="text-center" cols="12">
+                <btn-back/>
+            </v-col>
+        </v-row>
     </div>
 </div>
 
