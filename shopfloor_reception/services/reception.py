@@ -1366,7 +1366,7 @@ class Reception(Component):
                 "shopfloor_user_id": False,
                 "expiration_date": False,
             }
-            line._split_qty_to_be_done(quantity, **default_values)
+            line._split_partial_quantity_to_be_picked(quantity, default_values)
 
     def process_with_existing_pack(self, picking_id, selected_line_id, quantity):
         picking = self.env["stock.picking"].browse(picking_id)

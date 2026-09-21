@@ -8,6 +8,7 @@ from odoo.fields import first
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
 
+from ..exceptions import ConcurentWorkOnTransfer
 from ..utils import to_float
 
 # NOTE for the implementation: share several similarities with the "cluster
@@ -263,6 +264,9 @@ class LocationContentTransfer(Component):
             return self._response_for_start(message=self.msg_store.no_work_found())
         move_lines = self._select_move_lines_first_location(move_lines)
         stock = self._actions_for("stock")
+        # allow another operator to process any partially available move
+        # that would have its availability increased
+        move_lines.move_id.split_unavailable_qty()
         stock.mark_move_line_as_picked(move_lines, quantity=0)
         return self._response_for_scan_location(location=move_lines.location_id)
 
@@ -404,7 +408,15 @@ class LocationContentTransfer(Component):
                 message=self.msg_store.no_putaway_destination_available()
             )
 
-        stock.mark_move_line_as_picked(move_lines)
+        try:
+            # allow another operator to process any partially available move
+            # that would have its availability increased
+            move_lines.move_id.split_unavailable_qty()
+            stock.mark_move_line_as_picked(move_lines)
+        except ConcurentWorkOnTransfer:
+            return self._response_for_start(
+                message=self.msg_store.concurrent_work(),
+            )
 
         unreserved_moves._action_assign()
 
@@ -757,14 +769,11 @@ class LocationContentTransfer(Component):
             return self._response_for_scan_destination(
                 location, move_line, confirmation_required=barcode
             )
-        if (
-            quantity > move_line.qty_picked
-            and not self.work.menu.allow_quantity_exceeding_demand
-        ):
+        if message := self._check_move_line_qty_picked(move_line, quantity):
             return self._response_for_scan_destination(
                 location,
                 move_line,
-                message=self.msg_store.unable_to_pick_more(move_line.qty_picked),
+                message=message,
             )
 
         self._lock_lines(move_line)
