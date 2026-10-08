@@ -184,6 +184,26 @@ class TestSetPackDimension(CommonCase):
         self.assertEqual(measured_packaging.packaging_length, 44)
         self.assertEqual(measured_packaging.width, 45)
 
+    def test_select_device__domain(self):
+        picking = self.setup_picking()
+        line = picking.move_line_ids[0]
+        other_wh = self.env["stock.warehouse"].sudo().create(
+            {"name": "Other WH", "code": "OWH"}
+        )
+        self.device.unlink()
+        # Neither a device not ready nor a device from another warehouse
+        # can be used.
+        self._create_device("Not Ready Device", state="not_ready")
+        self._create_device("Other WH Device", warehouse_id=other_wh.id)
+        response = self._dispatch_assign(picking, line, self.packaging1)
+        self._assert_response_set_dimension(
+            response,
+            picking,
+            line,
+            self.packaging1,
+            message=self.msg_store.no_measuring_device_found(),
+        )
+
     def test_select_device__other_device_free(self):
         picking = self.setup_picking()
         line = picking.move_line_ids[0]
