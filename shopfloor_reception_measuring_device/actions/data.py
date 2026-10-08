@@ -9,9 +9,7 @@ class DataAction(Component):
 
     @ensure_model("measuring.device")
     def measuring_device(self, record, **kw):
-        return self._jsonify(
-            record.with_context(device=record.id), self._measuring_device_parser, **kw
-        )
+        return self._jsonify(record, self._measuring_device_parser, **kw)
 
     @property
     def _measuring_device_parser(self):
