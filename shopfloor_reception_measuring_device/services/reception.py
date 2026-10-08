@@ -15,26 +15,41 @@ class Reception(Component):
             ("state", "=", "ready"),
         ]
 
+    def _get_measuring_devices_in_use(self, devices):
+        return (
+            self.env["product.packaging"]
+            .sudo()
+            .search([("measuring_device_id", "in", devices.ids)])
+            .measuring_device_id
+        )
+
     def set_packaging_dimension__measuring_device_assign(
         self, picking_id, selected_line_id, packaging_id
     ):
         picking = self.env["stock.picking"].sudo().browse(picking_id)
         selected_line = self.env["stock.move.line"].sudo().browse(selected_line_id)
         packaging = self.env["product.packaging"].sudo().browse(packaging_id)
-        device_domain = self._get_measuring_device_domain()
-        device = self.env["measuring.device"].search(device_domain, limit=1)
-        msg = ""
         if not packaging:
-            msg = self.msg_store.record_not_found()
-        elif not device:
+            return self._response_for_set_packaging_dimension(
+                picking,
+                selected_line,
+                packaging,
+                message=self.msg_store.record_not_found(),
+            )
+        devices = self.env["measuring.device"].search(
+            self._get_measuring_device_domain()
+        )
+        free_devices = devices - self._get_measuring_devices_in_use(devices)
+        msg = None
+        if not devices:
             msg = self.msg_store.no_measuring_device_found()
-        elif device._is_being_used():
-            msg = self.msg_store.measuring_device_already_in_use(device)
+        elif not free_devices:
+            msg = self.msg_store.measuring_device_already_in_use(devices)
         if msg:
             return self._response_for_set_packaging_dimension(
                 picking, selected_line, packaging, message=msg
             )
-        packaging._measuring_device_assign(device)
+        packaging._measuring_device_assign(free_devices[0])
         return self._response_for_use_measuring_device(
             picking, selected_line, packaging
         )

@@ -80,6 +80,41 @@ class TestSetPackDimension(CommonCase):
             message=message,
         )
 
+    def _assert_response_use_device(self, response, picking, line, packaging):
+        data = {
+            "picking": self.data.picking(picking),
+            "selected_move_line": self.data.move_line(line),
+            "packaging": self.data_detail.packaging_detail(packaging),
+            "measuring_device": self.data.measuring_device(
+                packaging.measuring_device_id
+            ),
+        }
+        self.assert_response(
+            response,
+            next_state="use_measuring_device",
+            data=data,
+        )
+
+    def _create_device(self, name, **kw):
+        vals = {
+            "name": name,
+            "device_type": "testdevice",
+            "state": "ready",
+            "warehouse_id": self.wh.id,
+        }
+        vals.update(kw)
+        return self.device_model.create(vals)
+
+    def _dispatch_assign(self, picking, line, packaging):
+        return self.service.dispatch(
+            "set_packaging_dimension__measuring_device_assign",
+            params={
+                "picking_id": picking.id,
+                "selected_line_id": line.id,
+                "packaging_id": packaging.id,
+            },
+        )
+
     def test_select_device__no_device(self):
         picking = self.setup_picking()
         line = picking.move_line_ids[0]
@@ -134,20 +169,7 @@ class TestSetPackDimension(CommonCase):
                 "packaging_id": self.packaging1.id,
             },
         )
-        packaging = self.packaging1
-        data = {
-            "picking": self.data.picking(picking),
-            "selected_move_line": self.data.move_line(line),
-            "packaging": self.data_detail.packaging_detail(packaging),
-            "measuring_device": self.data.measuring_device(
-                packaging.measuring_device_id
-            ),
-        }
-        self.assert_response(
-            response,
-            next_state="use_measuring_device",
-            data=data,
-        )
+        self._assert_response_use_device(response, picking, line, self.packaging1)
         self.assertEqual(self.packaging1.measuring_device_id, self.device)
         measurements = {
             "weight": 42,
@@ -161,6 +183,16 @@ class TestSetPackDimension(CommonCase):
         self.assertEqual(measured_packaging.height, 43)
         self.assertEqual(measured_packaging.packaging_length, 44)
         self.assertEqual(measured_packaging.width, 45)
+
+    def test_select_device__other_device_free(self):
+        picking = self.setup_picking()
+        line = picking.move_line_ids[0]
+        device2 = self._create_device("Test Device 2")
+        # The first device is busy, the second one must be used
+        self.packaging2._measuring_device_assign(self.device)
+        response = self._dispatch_assign(picking, line, self.packaging1)
+        self._assert_response_use_device(response, picking, line, self.packaging1)
+        self.assertEqual(self.packaging1.measuring_device_id, device2)
 
     def test_release_device__no_device_assigned(self):
         picking = self.setup_picking()
