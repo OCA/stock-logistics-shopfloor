@@ -36,6 +36,12 @@ class Reception(Component):
                 packaging,
                 message=self.msg_store.record_not_found(),
             )
+        if packaging.measuring_device_id:
+            # Already assigned (eg: the user came back to the screen),
+            # keep using the same device.
+            return self._response_for_use_measuring_device(
+                picking, selected_line, packaging
+            )
         devices = self.env["measuring.device"].search(
             self._get_measuring_device_domain()
         )

@@ -194,6 +194,15 @@ class TestSetPackDimension(CommonCase):
         self._assert_response_use_device(response, picking, line, self.packaging1)
         self.assertEqual(self.packaging1.measuring_device_id, device2)
 
+    def test_select_device__already_assigned_to_packaging(self):
+        picking = self.setup_picking()
+        line = picking.move_line_ids[0]
+        # Eg: the user left the measuring screen and comes back
+        self.packaging1._measuring_device_assign(self.device)
+        response = self._dispatch_assign(picking, line, self.packaging1)
+        self._assert_response_use_device(response, picking, line, self.packaging1)
+        self.assertEqual(self.packaging1.measuring_device_id, self.device)
+
     def test_release_device__no_device_assigned(self):
         picking = self.setup_picking()
         line = picking.move_line_ids[0]
