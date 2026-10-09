@@ -22,11 +22,14 @@ const new_template =
         :options="{main: true, key_title: 'name', title_icon: 'mdi-package-variant'}"
     />
 
+    <!-- set-packaging-dimension-before-form -->
+
     <v-card class="pa-2" :color="utils.colors.color_for('screen_step_todo')">
       <v-form ref="form_dimension">
         <v-container>
             <v-row>
                 <v-text-field
+                    :readonly="state.is_form_locked()"
                     label="Barcode"
                     placeholder="Packaging Barcode"
                     v-model="state.data.packaging.barcode"
@@ -34,6 +37,7 @@ const new_template =
             </v-row>
             <v-row>
                 <v-text-field
+                    :readonly="state.is_form_locked()"
                     label="Quantiy"
                     type="number"
                     placeholder="Packaging Quantity"
@@ -42,6 +46,7 @@ const new_template =
             </v-row>
             <v-row>
                 <v-text-field
+                    :readonly="state.is_form_locked()"
                     label="Length"
                     type="number"
                     :suffix="state.data.packaging.length_uom"
@@ -51,6 +56,7 @@ const new_template =
             </v-row>
             <v-row>
                 <v-text-field
+                    :readonly="state.is_form_locked()"
                     label="Width"
                     type="number"
                     :suffix="state.data.packaging.length_uom"
@@ -60,6 +66,7 @@ const new_template =
             </v-row>
             <v-row>
                 <v-text-field
+                    :readonly="state.is_form_locked()"
                     label="Height"
                     type="number"
                     :suffix="state.data.packaging.length_uom"
@@ -69,6 +76,7 @@ const new_template =
             </v-row>
             <v-row>
                 <v-text-field
+                    :readonly="state.is_form_locked()"
                     label="Max Weight"
                     type="number"
                     :suffix="state.data.packaging.weight_uom"
@@ -82,19 +90,21 @@ const new_template =
     </v-card>
 
     <div class="button-list button-vertical-list full">
-        <!-- measuring-device-placeholder -->
-        <v-row align="center">
-            <v-col class="text-center" cols="12">
-                <btn-action @click="state.on_done">Done</btn-action>
-            </v-col>
-        </v-row>
-        <v-row align="center">
-            <v-col class="text-center" cols="12">
+        <!-- set-packaging-dimension-actions -->
+        <template v-if="!state.is_form_locked()">
+            <v-row align="center">
+                <v-col class="text-center" cols="12">
+                    <btn-action @click="state.on_done">Done</btn-action>
+                </v-col>
+            </v-row>
+            <v-row align="center">
+                <v-col class="text-center" cols="12">
 
-                <btn-action color="default" @click="state.on_skip">Skip</btn-action>
+                    <btn-action color="default" @click="state.on_skip">Skip</btn-action>
 
-            </v-col>
-        </v-row>
+                </v-col>
+            </v-row>
+        </template>
     </div>
 </div>
 
@@ -117,6 +127,10 @@ const ReceptionPackageDimension = process_registry.extend("reception", {
             },
             events: {
                 go_back: "on_back",
+            },
+            // Hook: return true to make the form read-only and hide Done/Skip
+            is_form_locked: () => {
+                return false;
             },
             get_payload_set_packaging_dimension: () => {
                 const values = {
