@@ -1,0 +1,17 @@
+{
+  "reception.packaging_dimension.title": "Verpackungsabmessungen erfassen",
+  "reception.packaging_dimension.barcode": "Barcode",
+  "reception.packaging_dimension.barcode_placeholder": "Barcode der Verpackung",
+  "reception.packaging_dimension.qty": "Menge",
+  "reception.packaging_dimension.qty_placeholder": "Menge der Verpackung",
+  "reception.packaging_dimension.length": "Länge",
+  "reception.packaging_dimension.length_placeholder": "Länge der Verpackung",
+  "reception.packaging_dimension.width": "Breite",
+  "reception.packaging_dimension.width_placeholder": "Breite der Verpackung",
+  "reception.packaging_dimension.height": "Höhe",
+  "reception.packaging_dimension.height_placeholder": "Höhe der Verpackung",
+  "reception.packaging_dimension.max_weight": "Max. Gewicht",
+  "reception.packaging_dimension.max_weight_placeholder": "Max. Gewicht der Verpackung",
+  "btn.done.title": "Fertig",
+  "btn.skip.title": "Überspringen"
+}

@@ -75,15 +75,16 @@ class Reception(Component):
     ):
         return self._response(
             next_state="set_packaging_dimension",
-            data={
-                "picking": self.data.picking(picking),
-                "selected_move_line": self.data.move_line(line),
-                "packaging": self._set_packaging_dimension_data_for_packaging(
-                    packaging
-                ),
-            },
+            data=self._data_for_set_packaging_dimension(picking, line, packaging),
             message=message,
         )
+
+    def _data_for_set_packaging_dimension(self, picking, line, packaging):
+        return {
+            "picking": self.data.picking(picking),
+            "selected_move_line": self.data.move_line(line),
+            "packaging": self._set_packaging_dimension_data_for_packaging(packaging),
+        }
 
     def _set_packaging_dimension_data_for_packaging(self, packaging):
         return self.data_detail.packaging_detail(packaging)
