@@ -1,0 +1,8 @@
+{
+  "reception.measuring_device.use": "Messgerät verwenden",
+  "reception.measuring_device.choose": "Messgerät auswählen",
+  "reception.measuring_device.in_use": "(belegt)",
+  "reception.measuring_device.measuring_on": "Messung auf {name}",
+  "reception.measuring_device.instructions": "Legen Sie die Verpackung auf das Gerät und tippen Sie dann auf Aktualisieren, um die Messwerte zu laden.",
+  "reception.measuring_device.refresh": "Aktualisieren"
+}

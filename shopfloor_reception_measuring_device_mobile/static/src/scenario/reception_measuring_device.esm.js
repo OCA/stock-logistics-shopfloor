@@ -20,7 +20,7 @@ const new_template = template
         `
         <v-row align="center" v-if="!state.data.assigned_measuring_device && !state.data.measuring_device_choices">
             <v-col class="text-center" cols="12">
-                <btn-action @click="state.on_use_measuring_device">Use measuring device</btn-action>
+                <btn-action @click="state.on_use_measuring_device">{{ $t('reception.measuring_device.use') }}</btn-action>
             </v-col>
         </v-row>
         <!-- set-packaging-dimension-actions -->
@@ -30,42 +30,42 @@ const new_template = template
         "<!-- set-packaging-dimension-before-form -->",
         `
     <v-card v-if="state.data.measuring_device_choices && !state.data.assigned_measuring_device" class="mt-3 mb-2" outlined>
-        <v-card-title>Choose a measuring device</v-card-title>
+        <v-card-title>{{ $t('reception.measuring_device.choose') }}</v-card-title>
         <v-card-text>
             <div class="button-list button-vertical-list full">
                 <v-row align="center" v-for="device in state.data.measuring_device_choices" :key="device.id">
                     <v-col class="text-center" cols="12">
                         <btn-action :disabled="device.in_use" @click="state.on_use_measuring_device(device)">
-                            {{ device.name }}<span v-if="device.in_use"> (in use)</span>
+                            {{ device.name }}<span v-if="device.in_use"> {{ $t('reception.measuring_device.in_use') }}</span>
                         </btn-action>
                     </v-col>
                 </v-row>
                 <v-row align="center">
                     <v-col class="text-center" cols="12">
-                        <btn-action action="cancel" @click="state.on_refresh_measures">Cancel</btn-action>
+                        <btn-action action="cancel" @click="state.on_refresh_measures">{{ $t('btn.cancel.title') }}</btn-action>
                     </v-col>
                 </v-row>
             </div>
         </v-card-text>
     </v-card>
     <v-card v-if="state.data.assigned_measuring_device" class="mt-3 mb-2" outlined>
-        <v-card-title>Measuring on {{ state.data.assigned_measuring_device.name }}</v-card-title>
+        <v-card-title>{{ $t('reception.measuring_device.measuring_on', {name: state.data.assigned_measuring_device.name}) }}</v-card-title>
         <v-card-text>
-            <p>Put the packaging on the device, then Refresh to load the measures.</p>
+            <p>{{ $t('reception.measuring_device.instructions') }}</p>
             <div class="button-list button-vertical-list full">
                 <v-row align="center">
                     <v-col class="text-center" cols="12">
-                        <btn-action @click="state.on_refresh_measures">Refresh</btn-action>
+                        <btn-action @click="state.on_refresh_measures">{{ $t('reception.measuring_device.refresh') }}</btn-action>
                     </v-col>
                 </v-row>
                 <v-row align="center">
                     <v-col class="text-center" cols="12">
-                        <btn-action action="complete" @click="state.on_confirm_measures">Confirm</btn-action>
+                        <btn-action action="complete" @click="state.on_confirm_measures">{{ $t('btn.confirm.title') }}</btn-action>
                     </v-col>
                 </v-row>
                 <v-row align="center">
                     <v-col class="text-center" cols="12">
-                        <btn-action action="cancel" @click="state.on_release_measuring_device">Cancel</btn-action>
+                        <btn-action action="cancel" @click="state.on_release_measuring_device">{{ $t('btn.cancel.title') }}</btn-action>
                     </v-col>
                 </v-row>
             </div>
