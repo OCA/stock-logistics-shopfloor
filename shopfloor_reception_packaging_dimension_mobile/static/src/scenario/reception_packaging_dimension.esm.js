@@ -30,57 +30,57 @@ const new_template =
             <v-row>
                 <v-text-field
                     :readonly="state.is_form_locked()"
-                    label="Barcode"
-                    placeholder="Packaging Barcode"
+                    :label="$t('reception.packaging_dimension.barcode')"
+                    :placeholder="$t('reception.packaging_dimension.barcode_placeholder')"
                     v-model="state.data.packaging.barcode"
                 ></v-text-field>
             </v-row>
             <v-row>
                 <v-text-field
                     :readonly="state.is_form_locked()"
-                    label="Quantiy"
+                    :label="$t('reception.packaging_dimension.qty')"
                     type="number"
-                    placeholder="Packaging Quantity"
+                    :placeholder="$t('reception.packaging_dimension.qty_placeholder')"
                     v-model="state.data.packaging.qty"
                 ></v-text-field>
             </v-row>
             <v-row>
                 <v-text-field
                     :readonly="state.is_form_locked()"
-                    label="Length"
+                    :label="$t('reception.packaging_dimension.length')"
                     type="number"
                     :suffix="state.data.packaging.length_uom"
-                    placeholder="Packaging Length"
+                    :placeholder="$t('reception.packaging_dimension.length_placeholder')"
                     v-model="state.data.packaging.length"
                 ></v-text-field>
             </v-row>
             <v-row>
                 <v-text-field
                     :readonly="state.is_form_locked()"
-                    label="Width"
+                    :label="$t('reception.packaging_dimension.width')"
                     type="number"
                     :suffix="state.data.packaging.length_uom"
-                    placeholder="Packaging Width"
+                    :placeholder="$t('reception.packaging_dimension.width_placeholder')"
                     v-model="state.data.packaging.width"
                 ></v-text-field>
             </v-row>
             <v-row>
                 <v-text-field
                     :readonly="state.is_form_locked()"
-                    label="Height"
+                    :label="$t('reception.packaging_dimension.height')"
                     type="number"
                     :suffix="state.data.packaging.length_uom"
-                    placeholder="Packaging Height"
+                    :placeholder="$t('reception.packaging_dimension.height_placeholder')"
                     v-model="state.data.packaging.height"
                 ></v-text-field>
             </v-row>
             <v-row>
                 <v-text-field
                     :readonly="state.is_form_locked()"
-                    label="Max Weight"
+                    :label="$t('reception.packaging_dimension.max_weight')"
                     type="number"
                     :suffix="state.data.packaging.weight_uom"
-                    placeholder="Packaging Max Weight"
+                    :placeholder="$t('reception.packaging_dimension.max_weight_placeholder')"
                     v-model="state.data.packaging.max_weight"
                 ></v-text-field>
             </v-row>
@@ -94,13 +94,13 @@ const new_template =
         <template v-if="!state.is_form_locked()">
             <v-row align="center">
                 <v-col class="text-center" cols="12">
-                    <btn-action @click="state.on_done">Done</btn-action>
+                    <btn-action @click="state.on_done">{{ $t('btn.done.title') }}</btn-action>
                 </v-col>
             </v-row>
             <v-row align="center">
                 <v-col class="text-center" cols="12">
 
-                    <btn-action color="default" @click="state.on_skip">Skip</btn-action>
+                    <btn-action color="default" @click="state.on_skip">{{ $t('btn.skip.title') }}</btn-action>
 
                 </v-col>
             </v-row>
@@ -123,7 +123,7 @@ const ReceptionPackageDimension = process_registry.extend("reception", {
         const states = _get_states.bind(this)();
         states.set_packaging_dimension = {
             display_info: {
-                title: "Set packaging dimension",
+                title: this.$t("reception.packaging_dimension.title"),
             },
             events: {
                 go_back: "on_back",
