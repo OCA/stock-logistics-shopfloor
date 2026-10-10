@@ -25,6 +25,46 @@ class CheckoutDoneCase(CheckoutCommonCase):
             data={"restrict_scan_first": False},
         )
 
+    def test_done_too_heavy(self):
+        delivery_product = (
+            self.env["product.product"]
+            .sudo()
+            .create(
+                {
+                    "name": "Test Delivery Product",
+                    "type": "service",
+                }
+            )
+        )
+        carrier = (
+            self.env["delivery.carrier"]
+            .sudo()
+            .create(
+                {
+                    "name": "Test Carrier",
+                    "product_id": delivery_product.id,
+                    "max_weight": 20,
+                }
+            )
+        )
+        self.product_a.write({"weight": 200})
+        picking = self._create_picking(lines=[(self.product_a, 1)])
+        picking.carrier_id = carrier
+        self._fill_stock_for_moves(picking.move_ids, in_package=True)
+        picking.action_assign()
+        picking.move_line_ids.write({"qty_picked": 10, "shopfloor_checkout_done": True})
+        response = self.service.dispatch("done", params={"picking_id": picking.id})
+        self.assert_response(
+            response,
+            next_state="select_document",
+            message={
+                "message_type": "error",
+                "body": f"Transfer {picking.name} weight ({picking.weight:.2f} kg) \
+exceeds the maximum limit of {carrier.max_weight:.2f} kg.",
+            },
+            data={"restrict_scan_first": False},
+        )
+
 
 class CheckoutDonePartialCase(CheckoutCommonCase):
     @classmethod

@@ -113,6 +113,15 @@ class BaseShopfloorProcess(AbstractComponent):
         ):  # the picking must be ready
             return self.msg_store.stock_picking_not_available(fields.first(pickings))
 
+    def _check_picking_weight(self, pickings):
+        """Check if the pickings weight is within allowed limits."""
+        for picking in pickings:
+            if not picking.carrier_id:
+                continue
+            max_weight = picking.carrier_id.max_weight
+            if max_weight and picking.weight > max_weight:
+                return self.msg_store.picking_above_max_weight(picking, max_weight)
+
     def _check_picking_processible(self, pickings, states=("assigned",)):
         """Check if given pickings can be processed"""
         message = self._check_picking_consistency(pickings)
@@ -124,6 +133,10 @@ class BaseShopfloorProcess(AbstractComponent):
         message = self._check_picking_status(pickings, states=states)
         if message:
             return message
+        message = self._check_picking_weight(pickings)
+        if message:
+            return message
+        return None
 
     def _check_move_line_qty_picked(self, move_line, qty_picked):
         rounding = move_line.product_id.uom_id.rounding
