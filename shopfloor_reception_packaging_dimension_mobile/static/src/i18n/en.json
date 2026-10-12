@@ -1,0 +1,17 @@
+{
+  "reception.packaging_dimension.title": "Set packaging dimension",
+  "reception.packaging_dimension.barcode": "Barcode",
+  "reception.packaging_dimension.barcode_placeholder": "Packaging Barcode",
+  "reception.packaging_dimension.qty": "Quantity",
+  "reception.packaging_dimension.qty_placeholder": "Packaging Quantity",
+  "reception.packaging_dimension.length": "Length",
+  "reception.packaging_dimension.length_placeholder": "Packaging Length",
+  "reception.packaging_dimension.width": "Width",
+  "reception.packaging_dimension.width_placeholder": "Packaging Width",
+  "reception.packaging_dimension.height": "Height",
+  "reception.packaging_dimension.height_placeholder": "Packaging Height",
+  "reception.packaging_dimension.max_weight": "Max Weight",
+  "reception.packaging_dimension.max_weight_placeholder": "Packaging Max Weight",
+  "btn.done.title": "Done",
+  "btn.skip.title": "Skip"
+}

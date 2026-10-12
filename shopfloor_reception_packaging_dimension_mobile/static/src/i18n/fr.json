@@ -1,0 +1,17 @@
+{
+  "reception.packaging_dimension.title": "Définir les dimensions de l'emballage",
+  "reception.packaging_dimension.barcode": "Code-barres",
+  "reception.packaging_dimension.barcode_placeholder": "Code-barres de l'emballage",
+  "reception.packaging_dimension.qty": "Quantité",
+  "reception.packaging_dimension.qty_placeholder": "Quantité de l'emballage",
+  "reception.packaging_dimension.length": "Longueur",
+  "reception.packaging_dimension.length_placeholder": "Longueur de l'emballage",
+  "reception.packaging_dimension.width": "Largeur",
+  "reception.packaging_dimension.width_placeholder": "Largeur de l'emballage",
+  "reception.packaging_dimension.height": "Hauteur",
+  "reception.packaging_dimension.height_placeholder": "Hauteur de l'emballage",
+  "reception.packaging_dimension.max_weight": "Poids max.",
+  "reception.packaging_dimension.max_weight_placeholder": "Poids max. de l'emballage",
+  "btn.done.title": "Terminé",
+  "btn.skip.title": "Passer"
+}

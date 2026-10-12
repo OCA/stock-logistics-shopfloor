@@ -13,11 +13,12 @@ class MessageAction(Component):
             "body": self.env._("No measuring device found"),
         }
 
-    def measuring_device_already_in_use(self, device):
+    def measuring_device_already_in_use(self, devices):
         return {
             "message_type": "error",
             "body": self.env._(
-                "Measuring device %(name)s already in use", name=device.name
+                "Measuring device %(name)s already in use",
+                name=", ".join(devices.mapped("name")),
             ),
         }
 

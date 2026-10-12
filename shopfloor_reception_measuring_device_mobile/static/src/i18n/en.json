@@ -1,0 +1,8 @@
+{
+  "reception.measuring_device.use": "Use measuring device",
+  "reception.measuring_device.choose": "Choose a measuring device",
+  "reception.measuring_device.in_use": "(in use)",
+  "reception.measuring_device.measuring_on": "Measuring on {name}",
+  "reception.measuring_device.instructions": "Put the packaging on the device, then Refresh to load the measures.",
+  "reception.measuring_device.refresh": "Refresh"
+}
