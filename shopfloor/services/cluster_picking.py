@@ -1472,7 +1472,6 @@ class ShopfloorClusterPickingValidator(Component):
             "quantity": {
                 "coerce": to_float,
                 "required": True,
-                "nullable": True,
                 "type": "float",
             },
         }
