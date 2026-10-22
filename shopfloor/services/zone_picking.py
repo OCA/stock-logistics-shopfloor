@@ -306,6 +306,9 @@ class ZonePicking(Component):
     def _get_data_for_jump_to_menu(self, location=None):
         """Get all the data to pass to the front end.
 
+        Based on the `location` the user is at, play the first steps of the scenario.
+        So the user is automatically presented to the screen related to is position.
+
         Returns 2 values
         * the next state the user will be landing on in the frontend
         * the data for each previous state, the next state included

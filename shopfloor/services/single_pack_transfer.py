@@ -66,12 +66,7 @@ class SinglePackTransfer(Component):
         response = self._response_for_start()
         next_state = response["next_state"]
         data = response["data"]
-        # Does not make sense in that scenario
-        # if location:
-        #     response = self.start(location.barcode or location.name)
-        #     if response["next_state"] == "scan_location":
-        #         next_state = "scan_location"
-        #         data.update(response["data"])
+        # There is no jump to do based on `location`
         return next_state, data
 
     def _scan_source(self, barcode, confirmation=None):
