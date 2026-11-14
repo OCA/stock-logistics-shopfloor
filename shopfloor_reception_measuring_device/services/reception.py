@@ -115,7 +115,7 @@ class ShopfloorReceptionValidatorResponse(Component):
         return {
             "picking": {"type": "dict", "schema": self.schemas.picking()},
             "selected_move_line": {"type": "dict", "schema": self.schemas.move_line()},
-            "packaging": self._schema_packaging(),
+            "packaging": self._schema_packaging_dimensions(),
             "measuring_device": {
                 "type": "dict",
                 "schema": self.schemas.measuring_device(),

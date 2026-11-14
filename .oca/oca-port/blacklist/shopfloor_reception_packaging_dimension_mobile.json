@@ -1,0 +1,6 @@
+{
+  "pull_requests": {
+    "OCA/wms#1103": "Migration to 16.0 (from 18.0), weight fix ported in OCA/stock-logistics-shopfloor#136",
+    "orphaned_commits": "1ad03b36 README formatting only"
+  }
+}

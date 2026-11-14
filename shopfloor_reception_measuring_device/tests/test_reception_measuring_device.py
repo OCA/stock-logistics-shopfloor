@@ -71,7 +71,7 @@ class TestSetPackDimension(CommonCase):
         data = {
             "picking": self.data.picking(picking),
             "selected_move_line": self.data.move_line(line),
-            "packaging": self.data_detail.packaging_detail(packaging),
+            "packaging": self.data.packaging_dimensions(packaging),
         }
         self.assert_response(
             response,
@@ -138,7 +138,7 @@ class TestSetPackDimension(CommonCase):
         data = {
             "picking": self.data.picking(picking),
             "selected_move_line": self.data.move_line(line),
-            "packaging": self.data_detail.packaging_detail(packaging),
+            "packaging": self.data.packaging_dimensions(packaging),
             "measuring_device": self.data.measuring_device(
                 packaging.measuring_device_id
             ),
